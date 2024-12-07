@@ -124,7 +124,7 @@ late Timer _timer;
           backgroundColor: Colors.transparent, // Allow the gradient to show through
           elevation: 0, // Remove shadow
           selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white70,
+          unselectedItemColor: Color.fromARGB(92, 255, 255, 255),selectedFontSize: 16,selectedIconTheme: IconThemeData(size: 30),
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.science),

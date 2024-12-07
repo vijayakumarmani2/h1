@@ -426,12 +426,15 @@ class _TestPageState extends State<TestPage>
                                 ElevatedButton(
                                   onPressed: _addCard,
                                   child: Text('Add'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Color.fromARGB(161, 54, 165, 244),
+                                  ),
                                 ),
                                 ElevatedButton(
                                   onPressed: _removeLastCard,
                                   child: Text('Remove'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
+                                    backgroundColor: const Color.fromARGB(163, 244, 67, 54),
                                   ),
                                 ),
                               ],
@@ -954,7 +957,7 @@ const FlSpot(115, 0.06),
                                             color: Colors.green, size: 24),
                                         SizedBox(width: 8),
                                         Text(
-                                          'Y=1.073X+0.434',
+                                          'Y=1.000X+0.000',
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,

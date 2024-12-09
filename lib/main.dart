@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hba1c_analyzer_1/screens/result.dart';
 import 'screens/test_page.dart';
 import 'screens/calibration_page.dart';
 import 'screens/qc_page.dart';
@@ -31,6 +33,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = [
     TestPage(),
+    ResultPage(),
     CalibrationPage(),
     QCPage(),
     LogPage(),
@@ -55,6 +58,31 @@ late Timer _timer;
       _updateTime();
     });
   }
+void _showShutdownDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("Confirm Shutdown"),
+        content: Text("Are you sure you want to shut down the application?"),
+        actions: [
+          TextButton(
+            child: Text("No"),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+          ),
+          TextButton(
+            child: Text("Yes"),
+            onPressed: () {
+              exit(0); // Exit the application
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 
   void _updateTime() {
     final now = DateTime.now();
@@ -81,27 +109,40 @@ late Timer _timer;
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Center(
-              child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        _currentDate,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color.fromARGB(192, 54, 54, 54),
-                        ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            _currentDate,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color.fromARGB(192, 54, 54, 54),
+                            ),
+                          ),
+                          Text(
+                            _currentTime,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        _currentTime,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
+                   IconButton(
+              icon: Icon(Icons.power_settings_new), // Icon for the shutdown button
+              onPressed: () {
+                _showShutdownDialog(context); // Show confirmation dialog
+              },
+              color: Colors.red,iconSize: 26, // Color for shutdown icon
+            ),
+                ],
+              ),
             ),
           ),
         ],
@@ -129,6 +170,10 @@ late Timer _timer;
             BottomNavigationBarItem(
               icon: Icon(Icons.science),
               label: 'Test',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart),
+              label: 'Result',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.build),

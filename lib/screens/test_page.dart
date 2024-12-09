@@ -16,7 +16,11 @@ class _TestPageState extends State<TestPage>
   final ScrollController _scrollController =
       ScrollController(); // ScrollController
 
+  bool _isStarted = false; // To track if the action has started
+
   void _addCard() {
+    if (_isStarted) return; // Disable button if action has started
+
     if (cards.length < 10) {
       setState(() {
         cards.add({
@@ -45,6 +49,8 @@ class _TestPageState extends State<TestPage>
   }
 
   void _removeLastCard() {
+    if (_isStarted) return;
+
     if (cards.isNotEmpty) {
       setState(() {
         cards.removeLast();
@@ -78,21 +84,61 @@ class _TestPageState extends State<TestPage>
   }
 
   void startTimer() {
+    if (cards.isEmpty) {
+      // Show error if no cards are added
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please add at least one sample before starting.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    for (var card in cards) {
+      if (card['sampleName'].isEmpty || card['type'] == '-') {
+        // Show error if any card has invalid data
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Ensure all cards have a valid Sample Name and Type.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+    }
+
+    // If all validations pass, start the action
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Action started successfully!'),
+        duration: Duration(seconds: 2),
+      ),
+    );
     setState(() {
       isRunning = true;
       runningTime = 120;
+      _isStarted = true; // Disable Add and Remove buttons
     });
     _animationController.repeat();
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         runningTime--;
+        if (runningTime == 0) {
+          _isStarted = false;
+          timer.cancel(); // Disable Add and Remove buttons
+        }
       });
     });
+    // Perform the intended action here
+    print('Action performed!');
   }
 
   void stopTimer() {
     setState(() {
       isRunning = false;
+      _isStarted = false;
     });
     timer?.cancel();
   }
@@ -100,7 +146,8 @@ class _TestPageState extends State<TestPage>
   TextEditingController _textController = TextEditingController();
   String _text = ''; // To store the current text
 
-  void _showCustomKeyboard(BuildContext context) {
+  void _showCustomKeyboard(BuildContext context, int index) {
+    _textController.text = cards[index]['sampleName']; // Set initial value
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -131,22 +178,22 @@ class _TestPageState extends State<TestPage>
                 child: VirtualKeyboard(
                   type: VirtualKeyboardType.Alphanumeric,
                   postKeyPress: (key) {
-                    // Handle key press and update TextField
+                    // Handle key press and update the specific card's sampleName
                     if (key.keyType == VirtualKeyboardKeyType.String) {
-                      // Append only valid character keys
                       setState(() {
-                        _text += key.text!;
-                        _textController.text = _text;
+                        cards[index]['sampleName'] += key.text!;
+                        _textController.text = cards[index]['sampleName'];
                         _textController.selection = TextSelection.fromPosition(
                             TextPosition(offset: _textController.text.length));
                       });
                     } else if (key.keyType == VirtualKeyboardKeyType.Action &&
                         key.action == VirtualKeyboardKeyAction.Backspace) {
-                      // Handle backspace
                       setState(() {
-                        if (_text.isNotEmpty) {
-                          _text = _text.substring(0, _text.length - 1);
-                          _textController.text = _text;
+                        if (cards[index]['sampleName'].isNotEmpty) {
+                          cards[index]['sampleName'] =
+                              cards[index]['sampleName'].substring(
+                                  0, cards[index]['sampleName'].length - 1);
+                          _textController.text = cards[index]['sampleName'];
                           _textController.selection =
                               TextSelection.fromPosition(TextPosition(
                                   offset: _textController.text.length));
@@ -154,11 +201,8 @@ class _TestPageState extends State<TestPage>
                       });
                     } else if (key.keyType == VirtualKeyboardKeyType.Action &&
                         key.action == VirtualKeyboardKeyAction.Return) {
-                      // Handle the Enter key
-                      setState(() {
-                        _textController.text = _text;
-                      });
-                      Navigator.pop(context); // Close the keyboard
+                      // Close the keyboard
+                      Navigator.pop(context);
                     }
                   },
                 ),
@@ -202,7 +246,7 @@ class _TestPageState extends State<TestPage>
                         border:
                             Border.all(color: Color.fromARGB(0, 91, 87, 87)),
                         borderRadius: BorderRadius.circular(8.0),
-                      ),
+                      ),width: 520,
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
@@ -213,15 +257,14 @@ class _TestPageState extends State<TestPage>
                                   vertical: 8, horizontal: 16),
                               padding: EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 213, 225,
-                                    255), // Light blue header background
+                                color: Color.fromARGB(72, 0, 150, 135), // Light blue header background
                                 borderRadius: BorderRadius.circular(
                                     10), // Rounded corners for the header
                               ),
                               child: Row(
                                 children: [
                                   Expanded(
-                                    flex: 1,
+                                    flex: 2,
                                     child: Text(
                                       'S No',
                                       textAlign: TextAlign.center,
@@ -234,7 +277,7 @@ class _TestPageState extends State<TestPage>
                                     ),
                                   ),
                                   Expanded(
-                                    flex: 3,
+                                    flex: 5,
                                     child: Text(
                                       'Sample Name',
                                       textAlign: TextAlign.center,
@@ -275,7 +318,18 @@ class _TestPageState extends State<TestPage>
                             Divider(thickness: 1.0), // Divider below the header
                             // List of Cards
                             Expanded(
-                              child: ListView.builder(
+                              child:  cards.isEmpty
+      ? Center(
+          child: Text(
+            'Add sample here', // Message when no cards are present
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        )
+      : ListView.builder(
                                 controller:
                                     _scrollController, // Attach ScrollController
                                 itemCount: cards.length,
@@ -333,8 +387,8 @@ class _TestPageState extends State<TestPage>
                                           Expanded(
                                             flex: 4,
                                             child: GestureDetector(
-                                              onTap: () =>
-                                                  _showCustomKeyboard(context),
+                                              onTap: () => _showCustomKeyboard(
+                                                  context, index),
                                               child: Container(
                                                 padding: EdgeInsets.all(12),
                                                 decoration: BoxDecoration(
@@ -347,7 +401,8 @@ class _TestPageState extends State<TestPage>
                                                       BorderRadius.circular(5),
                                                 ),
                                                 child: Text(
-                                                  _text,
+                                                  cards[index][
+                                                      'sampleName'], // Display card-specific sampleName
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     fontSize: 16,
@@ -427,14 +482,16 @@ class _TestPageState extends State<TestPage>
                                   onPressed: _addCard,
                                   child: Text('Add'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color.fromARGB(161, 54, 165, 244),
+                                    backgroundColor:
+                                        Color.fromARGB(161, 54, 165, 244),
                                   ),
                                 ),
                                 ElevatedButton(
                                   onPressed: _removeLastCard,
                                   child: Text('Remove'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color.fromARGB(163, 244, 67, 54),
+                                    backgroundColor:
+                                        const Color.fromARGB(163, 244, 67, 54),
                                   ),
                                 ),
                               ],
@@ -553,7 +610,7 @@ class _TestPageState extends State<TestPage>
                                         direction: Axis.vertical,
                                         backgroundColor: Colors.white,
                                         valueColor: AlwaysStoppedAnimation(
-                                            const Color.fromARGB(
+                                              const Color.fromARGB(
                                                 255, 100, 183, 251)),
                                         borderRadius: 12.0,
                                         center: Text(
@@ -601,8 +658,7 @@ class _TestPageState extends State<TestPage>
                                           value: 0.85,
                                           backgroundColor: Colors.white,
                                           valueColor: AlwaysStoppedAnimation(
-                                              Color.fromARGB(
-                                                  255, 76, 222, 134)),
+                                              Color.fromARGB(255, 144, 234, 180)),
                                           center: Text(
                                             "Column",
                                             style: TextStyle(
@@ -640,8 +696,7 @@ class _TestPageState extends State<TestPage>
                                           value: 0.9,
                                           backgroundColor: Colors.white,
                                           valueColor: AlwaysStoppedAnimation(
-                                              Color.fromARGB(
-                                                  255, 76, 222, 134)),
+                                              Color.fromARGB(255, 144, 234, 180)),
                                           center: Text(
                                             "Filter",
                                             style: TextStyle(
@@ -691,6 +746,7 @@ class _TestPageState extends State<TestPage>
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: LineChart(
+
                         LineChartData(
                           minX: 0,
                           maxX: 130,
@@ -784,36 +840,36 @@ class _TestPageState extends State<TestPage>
                           lineBarsData: [
                             LineChartBarData(
                               spots: [
-                               const FlSpot(5, 0.06),
-const FlSpot(10, 0.67),
-const FlSpot(15, 0.73),
-const FlSpot(20, 0.921),
-const FlSpot(25, 0.07),
-const FlSpot(30, 0.3),
-const FlSpot(35, 0.31),
-const FlSpot(40, 0.006),
-const FlSpot(45, 0.19),
-const FlSpot(50, 0.2),
-const FlSpot(55, 0.05),
-const FlSpot(60, 0.06),
-const FlSpot(65, 0.09),
-const FlSpot(70, 0.1),
-const FlSpot(75, 0.456),
-const FlSpot(80, 0.06),
-const FlSpot(85, 1.75),
-const FlSpot(90, 1.34),
-const FlSpot(95, 0.11),
-const FlSpot(100, 0.96),
-const FlSpot(105, 1.12),
-const FlSpot(110, 0.06),
-const FlSpot(115, 0.06),
-
+                                const FlSpot(5, 0.06),
+                                const FlSpot(10, 0.67),
+                                const FlSpot(15, 0.73),
+                                const FlSpot(20, 0.921),
+                                const FlSpot(25, 0.07),
+                                const FlSpot(30, 0.3),
+                                const FlSpot(35, 0.31),
+                                const FlSpot(40, 0.006),
+                                const FlSpot(45, 0.19),
+                                const FlSpot(50, 0.2),
+                                const FlSpot(55, 0.05),
+                                const FlSpot(60, 0.06),
+                                const FlSpot(65, 0.09),
+                                const FlSpot(70, 0.1),
+                                const FlSpot(75, 0.456),
+                                const FlSpot(80, 0.06),
+                                const FlSpot(85, 1.75),
+                                const FlSpot(90, 1.34),
+                                const FlSpot(95, 0.11),
+                                const FlSpot(100, 0.96),
+                                const FlSpot(105, 1.12),
+                                const FlSpot(110, 0.06),
+                                const FlSpot(115, 0.06),
                               ],
                               isCurved: true,
+
                               gradient: const LinearGradient(
                                 colors: [
-                                  Color(0xFF4A90E2), // Gradient start color
-                                  Color(0xFF007AFF), // Gradient end color
+                                  // Gradient start color
+                                  Colors.teal, Colors.teal,// Gradient end color
                                 ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
@@ -824,10 +880,10 @@ const FlSpot(115, 0.06),
                                 show: true,
                                 gradient: const LinearGradient(
                                   colors: [
-                                    Color.fromARGB(
-                                        91, 34, 77, 132), // Hex code #224c84
+                                     // Hex code #224c84
                                     Color.fromARGB(71, 14, 122,
-                                        61), // Gradient end (faded)
+                                        61),
+                                        Color.fromARGB(63, 34, 77, 132), // Gradient end (faded)
                                   ],
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
@@ -838,9 +894,9 @@ const FlSpot(115, 0.06),
                                 getDotPainter: (spot, percent, barData, index) {
                                   return FlDotCirclePainter(
                                     radius: 4,
-                                    color: Colors.white,
+                                    color:  Color.fromARGB(255, 255, 255, 255),
                                     strokeWidth: 2,
-                                    strokeColor: const Color(0xFF4A90E2),
+                                    strokeColor:  Color.fromARGB(159, 0, 136, 122),
                                   );
                                 },
                               ),
@@ -982,7 +1038,7 @@ const FlSpot(115, 0.06),
                               // Cal Button with Switch
                               Column(
                                 children: [
-                                  const Text('Cal',
+                                  const Text('CAL',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold)),
                                   Switch(
@@ -1041,7 +1097,7 @@ const FlSpot(115, 0.06),
                                                     height: 100,
                                                     decoration: BoxDecoration(
                                                       shape: BoxShape.circle,
-                                                      color: Colors.blue
+                                                      color: Colors.teal
                                                           .withOpacity((1.0 -
                                                                   _animationController
                                                                       .value) *
@@ -1080,7 +1136,7 @@ const FlSpot(115, 0.06),
                                           : ElevatedButton(
                                               onPressed: startTimer,
                                               style: ElevatedButton.styleFrom(
-                                                shape: const CircleBorder(),
+                                                shape: const CircleBorder(),backgroundColor: Colors.teal,
                                                 padding:
                                                     const EdgeInsets.all(20),
                                               ),

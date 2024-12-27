@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ResultPage extends StatefulWidget {
+  final VoidCallback onBackToMenu;
+
+  ResultPage({required this.onBackToMenu});
+
   @override
   _ResultPageState createState() => _ResultPageState();
 }
@@ -88,6 +92,7 @@ class _ResultPageState extends State<ResultPage> {
     _verticalScrollController.dispose();
     super.dispose();
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -229,8 +234,37 @@ class _ResultPageState extends State<ResultPage> {
                 ],
               ),
             ),
+        Container(
+  decoration: BoxDecoration(
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.2), // Shadow color with opacity
+        blurRadius: 10, // Amount of blur
+        offset: Offset(0, 5), // Offset in X and Y direction
+      ),
+    ],
+    shape: BoxShape.circle, // Ensures shadow follows the circular button
+  ),
+  child: FloatingActionButton(
+    onPressed: widget.onBackToMenu,
+    child: Icon(Icons.home, size: 35),
+    backgroundColor: Color(0xFF00706e),
+    elevation: 0, // Disable default elevation to avoid double shadow
+  ),
+)
+
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: widget.onBackToMenu,
+       
+        child: Icon(Icons.home,size: 35,), 
+        backgroundColor: Color(0xFF00706e),
+        elevation: 5,
+       
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
+

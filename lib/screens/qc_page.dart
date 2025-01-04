@@ -11,7 +11,8 @@ class QCPoint {
 }
 
 class QCPage extends StatefulWidget {
-  const QCPage({Key? key}) : super(key: key);
+  const QCPage({Key? key, required this.onBackToMenu}) : super(key: key);
+  final VoidCallback onBackToMenu;
 
   @override
   State<QCPage> createState() => _QCPageState();
@@ -254,7 +255,7 @@ class _QCPageState extends State<QCPage> {
                       mean: mean,
                       sd: sd,
                       cv: cv),
-                  const _OnePointCard(),
+                 
                 ],
               ),
             ),
@@ -346,14 +347,21 @@ class _QCPageState extends State<QCPage> {
                 child: SizedBox(height: 300, child: _buildLineChart()),
               ),
             ),
+
+           
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _addRandomDataPoint,
-        icon: const Icon(Icons.add),
-        label: const Text('Add Data'),
+      floatingActionButton: FloatingActionButton(
+        onPressed: widget.onBackToMenu,
+       
+        child: Icon(Icons.home,size: 35,), 
+        backgroundColor: Color(0xFF00706e),
+        elevation: 5,
+       
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+     
     );
   }
 }
@@ -370,14 +378,21 @@ class _QCDataCard extends StatelessWidget {
     return SizedBox(
       width: 500,
       child: Card(
-        elevation: 2,
+        elevation: 0,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                
                 padding: const EdgeInsets.all(8),
-                child: Text("QC Data")),
+                child:   Text(
+                            'QC Data',
+                            style: TextStyle(
+                              color: Colors.teal,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(

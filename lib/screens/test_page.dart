@@ -25,6 +25,7 @@ class _TestPageState extends State<TestPage>
       ScrollController(); // ScrollController
 
   bool _isStarted = false;
+  var running_status = "";
 
   int _adc_value1 = 1; // To track if the action has started
   int _adc_value2 = 1;
@@ -143,17 +144,13 @@ class _TestPageState extends State<TestPage>
 
   void initializeSerialReader() {
     serialReader = SerialReader('/dev/ttyUSB0');
-
+    // serialReader = SerialReader('COM5');
     if (!serialReader!.init()) {
-      print('Failed to open serial port /dev/ttyUSB0. Please check the connection.');
+      print(
+          'Failed to open serial port /dev/ttyUSB0. Please check the connection.');
       // Show a SnackBar if the maximum limit is reached
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              Text('Failed to open serial port. Please check the connection.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+
+      print('Failed to open serial port. Please check the connection.');
     } else {
       serialReader!.getStream()!.listen((data) {
         // Append received data to the buffer
@@ -177,11 +174,6 @@ class _TestPageState extends State<TestPage>
         }
       }, onError: (error) {
         print('Error reading serial port: $error');
-        SnackBar(
-          content:
-              Text('Error reading serial port: $error'),
-          duration: Duration(seconds: 2),
-        );
       }, onDone: () {
         print('Serial port communication ended unexpectedly.');
       });
@@ -282,6 +274,7 @@ class _TestPageState extends State<TestPage>
     setState(() {
       isRunning = true;
       runningTime = 120;
+      running_status = "Running";
       _isStarted = true; // Disable Add and Remove buttons
     });
     _animationController.repeat();
@@ -295,7 +288,7 @@ class _TestPageState extends State<TestPage>
         addFlSpot(secs.toDouble(), double.parse(_absorbance_value));
         if (runningTime == 0) {
           secs = 0;
-
+          running_status = "Tested";
           _isStarted = false;
           timer.cancel(); // Disable Add and Remove buttons
         }
@@ -309,6 +302,7 @@ class _TestPageState extends State<TestPage>
     setState(() {
       isRunning = false;
       _isStarted = false;
+      running_status = "Tested";
       secs = 0;
       spots = []; // Clear the data points
     });
@@ -430,12 +424,12 @@ class _TestPageState extends State<TestPage>
                                   vertical: 8, horizontal: 16),
                               padding: EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Color.fromARGB(72, 0, 150,
+                                color: Color.fromARGB(255, 0, 150,
                                     135), // Light blue header background
                                 borderRadius: BorderRadius.circular(
                                     10), // Rounded corners for the header
                               ),
-                              child: Row(
+                              child: const Row(
                                 children: [
                                   Expanded(
                                     flex: 2,
@@ -444,9 +438,9 @@ class _TestPageState extends State<TestPage>
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: Color.fromARGB(
-                                            255, 33, 49, 89), // Dark text color
+                                        fontSize: 18,
+                                        color: Color.fromARGB(255, 254, 254,
+                                            254), // Dark text color
                                       ),
                                     ),
                                   ),
@@ -457,8 +451,9 @@ class _TestPageState extends State<TestPage>
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: Color.fromARGB(255, 33, 49, 89),
+                                        fontSize: 18,
+                                        color:
+                                            Color.fromARGB(255, 254, 254, 254),
                                       ),
                                     ),
                                   ),
@@ -469,8 +464,9 @@ class _TestPageState extends State<TestPage>
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: Color.fromARGB(255, 33, 49, 89),
+                                        fontSize: 18,
+                                        color:
+                                            Color.fromARGB(255, 254, 254, 254),
                                       ),
                                     ),
                                   ),
@@ -481,8 +477,9 @@ class _TestPageState extends State<TestPage>
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: Color.fromARGB(255, 33, 49, 89),
+                                        fontSize: 18,
+                                        color:
+                                            Color.fromARGB(255, 254, 254, 254),
                                       ),
                                     ),
                                   ),
@@ -494,12 +491,14 @@ class _TestPageState extends State<TestPage>
                             Expanded(
                               child: cards.isEmpty
                                   ? Center(
-                                      child: Text(
-                                        'Add sample here', // Message when no cards are present
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.grey,
-                                          fontWeight: FontWeight.bold,
+                                      child: Container(
+                                        child: Text(
+                                          'Add sample here', // Message when no cards are present
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
                                     )
@@ -549,7 +548,7 @@ class _TestPageState extends State<TestPage>
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontSize: 16,
+                                                        fontSize: 18,
                                                         color: Color.fromARGB(
                                                             255,
                                                             33,
@@ -590,7 +589,7 @@ class _TestPageState extends State<TestPage>
                                                         textAlign:
                                                             TextAlign.center,
                                                         style: TextStyle(
-                                                          fontSize: 16,
+                                                          fontSize: 18,
                                                           color: Color.fromARGB(
                                                               255, 33, 49, 89),
                                                         ),
@@ -627,7 +626,7 @@ class _TestPageState extends State<TestPage>
                                                         textAlign:
                                                             TextAlign.center,
                                                         style: TextStyle(
-                                                          fontSize: 16,
+                                                          fontSize: 18,
                                                           color: Color.fromARGB(
                                                               255, 33, 49, 89),
                                                         ),
@@ -656,7 +655,7 @@ class _TestPageState extends State<TestPage>
                                                       textAlign:
                                                           TextAlign.center,
                                                       style: TextStyle(
-                                                        fontSize: 16,
+                                                        fontSize: 18,
                                                         color: Color.fromARGB(
                                                             255, 33, 49, 89),
                                                       ),
@@ -671,22 +670,26 @@ class _TestPageState extends State<TestPage>
                                     ),
                             ),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 ElevatedButton(
                                   onPressed: _addCard,
-                                  child: Text('Add'),
+                                  child: Icon(Icons.add,
+                                      color: const Color.fromARGB(
+                                          255, 243, 243, 243),
+                                      size: 24),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Color.fromARGB(161, 54, 165, 244),
+                                    backgroundColor: Color(0xff2196F3),
                                   ),
                                 ),
                                 ElevatedButton(
                                   onPressed: _removeLastCard,
-                                  child: Text('Remove'),
+                                  child: Icon(Icons.remove,
+                                      color: const Color.fromARGB(
+                                          255, 243, 243, 243),
+                                      size: 24),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromARGB(163, 244, 67, 54),
+                                    backgroundColor: const Color(0xffF44336),
                                   ),
                                 ),
                               ],
@@ -743,8 +746,9 @@ class _TestPageState extends State<TestPage>
                                   Text(
                                     "698/800 ml",
                                     style: TextStyle(
-                                      color: Colors.lightBlueAccent,
-                                      fontSize: 12.0,
+                                      color: const Color.fromARGB(
+                                          255, 100, 183, 251),
+                                      fontSize: 14.0,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   )
@@ -783,8 +787,9 @@ class _TestPageState extends State<TestPage>
                                   Text(
                                     "334/400 ml",
                                     style: TextStyle(
-                                      color: Colors.lightBlueAccent,
-                                      fontSize: 12.0,
+                                      color: const Color.fromARGB(
+                                          255, 100, 183, 251),
+                                      fontSize: 14.0,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   )
@@ -804,11 +809,12 @@ class _TestPageState extends State<TestPage>
                                         value: 0.8696,
                                         direction: Axis.vertical,
                                         backgroundColor: Colors.white,
-                                        valueColor: AlwaysStoppedAnimation(
-                                            const Color.fromARGB(
-                                                255, 100, 183, 251)),
+                                        valueColor:
+                                            const AlwaysStoppedAnimation(
+                                                Color.fromARGB(
+                                                    255, 100, 183, 251)),
                                         borderRadius: 12.0,
-                                        center: Text(
+                                        center: const Text(
                                           "L",
                                           style: TextStyle(
                                             color:
@@ -820,11 +826,11 @@ class _TestPageState extends State<TestPage>
                                       ),
                                     ),
                                   ),
-                                  Text(
+                                  const Text(
                                     "2174/2500 ml",
                                     style: TextStyle(
-                                      color: Colors.lightBlueAccent,
-                                      fontSize: 12.0,
+                                      color: Color.fromARGB(255, 100, 183, 251),
+                                      fontSize: 14.0,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   )
@@ -871,7 +877,7 @@ class _TestPageState extends State<TestPage>
                                       "1186/1200 ml",
                                       style: TextStyle(
                                         color: Color.fromARGB(195, 12, 78, 31),
-                                        fontSize: 12.0,
+                                        fontSize: 14.0,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     )
@@ -910,7 +916,7 @@ class _TestPageState extends State<TestPage>
                                       "386/400 ml",
                                       style: TextStyle(
                                         color: Color.fromARGB(195, 12, 78, 31),
-                                        fontSize: 12.0,
+                                        fontSize: 14.0,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     )
@@ -998,7 +1004,7 @@ class _TestPageState extends State<TestPage>
                                     value.toStringAsFixed(0),
                                     style: const TextStyle(
                                       fontSize: 12,
-                                      color: Colors.grey,
+                                      color: Color.fromARGB(255, 1, 86, 75),
                                       fontWeight: FontWeight.bold,
                                     ),
                                   );
@@ -1019,7 +1025,8 @@ class _TestPageState extends State<TestPage>
                             horizontalInterval: 0.2,
                             getDrawingHorizontalLine: (value) {
                               return FlLine(
-                                color: Colors.grey.withOpacity(0.3),
+                                color: Color.fromARGB(255, 6, 138, 121)
+                                    .withOpacity(0.3),
                                 strokeWidth: 1,
                               );
                             },
@@ -1027,7 +1034,8 @@ class _TestPageState extends State<TestPage>
                           borderData: FlBorderData(
                             show: true,
                             border: Border.all(
-                              color: Colors.grey.withOpacity(0.3),
+                              color: Color.fromARGB(255, 6, 138, 121)
+                                  .withOpacity(0.3),
                               width: 1,
                             ),
                           ),
@@ -1112,7 +1120,7 @@ class _TestPageState extends State<TestPage>
                                         Text(
                                           '0 MPa',
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 18,
                                             fontWeight: FontWeight.w600,
                                             color:
                                                 Color.fromARGB(255, 76, 76, 76),
@@ -1130,7 +1138,7 @@ class _TestPageState extends State<TestPage>
                                         Text(
                                           'Dil. Blood',
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 18,
                                             fontWeight: FontWeight.w600,
                                             color:
                                                 Color.fromARGB(255, 76, 76, 76),
@@ -1153,7 +1161,7 @@ class _TestPageState extends State<TestPage>
                                         Text(
                                           '$_temp_val \u00B0C',
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 18,
                                             fontWeight: FontWeight.w600,
                                             color:
                                                 Color.fromARGB(255, 76, 76, 76),
@@ -1171,7 +1179,7 @@ class _TestPageState extends State<TestPage>
                                         Text(
                                           'Y=1.000X+0.000',
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 18,
                                             fontWeight: FontWeight.w600,
                                             color:
                                                 Color.fromARGB(255, 76, 76, 76),
@@ -1298,8 +1306,8 @@ class _TestPageState extends State<TestPage>
                                           ? Column(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                const Text(
-                                                  'Running',
+                                                Text(
+                                                  running_status,
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 18,
@@ -1313,7 +1321,12 @@ class _TestPageState extends State<TestPage>
                                                 ),
                                                 ElevatedButton(
                                                   onPressed: stopTimer,
-                                                  child: const Text('Stop'),
+                                                  child: const Text(
+                                                    'Stop',
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
                                                 ),
                                               ],
                                             )
@@ -1325,7 +1338,12 @@ class _TestPageState extends State<TestPage>
                                                 padding:
                                                     const EdgeInsets.all(20),
                                               ),
-                                              child: const Text('Start'),
+                                              child: const Text(
+                                                'Start',
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                ),
+                                              ),
                                             ),
                                     ],
                                   ),

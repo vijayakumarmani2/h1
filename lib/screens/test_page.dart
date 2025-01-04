@@ -404,7 +404,7 @@ class _TestPageState extends State<TestPage>
               children: [
                 // Sample Table
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
@@ -490,17 +490,19 @@ class _TestPageState extends State<TestPage>
                             // List of Cards
                             Expanded(
                               child: cards.isEmpty
-                                  ? Center(
-                                      child: Container(
+                                  ? Container(
+                                      child: Center(
                                         child: Text(
                                           'Add sample here', // Message when no cards are present
                                           style: TextStyle(
                                             fontSize: 18,
-                                            color: Colors.grey,
+                                            color: Color.fromARGB(255, 0, 112, 110),
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ),
+                                      color: Color.fromARGB(30, 0, 112, 110),
+                                      width: 500,
                                     )
                                   : ListView.builder(
                                       controller:
@@ -528,32 +530,34 @@ class _TestPageState extends State<TestPage>
                                                 // Serial Number
                                                 Expanded(
                                                   flex: 1,
-                                                  child: Container(
-                                                    padding: EdgeInsets.all(
-                                                        12), // Increased padding for better spacing
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Color.fromARGB(
-                                                              60, 18, 44, 138)),
-                                                      color: Color.fromARGB(
-                                                          255, 245, 245, 245),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5), // Rounded corners for inner boxes
-                                                    ),
-                                                    child: Text(
-                                                      '${index + 1}',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 18,
-                                                        color: Color.fromARGB(
-                                                            255,
-                                                            33,
-                                                            49,
-                                                            89), // Darker text color
+                                                  child: ClipPath(
+                                                    clipper: ShapeBorderClipper(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)))),
+                                                    child: Container(
+                                                      padding: EdgeInsets.all(
+                                                          12), // Increased padding for better spacing
+                                                      decoration: const BoxDecoration(
+                                                          border: Border(
+                                                                  bottom: BorderSide(
+                                                                    color: Color.fromARGB(124, 0, 112, 110),
+                                                                    width: 3.0,
+                                                                    style: BorderStyle.solid,
+                                                                  ),
+                                                                ),
+                                                        color: Color.fromARGB(30, 0, 112, 110),
+                                                        // Rounded corners for inner boxes
+                                                      ),
+                                                      child: Text(
+                                                        '${index + 1}',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          fontSize: 18,
+                                                          color: Color.fromARGB(255, 0, 112, 110), // Darker text color
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -566,32 +570,35 @@ class _TestPageState extends State<TestPage>
                                                     onTap: () =>
                                                         _showCustomKeyboard(
                                                             context, index),
-                                                    child: Container(
-                                                      padding:
-                                                          EdgeInsets.all(12),
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                            color:
-                                                                Color.fromARGB(
-                                                                    60,
-                                                                    18,
-                                                                    44,
-                                                                    138)),
-                                                        color: Color.fromARGB(
-                                                            255, 245, 245, 245),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                      ),
-                                                      child: Text(
-                                                        cards[index][
-                                                            'sampleName'], // Display card-specific sampleName
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                          fontSize: 18,
-                                                          color: Color.fromARGB(
-                                                              255, 33, 49, 89),
+                                                    child: ClipPath(
+                                                      clipper: ShapeBorderClipper(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)))),
+                                                      child: Container(
+                                                        padding:
+                                                            EdgeInsets.all(12),
+                                                        decoration: BoxDecoration(
+                                                         border: Border(
+                                                                  bottom: BorderSide(
+                                                                    color: Color.fromARGB(124, 0, 112, 110),
+                                                                    width: 3.0,
+                                                                    style: BorderStyle.solid,
+                                                                  ),
+                                                                ),
+                                                        color: Color.fromARGB(30, 0, 112, 110),
+                                                         
+                                                        ),
+                                                        child: Text(
+                                                          cards[index][
+                                                              'sampleName'], // Display card-specific sampleName
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: Color.fromARGB(255, 0, 112, 110),
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
@@ -604,31 +611,34 @@ class _TestPageState extends State<TestPage>
                                                   child: GestureDetector(
                                                     onTap: () =>
                                                         _toggleType(index),
-                                                    child: Container(
-                                                      padding:
-                                                          EdgeInsets.all(12),
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                            color:
-                                                                Color.fromARGB(
-                                                                    60,
-                                                                    18,
-                                                                    44,
-                                                                    138)),
-                                                        color: Color.fromARGB(
-                                                            255, 245, 245, 245),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                      ),
-                                                      child: Text(
-                                                        card['type'],
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                          fontSize: 18,
-                                                          color: Color.fromARGB(
-                                                              255, 33, 49, 89),
+                                                    child: ClipPath(
+                                                      clipper: ShapeBorderClipper(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)))),
+                                                      child: Container(
+                                                        padding:
+                                                            EdgeInsets.all(12),
+                                                        decoration: BoxDecoration(
+                                                          border: Border(
+                                                                  bottom: BorderSide(
+                                                                    color: Color.fromARGB(124, 0, 112, 110),
+                                                                    width: 3.0,
+                                                                    style: BorderStyle.solid,
+                                                                  ),
+                                                                ),
+                                                        color: Color.fromARGB(30, 0, 112, 110),
+                                                         
+                                                        ),
+                                                        child: Text(
+                                                          card['type'],
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: Color.fromARGB(255, 0, 112, 110),
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
@@ -638,26 +648,33 @@ class _TestPageState extends State<TestPage>
                                                 // Result
                                                 Expanded(
                                                   flex: 3,
-                                                  child: Container(
-                                                    padding: EdgeInsets.all(12),
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Color.fromARGB(
-                                                              60, 18, 44, 138)),
-                                                      color: Color.fromARGB(
-                                                          255, 245, 245, 245),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
-                                                    ),
-                                                    child: Text(
-                                                      card['result'],
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                        fontSize: 18,
-                                                        color: Color.fromARGB(
-                                                            255, 33, 49, 89),
+                                                  child: ClipPath(
+                                                    clipper: ShapeBorderClipper(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)))),
+                                                    child: Container(
+                                                      padding: EdgeInsets.all(12),
+                                                      decoration: BoxDecoration(
+                                                        border: Border(
+                                                                  bottom: BorderSide(
+                                                                    color: Color.fromARGB(124, 0, 112, 110),
+                                                                    width: 3.0,
+                                                                    style: BorderStyle.solid,
+                                                                  ),
+                                                                ),
+                                                        color: Color.fromARGB(30, 0, 112, 110),
+                                                       
+                                                      ),
+                                                      child: Text(
+                                                        card['result'],
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: Color.fromARGB(255, 0, 112, 110),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -669,12 +686,14 @@ class _TestPageState extends State<TestPage>
                                       },
                                     ),
                             ),
+                            Divider(thickness: 1.0),
+                            // Add and Remove Buttons
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 ElevatedButton(
                                   onPressed: _addCard,
-                                  child: Icon(Icons.add,
+                                  child: Icon(Icons.add_circle_rounded,
                                       color: const Color.fromARGB(
                                           255, 243, 243, 243),
                                       size: 24),
@@ -684,7 +703,7 @@ class _TestPageState extends State<TestPage>
                                 ),
                                 ElevatedButton(
                                   onPressed: _removeLastCard,
-                                  child: Icon(Icons.remove,
+                                  child: Icon(Icons.delete,
                                       color: const Color.fromARGB(
                                           255, 243, 243, 243),
                                       size: 24),
@@ -701,16 +720,17 @@ class _TestPageState extends State<TestPage>
                   ),
                 ),
                 const SizedBox(height: 10),
-                // Column and Filter Data
+                // A B L ,Column and Filter Data
                 Expanded(
                   flex: 2,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Column(
+                    child: Row(
                       children: [
                         SizedBox(
                           height: 40,
                         ),
+                        // A B L
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -720,23 +740,22 @@ class _TestPageState extends State<TestPage>
                                   Center(
                                     child: Container(
                                       width: 100,
-                                      height: 75.0,
+                                      height: 90.0,
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 24.0),
+                                          horizontal: 18.0),
                                       child: LiquidLinearProgressIndicator(
                                         value: 0.7,
                                         direction: Axis.vertical,
                                         backgroundColor: Colors.white,
                                         valueColor: AlwaysStoppedAnimation(
-                                            const Color.fromARGB(
-                                                255, 100, 183, 251)),
-                                        borderRadius: 12.0,
+                                            Color.fromARGB(159, 100, 183, 251)),
+                                        borderRadius: 12.0,borderColor: Color.fromARGB(30, 0, 60, 112),borderWidth: 3,
                                         center: Text(
-                                          "A",
+                                          "Eluent\n    A",
                                           style: TextStyle(
                                             color:
                                                 Color.fromARGB(208, 15, 59, 94),
-                                            fontSize: 20.0,
+                                            fontSize: 18.0,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -746,8 +765,7 @@ class _TestPageState extends State<TestPage>
                                   Text(
                                     "698/800 ml",
                                     style: TextStyle(
-                                      color: const Color.fromARGB(
-                                          255, 100, 183, 251),
+                                      color: Color.fromARGB(208, 15, 59, 94),
                                       fontSize: 14.0,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -761,23 +779,22 @@ class _TestPageState extends State<TestPage>
                                   Center(
                                     child: Container(
                                       width: 100,
-                                      height: 75.0,
+                                      height: 90.0,
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 24.0),
+                                          horizontal: 18.0),
                                       child: LiquidLinearProgressIndicator(
                                         value: 0.8,
                                         direction: Axis.vertical,
                                         backgroundColor: Colors.white,
                                         valueColor: AlwaysStoppedAnimation(
-                                            const Color.fromARGB(
-                                                255, 100, 183, 251)),
-                                        borderRadius: 12.0,
+                                            Color.fromARGB(159, 100, 183, 251)),
+                                        borderRadius: 12.0,borderColor: Color.fromARGB(30, 0, 60, 112),borderWidth: 3,
                                         center: Text(
-                                          "B",
+                                          "Eluent\n    B",
                                           style: TextStyle(
                                             color:
                                                 Color.fromARGB(208, 15, 59, 94),
-                                            fontSize: 20.0,
+                                            fontSize: 18.0,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -787,8 +804,7 @@ class _TestPageState extends State<TestPage>
                                   Text(
                                     "334/400 ml",
                                     style: TextStyle(
-                                      color: const Color.fromARGB(
-                                          255, 100, 183, 251),
+                                      color: Color.fromARGB(208, 15, 59, 94),
                                       fontSize: 14.0,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -802,24 +818,23 @@ class _TestPageState extends State<TestPage>
                                   Center(
                                     child: Container(
                                       width: 100,
-                                      height: 75.0,
+                                      height: 90.0,
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 24.0),
+                                          horizontal: 18.0),
                                       child: LiquidLinearProgressIndicator(
                                         value: 0.8696,
                                         direction: Axis.vertical,
                                         backgroundColor: Colors.white,
                                         valueColor:
                                             const AlwaysStoppedAnimation(
-                                                Color.fromARGB(
-                                                    255, 100, 183, 251)),
-                                        borderRadius: 12.0,
+                                                Color.fromARGB(159, 100, 183, 251)),
+                                        borderRadius: 12.0,borderColor: Color.fromARGB(30, 0, 60, 112),borderWidth: 3,
                                         center: const Text(
-                                          "L",
+                                          "H/W",
                                           style: TextStyle(
                                             color:
                                                 Color.fromARGB(208, 15, 59, 94),
-                                            fontSize: 20.0,
+                                            fontSize: 18.0,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -829,7 +844,7 @@ class _TestPageState extends State<TestPage>
                                   const Text(
                                     "2174/2500 ml",
                                     style: TextStyle(
-                                      color: Color.fromARGB(255, 100, 183, 251),
+                                      color: Color.fromARGB(208, 15, 59, 94),
                                       fontSize: 14.0,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -839,18 +854,17 @@ class _TestPageState extends State<TestPage>
                             )
                           ],
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+
+                        // Column and Filter
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Center(
                                 child: Column(
                                   children: [
                                     Center(
                                       child: Container(
-                                        width: 200,
+                                        width: 180,
                                         height: 40.0,
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 24.0),
@@ -859,8 +873,8 @@ class _TestPageState extends State<TestPage>
                                           value: 0.85,
                                           backgroundColor: Colors.white,
                                           valueColor: AlwaysStoppedAnimation(
-                                              Color.fromARGB(
-                                                  255, 144, 234, 180)),
+                                              Color.fromARGB(124, 0, 112, 110)),
+                                        borderRadius: 12.0,borderColor: Color.fromARGB(30, 0, 112, 110),borderWidth: 3,
                                           center: Text(
                                             "Column",
                                             style: TextStyle(
@@ -884,12 +898,15 @@ class _TestPageState extends State<TestPage>
                                   ],
                                 ),
                               ),
+                              SizedBox(
+                                height: 5,
+                              ),
                               Center(
                                 child: Column(
                                   children: [
                                     Center(
                                       child: Container(
-                                        width: 200,
+                                        width: 180,
                                         height: 40.0,
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 24.0),
@@ -898,8 +915,8 @@ class _TestPageState extends State<TestPage>
                                           value: 0.9,
                                           backgroundColor: Colors.white,
                                           valueColor: AlwaysStoppedAnimation(
-                                              Color.fromARGB(
-                                                  255, 144, 234, 180)),
+                                              Color.fromARGB(124, 0, 112, 110)),
+                                        borderRadius: 12.0,borderColor: Color.fromARGB(30, 0, 112, 110),borderWidth: 3,
                                           center: Text(
                                             "Filter",
                                             style: TextStyle(
@@ -963,7 +980,7 @@ class _TestPageState extends State<TestPage>
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                    color: Color.fromARGB(255, 1, 90, 77),
                                   ),
                                 ),
                               ),

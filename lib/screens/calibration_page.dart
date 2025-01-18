@@ -14,19 +14,30 @@ class CalibrationPage extends StatefulWidget {
 
 class _CalibrationPageState extends State<CalibrationPage> {
     final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
+     String? active = null;
+    
   @override
   Future<void> initState() async {
     // TODO: implement initState
     super.initState();
-    String? active = await LinuxWiFiManager.getActiveNetwork();
-    if(active != null){
-      // Update the WiFi status notifier
-      wifiStatusNotifier.value = true;
-    }else{
-      wifiStatusNotifier.value = false;
-    }
+   checkActiveNetwork();
   }
 
+Future<void> checkActiveNetwork() async {
+  try {
+    active = await LinuxWiFiManager.getActiveNetwork();
+    setState(() {
+      // Update the WiFi status notifier based on the active network
+      wifiStatusNotifier.value = active != null;
+    });
+  } catch (e) {
+    setState(() {
+      wifiStatusNotifier.value = false;
+    });
+    // Optionally, handle errors (e.g., show a snackbar or log)
+    print("Error fetching active network: $e");
+  }
+}
 
 
   @override

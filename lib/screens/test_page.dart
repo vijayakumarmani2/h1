@@ -1,8 +1,11 @@
 import 'dart:collection';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:hba1c_analyzer_1/services/DataHandler.dart';
 import 'package:hba1c_analyzer_1/services/serial_port_service.dart';
+import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
 import 'dart:async';
 import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:virtual_keyboard_multi_language/virtual_keyboard_multi_language.dart';
@@ -88,6 +91,7 @@ class _TestPageState extends State<TestPage>
       });
     } else {
       // Show a SnackBar if the maximum limit is reached
+      logEvent('warning', 'Samples should be empty to add calibrators.', page: 'test_page');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Samples should be empty'),
@@ -135,23 +139,30 @@ class _TestPageState extends State<TestPage>
   @override
   void initState() {
     super.initState();
+     logEvent('info', 'TestPage initialized.', page: 'test_page');
     initializeSerialReader();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3), // Duration of the ripple animation
     )..repeat(); // Repeat the ripple animation
   }
-
+void logEvent(String type, String message,  {required String page}) async {
+    await DatabaseHelper.instance.logEvent(type, message, page: page);
+    print("$type: $message");
+  }
   void initializeSerialReader() {
+    logEvent('info', 'Serial reader initialization started.', page: 'test_page');
     serialReader = SerialReader('/dev/ttyUSB0');
     // serialReader = SerialReader('COM5');
     if (!serialReader!.init()) {
       print(
           'Failed to open serial port /dev/ttyUSB0. Please check the connection.');
       // Show a SnackBar if the maximum limit is reached
+      logEvent('error', 'Failed to open serial port /dev/ttyUSB0. Please check the connection.', page: 'test_page');
 
       print('Failed to open serial port. Please check the connection.');
     } else {
+       logEvent('info', 'Serial reader initialized successfully.', page: 'test_page');
       serialReader!.getStream()!.listen((data) {
         // Append received data to the buffer
         buffer += String.fromCharCodes(data);
@@ -174,32 +185,175 @@ class _TestPageState extends State<TestPage>
         }
       }, onError: (error) {
         print('Error reading serial port: $error');
+        logEvent('error', 'Error reading serial port: $error', page: 'test_page');
       }, onDone: () {
         print('Serial port communication ended unexpectedly.');
+        logEvent('warning', 'Serial port communication ended unexpectedly.', page: 'test_page');
       });
     }
   }
 
-  void processData(String data) {
-    if (isTemperatureData(data)) {
-      log.add('Temperature data: $data');
-      _temp_val = data;
-      print('Temperature data processed: $_temp_val');
-    } else if (isAbsorbanceData1(data)) {
-      log.add('Absorbance1 data: $data');
+void sendSampleCountToHardware(int sampleCount) {
+  if (serialReader != null) {
+    final message = "SAMPLES:$sampleCount\n"; // Example message format
+    serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
+    print("Sent to hardware: $message");
+  }
+}
 
-      _adc_value1 = int.parse(data.substring(1, data.length));
+ // Save samples and get their IDs
+  List<int> sampleIds = [];
+void startProcess() async {
+   if (cards.isEmpty) {
+      // Show error if no cards are added
+      logEvent('error', 'No samples added. Cannot start process.', page: 'test_page');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please add at least one sample before starting.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
 
-      print('Absorbance1 data processed: $data');
-    } else if (isAbsorbanceData2(data)) {
-      log.add('Absorbance2 data: $data');
-      _adc_value2 = int.parse(data.substring(1, data.length));
-      print('Absorbance2 data processed: $data');
+    for (var card in cards) {
+      if (card['sampleName'].isEmpty || card['type'] == '-') {
+        // Show error if any card has invalid data
+        logEvent('error', 'Invalid sample data found.', page: 'test_page');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Ensure all cards have a valid Sample Name and Type.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+    }
+
+    // If all validations pass, start the action
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Action started successfully!'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+ 
+  // for (var card in cards) {
+  //   int sampleId = await DatabaseHelper.instance.insertSample({
+  //     'sampleName': card['sampleName'],
+  //     'type': card['type'],
+  //     'result': card['result'],
+  //   });
+  //   sampleIds.add(sampleId);
+  // }
+
+  // Send sample count to hardware
+  sendSampleCountToHardware(2);
+
+  // Wait for "Started 1" signal from hardware
+  logEvent('info', 'Process started with ${cards.length} samples.', page: 'test_page');
+  setState(() {
+    running_status = "Waiting";
+    isRunning = true;
+  });
+}
+
+ void processData(String data) {
+   logEvent('info', 'Data received: $data', page: 'test_page');
+   if (data.startsWith("Started")) {
+    // Extract the sample number from the signal
+    final sampleNumber = int.tryParse(data.split(" ")[1]);
+    if (sampleNumber != null) {
+      logEvent('info', 'Sample $sampleNumber started processing. $sampleIds[$sampleNumber - 1]', page: 'test_page');
+      startSampleReading(sampleNumber);
+    }else{
+      logEvent('error', 'Failed to parse sample number from: $data', page: 'test_page');
+    }
+  } else if (data.startsWith("Ended")) {
+    final sampleNumber = int.tryParse(data.split(" ")[1]);
+    if (sampleNumber != null) {
+      print("Hardware ended processing Sample $sampleNumber.");
+      logEvent('info', 'Sample $sampleNumber completed.$sampleIds[$sampleNumber - 1]', page: 'test_page');
+      completeSampleProcessing(sampleNumber);
+    }else {
+        logEvent('error', 'Failed to parse sample number from: $data', page: 'test_page');
+      }
+  } else if (isTemperatureData(data)) {
+    logEvent('info', 'Temperature data: $data', page: 'test_page');
+    log.add('Temperature data: $data');
+    _temp_val = data;
+  } else if (isAbsorbanceData1(data)) {
+    _adc_value1 = int.parse(data.substring(1, data.length));
+  } else if (isAbsorbanceData2(data)) {
+    _adc_value2 = int.parse(data.substring(1, data.length));
+  }else {
+      logEvent('warning', 'Unknown data format: $data', page: 'test_page');
+    }
+}
+
+
+void startSampleReading(int sampleNumber) {
+  logEvent('info', 'Starting sample reading for Sample $sampleNumber. $sampleIds[$sampleNumber - 1]', page: 'test_page');
+  setState(() {
+    running_status = "Running Sample $sampleNumber";
+    isRunning = true;
+    runningTime = 120;
+    secs = 0;
+    spots = [];
+  });
+
+  _animationController.repeat();
+
+  timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    setState(() {
+      runningTime--;
+      _absorbance_value =
+          calculateAbsorbance(_adc_value2, _adc_value1).toStringAsFixed(4);
+      secs++;
+      addFlSpot(secs.toDouble(), double.parse(_absorbance_value));
+
+      // Save absorbance value to the database
+      // DatabaseHelper.instance.insertAbsorbance({
+      //   'sample_id': sampleIds[sampleNumber - 1], // Map to correct sample ID
+      //   'time': secs,
+      //   'absorbance_value': _absorbance_value,
+      // });
+
+      if (runningTime == 0) {
+        setState(() {
+          running_status = "Sample $sampleNumber Completed";
+          logEvent('info', 'Sample $sampleNumber processing completed.$sampleIds[$sampleNumber - 1]', page: 'test_page');
+        });
+        timer.cancel();
+      }
+    });
+  });
+}
+int currentSampleIndex = 0;
+
+
+void completeSampleProcessing(int sampleNumber) {
+    logEvent('info', 'Sample $sampleNumber processing completed. $sampleIds[$sampleNumber - 1]', page: 'test_page');
+
+    setState(() {
+      running_status = "Sample $sampleNumber Completed";
+    });
+
+    if (sampleNumber < sampleIds.length) {
+      logEvent('info', 'Waiting for next sample to process.', page: 'test_page');
+      setState(() {
+        running_status = "Waiting for Next Sample";
+      });
     } else {
-      log.add('Unknown data format: $data');
-      print('Unknown data format received: $data');
+      logEvent('info', 'All samples processed successfully.', page: 'test_page');
+      setState(() {
+        running_status = "All samples processed.";
+      });
     }
   }
+
 
   double calculateAbsorbance(int intensity, int referenceIntensity) {
     if (intensity <= 0 || referenceIntensity <= 0) {
@@ -238,65 +392,7 @@ class _TestPageState extends State<TestPage>
     super.dispose();
   }
 
-  void startTimer() {
-    if (cards.isEmpty) {
-      // Show error if no cards are added
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please add at least one sample before starting.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-
-    for (var card in cards) {
-      if (card['sampleName'].isEmpty || card['type'] == '-') {
-        // Show error if any card has invalid data
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                Text('Ensure all cards have a valid Sample Name and Type.'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-        return;
-      }
-    }
-
-    // If all validations pass, start the action
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Action started successfully!'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-    setState(() {
-      isRunning = true;
-      runningTime = 120;
-      running_status = "Running";
-      _isStarted = true; // Disable Add and Remove buttons
-    });
-    _animationController.repeat();
-    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        runningTime--;
-        _absorbance_value =
-            calculateAbsorbance(_adc_value2, _adc_value1).toStringAsFixed(4);
-        secs++;
-        print('_absorbance_value : $secs - $_absorbance_value');
-        addFlSpot(secs.toDouble(), double.parse(_absorbance_value));
-        if (runningTime == 0) {
-          secs = 0;
-          running_status = "Tested";
-          _isStarted = false;
-          timer.cancel(); // Disable Add and Remove buttons
-        }
-      });
-    });
-    // Perform the intended action here
-    print('Action performed!');
-  }
+  
 
   void stopTimer() {
     setState(() {
@@ -689,27 +785,76 @@ class _TestPageState extends State<TestPage>
                             Divider(thickness: 1.0),
                             // Add and Remove Buttons
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                ElevatedButton(
-                                  onPressed: _addCard,
-                                  child: Icon(Icons.add_circle_rounded,
-                                      color: const Color.fromARGB(
-                                          255, 243, 243, 243),
-                                      size: 24),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xff2196F3),
+                                Row(
+                                  children: [
+                                     // Cal Button with Switch
+                                  Row(
+                                    children: [
+                                      const Text('CAL.',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 112, 110))),
+                                      Switch(
+                                        value: isCalSwitched,activeColor: Color.fromARGB(255, 0, 112, 110),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            isCalSwitched = value;
+                                            if (isCalSwitched) {
+                                              _addCals();
+                                            } else {
+                                              _removeAll();
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ],
                                   ),
+                                  // QC Button with Switch
+                                  Row(
+                                    children: [
+                                      const Text('QC',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 112, 110))),
+                                      Switch(
+                                        value: isQcSwitched, activeColor: Color.fromARGB(255, 0, 112, 110),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            isQcSwitched = value;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  
+                                   
+                                  ],
                                 ),
-                                ElevatedButton(
-                                  onPressed: _removeLastCard,
-                                  child: Icon(Icons.delete,
-                                      color: const Color.fromARGB(
-                                          255, 243, 243, 243),
-                                      size: 24),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xffF44336),
-                                  ),
+                               Row(
+                                  children: [
+                                  
+                                  
+                                    ElevatedButton(
+                                      onPressed: _addCard,
+                                      child: Icon(Icons.add_circle_rounded,
+                                          color: const Color.fromARGB(
+                                              255, 243, 243, 243),
+                                          size: 24),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Color(0xff2196F3),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: _removeLastCard,
+                                      child: Icon(Icons.delete,
+                                          color: const Color.fromARGB(
+                                              255, 243, 243, 243),
+                                          size: 24),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xffF44336),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -962,7 +1107,7 @@ class _TestPageState extends State<TestPage>
                       padding: EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         border: Border.all(
-                            color: const Color.fromARGB(0, 158, 158, 158)),
+                            color: Color.fromARGB(0, 0, 112, 110)),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: LineChart(
@@ -974,7 +1119,7 @@ class _TestPageState extends State<TestPage>
                           titlesData: FlTitlesData(
                             leftTitles: AxisTitles(
                               axisNameWidget: Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
+                                padding: const EdgeInsets.only(bottom: 1.0),
                                 child: Text(
                                   "Abs. Value",
                                   style: TextStyle(
@@ -990,10 +1135,10 @@ class _TestPageState extends State<TestPage>
                                 interval: 0.2,
                                 getTitlesWidget: (value, meta) {
                                   return Text(
-                                    value.toStringAsFixed(1),
+                                    value.toStringAsFixed(1),textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 12,
-                                      color: Colors.grey,
+                                      color: Color.fromARGB(255, 0, 112, 110),
                                       fontWeight: FontWeight.bold,
                                     ),
                                   );
@@ -1008,7 +1153,7 @@ class _TestPageState extends State<TestPage>
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                    color: Color.fromARGB(255, 0, 78, 76),
                                   ),
                                 ),
                               ),
@@ -1018,10 +1163,10 @@ class _TestPageState extends State<TestPage>
                                 interval: 20,
                                 getTitlesWidget: (value, meta) {
                                   return Text(
-                                    value.toStringAsFixed(0),
+                                    value.toStringAsFixed(0),textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 12,
-                                      color: Color.fromARGB(255, 1, 86, 75),
+                                      color: Color.fromARGB(255, 0, 112, 110),
                                       fontWeight: FontWeight.bold,
                                     ),
                                   );
@@ -1056,8 +1201,7 @@ class _TestPageState extends State<TestPage>
                               width: 1,
                             ),
                           ),
-                          backgroundColor: const Color(
-                              0xFFF5F5F5), // Background color for the chart
+                          backgroundColor: const Color.fromARGB(30, 0, 112, 110), // Background color for the chart
                           lineBarsData: [
                             LineChartBarData(
                               spots: spots,
@@ -1109,9 +1253,9 @@ class _TestPageState extends State<TestPage>
                 Expanded(
                   flex: 1,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.only(top: 0),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
@@ -1239,44 +1383,7 @@ class _TestPageState extends State<TestPage>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              // Cal Button with Switch
-                              Column(
-                                children: [
-                                  const Text('CAL',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  Switch(
-                                    value: isCalSwitched,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        isCalSwitched = value;
-                                        if (isCalSwitched) {
-                                          _addCals();
-                                        } else {
-                                          _removeAll();
-                                        }
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                              // QC Button with Switch
-                              Column(
-                                children: [
-                                  const Text('QC',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  Switch(
-                                    value: isQcSwitched,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        isQcSwitched = value;
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                              // Ripple Animation and Timer
+                             // Ripple Animation and Timer
                               Center(
                                 child: SizedBox(
                                   width: 200,
@@ -1348,7 +1455,7 @@ class _TestPageState extends State<TestPage>
                                               ],
                                             )
                                           : ElevatedButton(
-                                              onPressed: startTimer,
+                                              onPressed: startProcess,
                                               style: ElevatedButton.styleFrom(
                                                 shape: const CircleBorder(),
                                                 backgroundColor: Colors.teal,
@@ -1358,7 +1465,7 @@ class _TestPageState extends State<TestPage>
                                               child: const Text(
                                                 'Start',
                                                 style: const TextStyle(
-                                                  fontSize: 16,
+                                                  fontSize: 20,
                                                 ),
                                               ),
                                             ),
@@ -1378,75 +1485,21 @@ class _TestPageState extends State<TestPage>
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: widget.onBackToMenu,
-        child: Icon(
-          Icons.home,
-          size: 35,
-        ),
-        backgroundColor: Color(0xFF00706e),
-        elevation: 5,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: widget.onBackToMenu,
+      //   child: Icon(
+      //     Icons.home,
+      //     size: 35,
+      //   ),
+      //   backgroundColor: Color(0xFF00706e),
+      //   elevation: 5,
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu),
     );
   }
 
-  Path _buildHeartPath() {
-    double scale = 0.909; // Scaling factor to fit 100x100
-    return Path()
-      ..moveTo(55 * scale, 15 * scale)
-      ..cubicTo(55 * scale, 12 * scale, 50 * scale, 0, 30 * scale, 0)
-      ..cubicTo(0, 0, 0, 37.5 * scale, 0, 37.5 * scale)
-      ..cubicTo(0, 55 * scale, 20 * scale, 77 * scale, 55 * scale, 95 * scale)
-      ..cubicTo(90 * scale, 77 * scale, 110 * scale, 55 * scale, 110 * scale,
-          37.5 * scale)
-      ..cubicTo(110 * scale, 37.5 * scale, 110 * scale, 0, 80 * scale, 0)
-      ..cubicTo(65 * scale, 0, 55 * scale, 12 * scale, 55 * scale, 15 * scale)
-      ..close();
-  }
 
-  Path _buildBottlePath() {
-    return Path()
-      // Handle
-      ..moveTo(45, 10) // Start of the handle
-      ..lineTo(55, 5) // Top-left of the handle
-      ..arcToPoint(
-        Offset(75, 5), // Top-right of the handle
-        radius: Radius.circular(15),
-        clockwise: false,
-      )
-      ..lineTo(85, 10) // End of the handle
-
-      // Cap
-      ..lineTo(75, 20) // Right side of the cap
-      ..lineTo(45, 20) // Left side of the cap
-      ..close()
-
-      // Body
-      ..moveTo(30, 20) // Left of the bottle body
-      ..lineTo(30, 70) // Bottom-left of the bottle
-      ..arcToPoint(
-        Offset(70, 70), // Bottom-right curve of the bottle
-        radius: Radius.circular(20),
-        clockwise: false,
-      )
-      ..lineTo(70, 20) // Top-right of the bottle
-      ..arcToPoint(
-        Offset(30, 20), // Top-left curve
-        radius: Radius.circular(20),
-        clockwise: false,
-      )
-      ..close()
-
-      // Base
-      ..moveTo(30, 70) // Left bottom of the bottle
-      ..arcToPoint(
-        Offset(70, 70), // Right bottom curve
-        radius: Radius.circular(15),
-        clockwise: true,
-      )
-      ..close();
-  }
 
   Widget buildStatusCard(
     String title,

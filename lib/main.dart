@@ -11,8 +11,14 @@ import 'screens/qc_page.dart';
 import 'screens/log_page.dart';
 import 'screens/system_page.dart';
 import 'screens/result.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void main() {
+
+ void main() {
+   // Initialize FFI for desktop platforms
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+
   runApp(MyApp()); // Start the Flutter application
 }
 
@@ -82,7 +88,7 @@ class _MainScreenState extends State<MainScreen> {
         'page': CalibrationPage(onBackToMenu: _goToMenu) // Calibration Page
       },
       {'icon': Icons.check_circle, 'label': 'QC', 'page': QCPage(onBackToMenu: _goToMenu)}, // QC Page
-      {'icon': Icons.book, 'label': 'Log', 'page': LogPage()}, // Log Page
+      {'icon': Icons.book, 'label': 'Log', 'page': LogPage(onBackToMenu: _goToMenu)}, // Log Page
       {
         'icon': Icons.settings,
         'label': 'System',

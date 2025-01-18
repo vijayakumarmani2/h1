@@ -1,0 +1,190 @@
+
+import 'package:flutter/material.dart';
+class CurvedBottomNavigationBar extends StatefulWidget {
+  final VoidCallback onBackToMenu;
+
+  CurvedBottomNavigationBar({required this.onBackToMenu});
+
+  @override
+  _CurvedBottomNavigationBarState createState() =>
+      _CurvedBottomNavigationBarState();
+}
+    
+  
+  
+
+
+
+class _CurvedBottomNavigationBarState extends State<CurvedBottomNavigationBar> {
+  bool isWiFiEnabled = false; // WiFi state
+  bool isCableConnected = false; // Cable state
+  bool isBluetoothEnabled = false; // Bluetooth state
+
+  // Toggle WiFi state
+  void toggleWiFi() {
+    setState(() {
+      isWiFiEnabled = !isWiFiEnabled;
+    });
+    print("WiFi ${isWiFiEnabled ? "Enabled" : "Disabled"}");
+  }
+
+  // Toggle Cable state
+  void toggleCable() {
+    setState(() {
+      isCableConnected = !isCableConnected;
+    });
+    print("Cable ${isCableConnected ? "Connected" : "Disconnected"}");
+  }
+
+  // Toggle Bluetooth state
+  void toggleBluetooth() {
+    setState(() {
+      isBluetoothEnabled = !isBluetoothEnabled;
+    });
+    print("Bluetooth ${isBluetoothEnabled ? "Enabled" : "Disabled"}");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.bottomCenter,
+      children: [
+        ClipPath(
+          clipper: SoftEdgeCurveClipper(),
+          child: Container(
+            height: 50,
+            width: 500,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Color.fromARGB(110, 2, 101, 80),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                // WiFi Icon
+                IconButton(
+                  icon: Icon(
+                    isWiFiEnabled ? Icons.wifi : Icons.wifi_off,
+                    color: Colors.white,
+                  ),
+                  onPressed: toggleWiFi,
+                ),
+                // Print Icon (Placeholder)
+                Icon(
+                  Icons.print_disabled,
+                  color: Colors.white,
+                ),
+                SizedBox(width: 50), // Spacer
+                // Cable Icon with Green/Red Dot
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.cable,
+                        color: Colors.white,
+                      ),
+                      onPressed: toggleCable,
+                    ),
+                    Positioned(
+                      bottom: 10,
+                      right: 10,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: isCableConnected ? Colors.green : Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // Bluetooth Icon
+                IconButton(
+                  icon: Icon(
+                    isBluetoothEnabled
+                        ? Icons.bluetooth
+                        : Icons.bluetooth_disabled,
+                    color: Colors.white,
+                  ),
+                  onPressed: toggleBluetooth,
+                ),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
+          top: -35,
+          left: screenWidth / 2 - 35,
+          child: GestureDetector(
+    onTap: () {
+      // Define your action here
+      print("Home icon tapped");
+     widget.onBackToMenu();
+      // You can navigate, show a dialog, or perform any other action here
+    },
+    child: CircleAvatar(
+      radius: 35,
+      backgroundColor: const Color.fromARGB(255, 10, 74, 152),
+      child: const Icon(
+        Icons.home,
+        size: 40,
+        color: Color.fromARGB(255, 255, 255, 255),
+      ),
+    ),
+  ),
+        ),
+      ],
+    );
+  }
+}
+
+class SoftEdgeCurveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    double width = size.width;
+    double height = size.height;
+
+     // Start from the bottom-left corner
+    path.lineTo(width / 2 - 80, 0);
+
+    // Add smooth bend at the start of the curve
+    path.quadraticBezierTo(
+      width / 2 - 60, 0,  // Control point (closer to the flat edge)
+      width / 2 - 40, 20, // End point (higher on the curve)
+    );
+
+    // Draw a half-circle curve
+    path.arcToPoint(
+      Offset(width / 2 + 40, 20), // End point of the arc
+      radius: Radius.circular(47), // Radius of the arc
+      clockwise: false,
+    );
+
+    // Add smooth bend at the end of the curve
+    path.quadraticBezierTo(
+      width / 2 + 60, 0,  // Control point (mirrored on the opposite side)
+      width / 2 + 80, 0, // End point (aligned with the flat edge)
+    );
+
+    // Complete the path
+    path.lineTo(width, 0); // Move to the top-right corner
+    path.lineTo(width, height); // Bottom-right corner
+    path.lineTo(0, height); // Bottom-left corner
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}

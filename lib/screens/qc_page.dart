@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
 import 'package:intl/intl.dart';
 
 class QCPoint {
@@ -352,15 +353,7 @@ class _QCPageState extends State<QCPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: widget.onBackToMenu,
-       
-        child: Icon(Icons.home,size: 35,), 
-        backgroundColor: Color(0xFF00706e),
-        elevation: 5,
-       
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu),
      
     );
   }

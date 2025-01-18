@@ -94,7 +94,7 @@ class _ResultPageState extends State<ResultPage> {
     super.dispose();
   }
   
-
+  final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -239,7 +239,7 @@ class _ResultPageState extends State<ResultPage> {
 
         ],
       ),
-      bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu),
+      bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu, wifiStatusNotifier: wifiStatusNotifier,),
     );
   }
 }

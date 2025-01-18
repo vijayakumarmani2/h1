@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 class CurvedBottomNavigationBar extends StatefulWidget {
   final VoidCallback onBackToMenu;
 
-  CurvedBottomNavigationBar({required this.onBackToMenu});
+   final ValueNotifier<bool> wifiStatusNotifier;
+
+  CurvedBottomNavigationBar({required this.onBackToMenu, required this.wifiStatusNotifier});
+
 
   @override
   _CurvedBottomNavigationBarState createState() =>
@@ -20,6 +23,14 @@ class _CurvedBottomNavigationBarState extends State<CurvedBottomNavigationBar> {
   bool isCableConnected = false; // Cable state
   bool isBluetoothEnabled = false; // Bluetooth state
 
+void initState() {
+    super.initState();
+
+    // Listen to WiFi status changes
+    widget.wifiStatusNotifier.addListener(() {
+      setState(() {}); // Trigger a rebuild to update the UI
+    });
+  }
   // Toggle WiFi state
   void toggleWiFi() {
     setState(() {
@@ -27,6 +38,7 @@ class _CurvedBottomNavigationBarState extends State<CurvedBottomNavigationBar> {
     });
     print("WiFi ${isWiFiEnabled ? "Enabled" : "Disabled"}");
   }
+
 
   // Toggle Cable state
   void toggleCable() {
@@ -71,7 +83,7 @@ class _CurvedBottomNavigationBarState extends State<CurvedBottomNavigationBar> {
                 // WiFi Icon
                 IconButton(
                   icon: Icon(
-                    isWiFiEnabled ? Icons.wifi : Icons.wifi_off,
+                   widget.wifiStatusNotifier.value ? Icons.wifi : Icons.wifi_off,
                     color: Colors.white,
                   ),
                   onPressed: toggleWiFi,

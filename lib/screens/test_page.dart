@@ -508,6 +508,8 @@ class _TestPageState extends State<TestPage>
     });
   }
 
+  final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1597,7 +1599,7 @@ class _TestPageState extends State<TestPage>
       // ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar:
-          CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu),
+          CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu, wifiStatusNotifier: wifiStatusNotifier,),
     );
   }
 

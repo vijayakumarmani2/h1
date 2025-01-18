@@ -111,6 +111,10 @@ class _LogPageState extends State<LogPage> {
     }
   }
 
+
+  final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
+
+  
   @override
  Widget build(BuildContext context) {
   return Scaffold(
@@ -337,7 +341,7 @@ SizedBox(
             ),
     ],
     ),
-     bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu),
+     bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu, wifiStatusNotifier: wifiStatusNotifier,),
   );
 }
 }

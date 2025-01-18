@@ -4,6 +4,9 @@ import 'package:virtual_keyboard_multi_language/virtual_keyboard_multi_language.
 
 
 class WiFiConfigurationWidget extends StatefulWidget {
+  final ValueNotifier<bool> wifiStatusNotifier;
+
+  WiFiConfigurationWidget({required this.wifiStatusNotifier});
   @override
   _WiFiConfigurationWidgetState createState() => _WiFiConfigurationWidgetState();
 }
@@ -28,7 +31,12 @@ class _WiFiConfigurationWidgetState extends State<WiFiConfigurationWidget> {
         networks = availableNetworks;
         activeNetwork = active;
       });
+      if(activeNetwork != null){
+        // Update the WiFi status notifier
+      widget.wifiStatusNotifier.value = true;
+      }
     } catch (e) {
+       widget.wifiStatusNotifier.value = false;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Failed to fetch networks: $e"),
       ));
@@ -42,15 +50,18 @@ class _WiFiConfigurationWidgetState extends State<WiFiConfigurationWidget> {
         setState(() {
           activeNetwork = ssid; // Update active network
         });
+         widget.wifiStatusNotifier.value = true;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("Connected to $ssid"),
         ));
       } else {
+         widget.wifiStatusNotifier.value = false;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("Failed to connect to $ssid"),
         ));
       }
     } catch (e) {
+       widget.wifiStatusNotifier.value = false;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Error connecting to network: $e"),
       ));

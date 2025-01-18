@@ -235,6 +235,10 @@ class _QCPageState extends State<QCPage> {
     );
   }
 
+
+  final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
+
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -353,7 +357,7 @@ class _QCPageState extends State<QCPage> {
           ],
         ),
       ),
-      bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu),
+      bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu, wifiStatusNotifier:  wifiStatusNotifier,),
      
     );
   }

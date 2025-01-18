@@ -13,31 +13,35 @@ class CalibrationPage extends StatefulWidget {
 }
 
 class _CalibrationPageState extends State<CalibrationPage> {
-    final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
-     String? active = null;
-    
+  final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
+  String? active = null;
+
   @override
-void initState() {
-  super.initState();
-  checkActiveNetwork(); // Call the asynchronous logic
-}
-
-Future<void> checkActiveNetwork() async {
-  try {
-    active = await LinuxWiFiManager.getActiveNetwork();
-    setState(() {
-      // Update the WiFi status notifier based on the active network
-      wifiStatusNotifier.value = active != null;
-    });
-  } catch (e) {
-    setState(() {
-      wifiStatusNotifier.value = false;
-    });
-    // Optionally, handle errors (e.g., show a snackbar or log)
-    print("Error fetching active network: $e");
+  void initState() {
+    super.initState();
+    checkActiveNetwork(); // Call the asynchronous logic
   }
-}
 
+  Future<void> checkActiveNetwork() async {
+    try {
+      active = await LinuxWiFiManager.getActiveNetwork();
+      setState(() {
+        // Update the WiFi status notifier based on the active network
+        if (active != null && active == "lo:lo") {
+          wifiStatusNotifier.value = true;
+        } else {
+          wifiStatusNotifier.value = false;
+        }
+        
+      });
+    } catch (e) {
+      setState(() {
+        wifiStatusNotifier.value = false;
+      });
+      // Optionally, handle errors (e.g., show a snackbar or log)
+      print("Error fetching active network: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -332,7 +336,10 @@ Future<void> checkActiveNetwork() async {
           ),
         ),
       ),
-           bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu, wifiStatusNotifier: wifiStatusNotifier,),
+      bottomNavigationBar: CurvedBottomNavigationBar(
+        onBackToMenu: widget.onBackToMenu,
+        wifiStatusNotifier: wifiStatusNotifier,
+      ),
     );
   }
 }

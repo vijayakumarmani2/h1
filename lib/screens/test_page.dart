@@ -91,7 +91,8 @@ class _TestPageState extends State<TestPage>
       });
     } else {
       // Show a SnackBar if the maximum limit is reached
-      logEvent('warning', 'Samples should be empty to add calibrators.', page: 'test_page');
+      logEvent('warning', 'Samples should be empty to add calibrators.',
+          page: 'test_page');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Samples should be empty'),
@@ -139,30 +140,36 @@ class _TestPageState extends State<TestPage>
   @override
   void initState() {
     super.initState();
-     logEvent('info', 'TestPage initialized.', page: 'test_page');
+    logEvent('info', 'TestPage initialized.', page: 'test_page');
     initializeSerialReader();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3), // Duration of the ripple animation
     )..repeat(); // Repeat the ripple animation
   }
-void logEvent(String type, String message,  {required String page}) async {
+
+  void logEvent(String type, String message, {required String page}) async {
     await DatabaseHelper.instance.logEvent(type, message, page: page);
     print("$type: $message");
   }
+
   void initializeSerialReader() {
-    logEvent('info', 'Serial reader initialization started.', page: 'test_page');
+    logEvent('info', 'Serial reader initialization started.',
+        page: 'test_page');
     serialReader = SerialReader('/dev/ttyUSB0');
     // serialReader = SerialReader('COM5');
     if (!serialReader!.init()) {
       print(
           'Failed to open serial port /dev/ttyUSB0. Please check the connection.');
       // Show a SnackBar if the maximum limit is reached
-      logEvent('error', 'Failed to open serial port /dev/ttyUSB0. Please check the connection.', page: 'test_page');
+      logEvent('error',
+          'Failed to open serial port /dev/ttyUSB0. Please check the connection.',
+          page: 'test_page');
 
       print('Failed to open serial port. Please check the connection.');
     } else {
-       logEvent('info', 'Serial reader initialized successfully.', page: 'test_page');
+      logEvent('info', 'Serial reader initialized successfully.',
+          page: 'test_page');
       serialReader!.getStream()!.listen((data) {
         // Append received data to the buffer
         buffer += String.fromCharCodes(data);
@@ -185,28 +192,31 @@ void logEvent(String type, String message,  {required String page}) async {
         }
       }, onError: (error) {
         print('Error reading serial port: $error');
-        logEvent('error', 'Error reading serial port: $error', page: 'test_page');
+        logEvent('error', 'Error reading serial port: $error',
+            page: 'test_page');
       }, onDone: () {
         print('Serial port communication ended unexpectedly.');
-        logEvent('warning', 'Serial port communication ended unexpectedly.', page: 'test_page');
+        logEvent('warning', 'Serial port communication ended unexpectedly.',
+            page: 'test_page');
       });
     }
   }
 
-void sendSampleCountToHardware(int sampleCount) {
-  if (serialReader != null) {
-    final message = "SAMPLES:$sampleCount\n"; // Example message format
-    serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
-    print("Sent to hardware: $message");
+  void sendSampleCountToHardware(int sampleCount) {
+    if (serialReader != null) {
+      final message = "SAMPLES:$sampleCount\n"; // Example message format
+      serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
+      print("Sent to hardware: $message");
+    }
   }
-}
 
- // Save samples and get their IDs
+  // Save samples and get their IDs
   List<int> sampleIds = [];
-void startProcess() async {
-   if (cards.isEmpty) {
+  void startProcess() async {
+    if (cards.isEmpty) {
       // Show error if no cards are added
-      logEvent('error', 'No samples added. Cannot start process.', page: 'test_page');
+      logEvent('error', 'No samples added. Cannot start process.',
+          page: 'test_page');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please add at least one sample before starting.'),
@@ -239,121 +249,133 @@ void startProcess() async {
       ),
     );
 
- 
-  // for (var card in cards) {
-  //   int sampleId = await DatabaseHelper.instance.insertSample({
-  //     'sampleName': card['sampleName'],
-  //     'type': card['type'],
-  //     'result': card['result'],
-  //   });
-  //   sampleIds.add(sampleId);
-  // }
+    // for (var card in cards) {
+    //   int sampleId = await DatabaseHelper.instance.insertSample({
+    //     'sampleName': card['sampleName'],
+    //     'type': card['type'],
+    //     'result': card['result'],
+    //   });
+    //   sampleIds.add(sampleId);
+    // }
 
-  // Send sample count to hardware
-  sendSampleCountToHardware(2);
+    // Send sample count to hardware
+    sendSampleCountToHardware(2);
 
-  // Wait for "Started 1" signal from hardware
-  logEvent('info', 'Process started with ${cards.length} samples.', page: 'test_page');
-  setState(() {
-    running_status = "Waiting";
-    isRunning = true;
-  });
-}
+    // Wait for "Started 1" signal from hardware
+    logEvent('info', 'Process started with ${cards.length} samples.',
+        page: 'test_page');
+    setState(() {
+      running_status = "Waiting";
+      isRunning = true;
+    });
+  }
 
- void processData(String data) {
-   logEvent('info', 'Data received: $data', page: 'test_page');
-   if (data.startsWith("Started")) {
-    // Extract the sample number from the signal
-    final sampleNumber = int.tryParse(data.split(" ")[1]);
-    if (sampleNumber != null) {
-      logEvent('info', 'Sample $sampleNumber started processing. $sampleIds[$sampleNumber - 1]', page: 'test_page');
-      startSampleReading(sampleNumber);
-    }else{
-      logEvent('error', 'Failed to parse sample number from: $data', page: 'test_page');
-    }
-  } else if (data.startsWith("Ended")) {
-    final sampleNumber = int.tryParse(data.split(" ")[1]);
-    if (sampleNumber != null) {
-      print("Hardware ended processing Sample $sampleNumber.");
-      logEvent('info', 'Sample $sampleNumber completed.$sampleIds[$sampleNumber - 1]', page: 'test_page');
-      completeSampleProcessing(sampleNumber);
-    }else {
-        logEvent('error', 'Failed to parse sample number from: $data', page: 'test_page');
+  void processData(String data) {
+    logEvent('info', 'Data received: $data', page: 'test_page');
+    if (data.startsWith("Started")) {
+      // Extract the sample number from the signal
+      final sampleNumber = int.tryParse(data.split(" ")[1]);
+      if (sampleNumber != null) {
+        logEvent('info',
+            'Sample $sampleNumber started processing. $sampleIds[$sampleNumber - 1]',
+            page: 'test_page');
+        startSampleReading(sampleNumber);
+      } else {
+        logEvent('error', 'Failed to parse sample number from: $data',
+            page: 'test_page');
       }
-  } else if (isTemperatureData(data)) {
-    logEvent('info', 'Temperature data: $data', page: 'test_page');
-    log.add('Temperature data: $data');
-    _temp_val = data;
-  } else if (isAbsorbanceData1(data)) {
-    _adc_value1 = int.parse(data.substring(1, data.length));
-  } else if (isAbsorbanceData2(data)) {
-    _adc_value2 = int.parse(data.substring(1, data.length));
-  }else {
+    } else if (data.startsWith("Ended")) {
+      final sampleNumber = int.tryParse(data.split(" ")[1]);
+      if (sampleNumber != null) {
+        print("Hardware ended processing Sample $sampleNumber.");
+        logEvent('info',
+            'Sample $sampleNumber completed.$sampleIds[$sampleNumber - 1]',
+            page: 'test_page');
+        completeSampleProcessing(sampleNumber);
+      } else {
+        logEvent('error', 'Failed to parse sample number from: $data',
+            page: 'test_page');
+      }
+    } else if (isTemperatureData(data)) {
+      logEvent('info', 'Temperature data: $data', page: 'test_page');
+      log.add('Temperature data: $data');
+      _temp_val = data;
+    } else if (isAbsorbanceData1(data)) {
+      _adc_value1 = int.parse(data.substring(1, data.length));
+    } else if (isAbsorbanceData2(data)) {
+      _adc_value2 = int.parse(data.substring(1, data.length));
+    } else {
       logEvent('warning', 'Unknown data format: $data', page: 'test_page');
     }
-}
+  }
 
-
-void startSampleReading(int sampleNumber) {
-  logEvent('info', 'Starting sample reading for Sample $sampleNumber. $sampleIds[$sampleNumber - 1]', page: 'test_page');
-  setState(() {
-    running_status = "Running Sample $sampleNumber";
-    isRunning = true;
-    runningTime = 120;
-    secs = 0;
-    spots = [];
-  });
-
-  _animationController.repeat();
-
-  timer = Timer.periodic(Duration(seconds: 1), (timer) {
+  void startSampleReading(int sampleNumber) {
+    logEvent('info',
+        'Starting sample reading for Sample $sampleNumber. $sampleIds[$sampleNumber - 1]',
+        page: 'test_page');
     setState(() {
-      runningTime--;
-      _absorbance_value =
-          calculateAbsorbance(_adc_value2, _adc_value1).toStringAsFixed(4);
-      secs++;
-      addFlSpot(secs.toDouble(), double.parse(_absorbance_value));
-
-      // Save absorbance value to the database
-      // DatabaseHelper.instance.insertAbsorbance({
-      //   'sample_id': sampleIds[sampleNumber - 1], // Map to correct sample ID
-      //   'time': secs,
-      //   'absorbance_value': _absorbance_value,
-      // });
-
-      if (runningTime == 0) {
-        setState(() {
-          running_status = "Sample $sampleNumber Completed";
-          logEvent('info', 'Sample $sampleNumber processing completed.$sampleIds[$sampleNumber - 1]', page: 'test_page');
-        });
-        timer.cancel();
-      }
+      running_status = "Running Sample $sampleNumber";
+      isRunning = true;
+      runningTime = 120;
+      secs = 0;
+      spots = [];
     });
-  });
-}
-int currentSampleIndex = 0;
 
+    _animationController.repeat();
 
-void completeSampleProcessing(int sampleNumber) {
-    logEvent('info', 'Sample $sampleNumber processing completed. $sampleIds[$sampleNumber - 1]', page: 'test_page');
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        runningTime--;
+        _absorbance_value =
+            calculateAbsorbance(_adc_value2, _adc_value1).toStringAsFixed(4);
+        secs++;
+        addFlSpot(secs.toDouble(), double.parse(_absorbance_value));
+
+        // Save absorbance value to the database
+        // DatabaseHelper.instance.insertAbsorbance({
+        //   'sample_id': sampleIds[sampleNumber - 1], // Map to correct sample ID
+        //   'time': secs,
+        //   'absorbance_value': _absorbance_value,
+        // });
+
+        if (runningTime == 0) {
+          setState(() {
+            running_status = "Sample $sampleNumber Completed";
+            logEvent('info',
+                'Sample $sampleNumber processing completed.$sampleIds[$sampleNumber - 1]',
+                page: 'test_page');
+          });
+          timer.cancel();
+        }
+      });
+    });
+  }
+
+  int currentSampleIndex = 0;
+
+  void completeSampleProcessing(int sampleNumber) {
+    logEvent('info',
+        'Sample $sampleNumber processing completed. $sampleIds[$sampleNumber - 1]',
+        page: 'test_page');
 
     setState(() {
       running_status = "Sample $sampleNumber Completed";
     });
 
     if (sampleNumber < sampleIds.length) {
-      logEvent('info', 'Waiting for next sample to process.', page: 'test_page');
+      logEvent('info', 'Waiting for next sample to process.',
+          page: 'test_page');
       setState(() {
         running_status = "Waiting for Next Sample";
       });
     } else {
-      logEvent('info', 'All samples processed successfully.', page: 'test_page');
+      logEvent('info', 'All samples processed successfully.',
+          page: 'test_page');
       setState(() {
         running_status = "All samples processed.";
       });
     }
   }
-
 
   double calculateAbsorbance(int intensity, int referenceIntensity) {
     if (intensity <= 0 || referenceIntensity <= 0) {
@@ -391,8 +413,6 @@ void completeSampleProcessing(int sampleNumber) {
     timer?.cancel();
     super.dispose();
   }
-
-  
 
   void stopTimer() {
     setState(() {
@@ -592,7 +612,8 @@ void completeSampleProcessing(int sampleNumber) {
                                           'Add sample here', // Message when no cards are present
                                           style: TextStyle(
                                             fontSize: 18,
-                                            color: Color.fromARGB(255, 0, 112, 110),
+                                            color: Color.fromARGB(
+                                                255, 0, 112, 110),
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -628,20 +649,31 @@ void completeSampleProcessing(int sampleNumber) {
                                                   flex: 1,
                                                   child: ClipPath(
                                                     clipper: ShapeBorderClipper(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)))),
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.all(
+                                                                    Radius.circular(
+                                                                        10)))),
                                                     child: Container(
                                                       padding: EdgeInsets.all(
                                                           12), // Increased padding for better spacing
-                                                      decoration: const BoxDecoration(
-                                                          border: Border(
-                                                                  bottom: BorderSide(
-                                                                    color: Color.fromARGB(124, 0, 112, 110),
-                                                                    width: 3.0,
-                                                                    style: BorderStyle.solid,
-                                                                  ),
-                                                                ),
-                                                        color: Color.fromARGB(30, 0, 112, 110),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        border: Border(
+                                                          bottom: BorderSide(
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    124,
+                                                                    0,
+                                                                    112,
+                                                                    110),
+                                                            width: 3.0,
+                                                            style: BorderStyle
+                                                                .solid,
+                                                          ),
+                                                        ),
+                                                        color: Color.fromARGB(
+                                                            30, 0, 112, 110),
                                                         // Rounded corners for inner boxes
                                                       ),
                                                       child: Text(
@@ -652,7 +684,11 @@ void completeSampleProcessing(int sampleNumber) {
                                                           fontWeight:
                                                               FontWeight.w700,
                                                           fontSize: 18,
-                                                          color: Color.fromARGB(255, 0, 112, 110), // Darker text color
+                                                          color: Color.fromARGB(
+                                                              255,
+                                                              0,
+                                                              112,
+                                                              110), // Darker text color
                                                         ),
                                                       ),
                                                     ),
@@ -668,21 +704,31 @@ void completeSampleProcessing(int sampleNumber) {
                                                             context, index),
                                                     child: ClipPath(
                                                       clipper: ShapeBorderClipper(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)))),
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          10)))),
                                                       child: Container(
                                                         padding:
                                                             EdgeInsets.all(12),
-                                                        decoration: BoxDecoration(
-                                                         border: Border(
-                                                                  bottom: BorderSide(
-                                                                    color: Color.fromARGB(124, 0, 112, 110),
-                                                                    width: 3.0,
-                                                                    style: BorderStyle.solid,
-                                                                  ),
-                                                                ),
-                                                        color: Color.fromARGB(30, 0, 112, 110),
-                                                         
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border(
+                                                            bottom: BorderSide(
+                                                              color: Color
+                                                                  .fromARGB(
+                                                                      124,
+                                                                      0,
+                                                                      112,
+                                                                      110),
+                                                              width: 3.0,
+                                                              style: BorderStyle
+                                                                  .solid,
+                                                            ),
+                                                          ),
+                                                          color: Color.fromARGB(
+                                                              30, 0, 112, 110),
                                                         ),
                                                         child: Text(
                                                           cards[index][
@@ -693,7 +739,12 @@ void completeSampleProcessing(int sampleNumber) {
                                                             fontSize: 18,
                                                             fontWeight:
                                                                 FontWeight.w500,
-                                                            color: Color.fromARGB(255, 0, 112, 110),
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    0,
+                                                                    112,
+                                                                    110),
                                                           ),
                                                         ),
                                                       ),
@@ -709,21 +760,31 @@ void completeSampleProcessing(int sampleNumber) {
                                                         _toggleType(index),
                                                     child: ClipPath(
                                                       clipper: ShapeBorderClipper(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)))),
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          10)))),
                                                       child: Container(
                                                         padding:
                                                             EdgeInsets.all(12),
-                                                        decoration: BoxDecoration(
+                                                        decoration:
+                                                            BoxDecoration(
                                                           border: Border(
-                                                                  bottom: BorderSide(
-                                                                    color: Color.fromARGB(124, 0, 112, 110),
-                                                                    width: 3.0,
-                                                                    style: BorderStyle.solid,
-                                                                  ),
-                                                                ),
-                                                        color: Color.fromARGB(30, 0, 112, 110),
-                                                         
+                                                            bottom: BorderSide(
+                                                              color: Color
+                                                                  .fromARGB(
+                                                                      124,
+                                                                      0,
+                                                                      112,
+                                                                      110),
+                                                              width: 3.0,
+                                                              style: BorderStyle
+                                                                  .solid,
+                                                            ),
+                                                          ),
+                                                          color: Color.fromARGB(
+                                                              30, 0, 112, 110),
                                                         ),
                                                         child: Text(
                                                           card['type'],
@@ -733,7 +794,12 @@ void completeSampleProcessing(int sampleNumber) {
                                                             fontSize: 18,
                                                             fontWeight:
                                                                 FontWeight.w500,
-                                                            color: Color.fromARGB(255, 0, 112, 110),
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    0,
+                                                                    112,
+                                                                    110),
                                                           ),
                                                         ),
                                                       ),
@@ -746,20 +812,30 @@ void completeSampleProcessing(int sampleNumber) {
                                                   flex: 3,
                                                   child: ClipPath(
                                                     clipper: ShapeBorderClipper(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)))),
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.all(
+                                                                    Radius.circular(
+                                                                        10)))),
                                                     child: Container(
-                                                      padding: EdgeInsets.all(12),
+                                                      padding:
+                                                          EdgeInsets.all(12),
                                                       decoration: BoxDecoration(
                                                         border: Border(
-                                                                  bottom: BorderSide(
-                                                                    color: Color.fromARGB(124, 0, 112, 110),
-                                                                    width: 3.0,
-                                                                    style: BorderStyle.solid,
-                                                                  ),
-                                                                ),
-                                                        color: Color.fromARGB(30, 0, 112, 110),
-                                                       
+                                                          bottom: BorderSide(
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    124,
+                                                                    0,
+                                                                    112,
+                                                                    110),
+                                                            width: 3.0,
+                                                            style: BorderStyle
+                                                                .solid,
+                                                          ),
+                                                        ),
+                                                        color: Color.fromARGB(
+                                                            30, 0, 112, 110),
                                                       ),
                                                       child: Text(
                                                         card['result'],
@@ -769,7 +845,8 @@ void completeSampleProcessing(int sampleNumber) {
                                                           fontSize: 18,
                                                           fontWeight:
                                                               FontWeight.w500,
-                                                          color: Color.fromARGB(255, 0, 112, 110),
+                                                          color: Color.fromARGB(
+                                                              255, 0, 112, 110),
                                                         ),
                                                       ),
                                                     ),
@@ -789,51 +866,55 @@ void completeSampleProcessing(int sampleNumber) {
                               children: [
                                 Row(
                                   children: [
-                                     // Cal Button with Switch
-                                  Row(
-                                    children: [
-                                      const Text('CAL.',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 112, 110))),
-                                      Switch(
-                                        value: isCalSwitched,activeColor: Color.fromARGB(255, 0, 112, 110),
-                                        onChanged: (value) {
-                                          setState(() {
-                                            isCalSwitched = value;
-                                            if (isCalSwitched) {
-                                              _addCals();
-                                            } else {
-                                              _removeAll();
-                                            }
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  // QC Button with Switch
-                                  Row(
-                                    children: [
-                                      const Text('QC',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 112, 110))),
-                                      Switch(
-                                        value: isQcSwitched, activeColor: Color.fromARGB(255, 0, 112, 110),
-                                        onChanged: (value) {
-                                          setState(() {
-                                            isQcSwitched = value;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  
-                                   
+                                    // Cal Button with Switch
+                                    Row(
+                                      children: [
+                                        const Text('CAL.',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Color.fromARGB(
+                                                    255, 0, 112, 110))),
+                                        Switch(
+                                          value: isCalSwitched,
+                                          activeColor:
+                                              Color.fromARGB(255, 0, 112, 110),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              isCalSwitched = value;
+                                              if (isCalSwitched) {
+                                                _addCals();
+                                              } else {
+                                                _removeAll();
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    // QC Button with Switch
+                                    Row(
+                                      children: [
+                                        const Text('QC',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Color.fromARGB(
+                                                    255, 0, 112, 110))),
+                                        Switch(
+                                          value: isQcSwitched,
+                                          activeColor:
+                                              Color.fromARGB(255, 0, 112, 110),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              isQcSwitched = value;
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
-                               Row(
+                                Row(
                                   children: [
-                                  
-                                  
                                     ElevatedButton(
                                       onPressed: _addCard,
                                       child: Icon(Icons.add_circle_rounded,
@@ -851,7 +932,8 @@ void completeSampleProcessing(int sampleNumber) {
                                               255, 243, 243, 243),
                                           size: 24),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xffF44336),
+                                        backgroundColor:
+                                            const Color(0xffF44336),
                                       ),
                                     ),
                                   ],
@@ -894,7 +976,10 @@ void completeSampleProcessing(int sampleNumber) {
                                         backgroundColor: Colors.white,
                                         valueColor: AlwaysStoppedAnimation(
                                             Color.fromARGB(159, 100, 183, 251)),
-                                        borderRadius: 12.0,borderColor: Color.fromARGB(30, 0, 60, 112),borderWidth: 3,
+                                        borderRadius: 12.0,
+                                        borderColor:
+                                            Color.fromARGB(30, 0, 60, 112),
+                                        borderWidth: 3,
                                         center: Text(
                                           "Eluent\n    A",
                                           style: TextStyle(
@@ -933,7 +1018,10 @@ void completeSampleProcessing(int sampleNumber) {
                                         backgroundColor: Colors.white,
                                         valueColor: AlwaysStoppedAnimation(
                                             Color.fromARGB(159, 100, 183, 251)),
-                                        borderRadius: 12.0,borderColor: Color.fromARGB(30, 0, 60, 112),borderWidth: 3,
+                                        borderRadius: 12.0,
+                                        borderColor:
+                                            Color.fromARGB(30, 0, 60, 112),
+                                        borderWidth: 3,
                                         center: Text(
                                           "Eluent\n    B",
                                           style: TextStyle(
@@ -972,8 +1060,12 @@ void completeSampleProcessing(int sampleNumber) {
                                         backgroundColor: Colors.white,
                                         valueColor:
                                             const AlwaysStoppedAnimation(
-                                                Color.fromARGB(159, 100, 183, 251)),
-                                        borderRadius: 12.0,borderColor: Color.fromARGB(30, 0, 60, 112),borderWidth: 3,
+                                                Color.fromARGB(
+                                                    159, 100, 183, 251)),
+                                        borderRadius: 12.0,
+                                        borderColor:
+                                            Color.fromARGB(30, 0, 60, 112),
+                                        borderWidth: 3,
                                         center: const Text(
                                           "H/W",
                                           style: TextStyle(
@@ -1019,7 +1111,10 @@ void completeSampleProcessing(int sampleNumber) {
                                           backgroundColor: Colors.white,
                                           valueColor: AlwaysStoppedAnimation(
                                               Color.fromARGB(124, 0, 112, 110)),
-                                        borderRadius: 12.0,borderColor: Color.fromARGB(30, 0, 112, 110),borderWidth: 3,
+                                          borderRadius: 12.0,
+                                          borderColor:
+                                              Color.fromARGB(30, 0, 112, 110),
+                                          borderWidth: 3,
                                           center: Text(
                                             "Column",
                                             style: TextStyle(
@@ -1061,7 +1156,10 @@ void completeSampleProcessing(int sampleNumber) {
                                           backgroundColor: Colors.white,
                                           valueColor: AlwaysStoppedAnimation(
                                               Color.fromARGB(124, 0, 112, 110)),
-                                        borderRadius: 12.0,borderColor: Color.fromARGB(30, 0, 112, 110),borderWidth: 3,
+                                          borderRadius: 12.0,
+                                          borderColor:
+                                              Color.fromARGB(30, 0, 112, 110),
+                                          borderWidth: 3,
                                           center: Text(
                                             "Filter",
                                             style: TextStyle(
@@ -1106,8 +1204,8 @@ void completeSampleProcessing(int sampleNumber) {
                     child: Container(
                       padding: EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Color.fromARGB(0, 0, 112, 110)),
+                        border:
+                            Border.all(color: Color.fromARGB(0, 0, 112, 110)),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: LineChart(
@@ -1135,7 +1233,8 @@ void completeSampleProcessing(int sampleNumber) {
                                 interval: 0.2,
                                 getTitlesWidget: (value, meta) {
                                   return Text(
-                                    value.toStringAsFixed(1),textAlign: TextAlign.center,
+                                    value.toStringAsFixed(1),
+                                    textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 12,
                                       color: Color.fromARGB(255, 0, 112, 110),
@@ -1163,7 +1262,8 @@ void completeSampleProcessing(int sampleNumber) {
                                 interval: 20,
                                 getTitlesWidget: (value, meta) {
                                   return Text(
-                                    value.toStringAsFixed(0),textAlign: TextAlign.center,
+                                    value.toStringAsFixed(0),
+                                    textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 12,
                                       color: Color.fromARGB(255, 0, 112, 110),
@@ -1201,7 +1301,8 @@ void completeSampleProcessing(int sampleNumber) {
                               width: 1,
                             ),
                           ),
-                          backgroundColor: const Color.fromARGB(30, 0, 112, 110), // Background color for the chart
+                          backgroundColor: const Color.fromARGB(30, 0, 112,
+                              110), // Background color for the chart
                           lineBarsData: [
                             LineChartBarData(
                               spots: spots,
@@ -1383,7 +1484,7 @@ void completeSampleProcessing(int sampleNumber) {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                             // Ripple Animation and Timer
+                              // Ripple Animation and Timer
                               Center(
                                 child: SizedBox(
                                   width: 200,
@@ -1495,11 +1596,10 @@ void completeSampleProcessing(int sampleNumber) {
       //   elevation: 5,
       // ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu),
+      bottomNavigationBar:
+          CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu),
     );
   }
-
-
 
   Widget buildStatusCard(
     String title,

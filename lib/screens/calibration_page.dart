@@ -27,7 +27,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
       active = await LinuxWiFiManager.getActiveNetwork();
       setState(() {
         // Update the WiFi status notifier based on the active network
-        if (active != null && active == "lo:lo") {
+        if (active != null && active!.contains("wlan")) {
           wifiStatusNotifier.value = true;
         } else {
           wifiStatusNotifier.value = false;

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hba1c_analyzer_1/services/linux_wif_manager.dart';
+import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
 import 'package:virtual_keyboard_multi_language/virtual_keyboard_multi_language.dart';
 
 class CalibrationPage extends StatefulWidget {
@@ -11,11 +13,25 @@ class CalibrationPage extends StatefulWidget {
 }
 
 class _CalibrationPageState extends State<CalibrationPage> {
+    final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
+  @override
+  Future<void> initState() async {
+    // TODO: implement initState
+    super.initState();
+    String? active = await LinuxWiFiManager.getActiveNetwork();
+    if(active != null){
+      // Update the WiFi status notifier
+      wifiStatusNotifier.value = true;
+    }else{
+      wifiStatusNotifier.value = false;
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -40,7 +56,9 @@ class _CalibrationPageState extends State<CalibrationPage> {
                             height: 120,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              border: Border.all(color: const Color.fromARGB(0, 0, 150, 135), width: 1.5),
+                              border: Border.all(
+                                  color: const Color.fromARGB(0, 0, 150, 135),
+                                  width: 1.5),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             padding: EdgeInsets.all(8.0),
@@ -57,12 +75,15 @@ class _CalibrationPageState extends State<CalibrationPage> {
                                     ],
                                   ),
                                 ),
-                                VerticalDivider(color: Colors.teal, thickness: 1),
+                                VerticalDivider(
+                                    color: Colors.teal, thickness: 1),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      InfoRowValue(value: "2024/11/28 14:23:40"),
+                                      InfoRowValue(
+                                          value: "2024/11/28 14:23:40"),
                                       InfoRowValue(value: "GSX1240020"),
                                       InfoRowValue(value: "1.0725"),
                                       InfoRowValue(value: "0.4338"),
@@ -92,7 +113,9 @@ class _CalibrationPageState extends State<CalibrationPage> {
                             height: 120,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              border: Border.all(color: const Color.fromARGB(0, 0, 150, 135), width: 1.5),
+                              border: Border.all(
+                                  color: const Color.fromARGB(0, 0, 150, 135),
+                                  width: 1.5),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             padding: EdgeInsets.all(8.0),
@@ -109,12 +132,15 @@ class _CalibrationPageState extends State<CalibrationPage> {
                                     ],
                                   ),
                                 ),
-                                VerticalDivider(color: Colors.teal, thickness: 1),
+                                VerticalDivider(
+                                    color: Colors.teal, thickness: 1),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      InfoRowValue(value: "2024/08/26 09:43:05"),
+                                      InfoRowValue(
+                                          value: "2024/08/26 09:43:05"),
                                       InfoRowValue(value: "GSX1230020"),
                                       InfoRowValue(value: "1.1517"),
                                       InfoRowValue(value: "0.0930"),
@@ -148,7 +174,9 @@ class _CalibrationPageState extends State<CalibrationPage> {
                             height: 150,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              border: Border.all(color: const Color.fromARGB(0, 0, 150, 135), width: 1.5),
+                              border: Border.all(
+                                  color: const Color.fromARGB(0, 0, 150, 135),
+                                  width: 1.5),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             padding: EdgeInsets.all(8.0),
@@ -166,32 +194,36 @@ class _CalibrationPageState extends State<CalibrationPage> {
                                     ],
                                   ),
                                 ),
-                                VerticalDivider(color: Colors.teal, thickness: 1),
+                                VerticalDivider(
+                                    color: Colors.teal, thickness: 1),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                       EditableInfoValueWithKeyboard(
-                        initialValue: "GSX1240020",
-                        onSave: (newValue) {
-                          print("Updated Lot No. Value: $newValue");
-                          // Add logic to save the new value
-                        },
-                      ),
+                                      EditableInfoValueWithKeyboard(
+                                        initialValue: "GSX1240020",
+                                        onSave: (newValue) {
+                                          print(
+                                              "Updated Lot No. Value: $newValue");
+                                          // Add logic to save the new value
+                                        },
+                                      ),
                                       EditableInfoValueWithNumericKeyboard(
-  initialValue: "5.50",
-  onSave: (newValue) {
-    print("Updated Low Value: $newValue");
-    // Add logic to save the new value
-  },
-),
-EditableInfoValueWithNumericKeyboard(
-  initialValue: "9.90",
-  onSave: (newValue) {
-    print("Updated High Value: $newValue");
-    // Add logic to save the new value
-  },
-),
+                                        initialValue: "5.50",
+                                        onSave: (newValue) {
+                                          print("Updated Low Value: $newValue");
+                                          // Add logic to save the new value
+                                        },
+                                      ),
+                                      EditableInfoValueWithNumericKeyboard(
+                                        initialValue: "9.90",
+                                        onSave: (newValue) {
+                                          print(
+                                              "Updated High Value: $newValue");
+                                          // Add logic to save the new value
+                                        },
+                                      ),
                                       InfoRowValue(value: "1"),
                                       InfoRowValue(value: "2"),
                                     ],
@@ -200,103 +232,97 @@ EditableInfoValueWithNumericKeyboard(
                               ],
                             ),
                           ),
-                        
                         ],
                       ),
                     ),
                     SizedBox(width: 16),
-                   ],
+                  ],
                 ),
-                 Container(
-                  height: 157,width: 400,
-                      child: Column(
-                        children: [
-                          Text(
-                            'Manual',
-                            style: TextStyle(
-                              color: Colors.teal,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Container(
-                            height: 125,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: const Color.fromARGB(0, 0, 150, 135), width: 1.5),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: EdgeInsets.all(4.0),
-                            child: Column(
+                Container(
+                  height: 157,
+                  width: 400,
+                  child: Column(
+                    children: [
+                      Text(
+                        'Manual',
+                        style: TextStyle(
+                          color: Colors.teal,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Container(
+                        height: 125,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: const Color.fromARGB(0, 0, 150, 135),
+                              width: 1.5),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.all(4.0),
+                        child: Column(
+                          children: [
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                const Row(
-                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                     Text( "HbA1c K"),
-                                    SizedBox(width: 8),
-                                    SizedBox(
-                                      width: 190,height: 30,
-                                      child: TextField(
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
-                                        ),
-                                      ),
+                                Text("HbA1c K"),
+                                SizedBox(width: 8),
+                                SizedBox(
+                                  width: 190,
+                                  height: 30,
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
                                     ),
-                                  ],
-                                ),
-                                SizedBox(height: 5),
-                                const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                     Text( "HbA1c B"),
-                                    SizedBox(width: 8),
-                                    SizedBox(
-                                      width: 190,height: 30,
-                                      child: TextField(
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 5),
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.teal,
-                                      padding: EdgeInsets.symmetric(horizontal: 20),
-                                    ),
-                                    child: Text("Save"),
                                   ),
                                 ),
-                                
-                                
                               ],
                             ),
-                          ),
-                        ],
+                            SizedBox(height: 5),
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text("HbA1c B"),
+                                SizedBox(width: 8),
+                                SizedBox(
+                                  width: 190,
+                                  height: 30,
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 5),
+                            Align(
+                              alignment: Alignment.center,
+                              child: ElevatedButton(
+                                onPressed: () {},
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.teal,
+                                  padding: EdgeInsets.symmetric(horizontal: 20),
+                                ),
+                                child: Text("Save"),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
         ),
-      ),floatingActionButton: FloatingActionButton(
-        onPressed: widget.onBackToMenu,
-       
-        child: Icon(Icons.home,size: 35,), 
-        backgroundColor: Color(0xFF00706e),
-        elevation: 5,
-       
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+           bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu, wifiStatusNotifier: wifiStatusNotifier,),
     );
   }
 }
@@ -336,18 +362,20 @@ class InfoRowValue extends StatelessWidget {
   }
 }
 
-
 class EditableInfoValueWithKeyboard extends StatefulWidget {
   final String initialValue;
   final Function(String) onSave;
 
-  EditableInfoValueWithKeyboard({required this.initialValue, required this.onSave});
+  EditableInfoValueWithKeyboard(
+      {required this.initialValue, required this.onSave});
 
   @override
-  _EditableInfoValueWithKeyboardState createState() => _EditableInfoValueWithKeyboardState();
+  _EditableInfoValueWithKeyboardState createState() =>
+      _EditableInfoValueWithKeyboardState();
 }
 
-class _EditableInfoValueWithKeyboardState extends State<EditableInfoValueWithKeyboard> {
+class _EditableInfoValueWithKeyboardState
+    extends State<EditableInfoValueWithKeyboard> {
   late TextEditingController _controller;
   bool _isEditing = false;
 
@@ -435,18 +463,20 @@ class _EditableInfoValueWithKeyboardState extends State<EditableInfoValueWithKey
   }
 }
 
-
 class EditableInfoValueWithNumericKeyboard extends StatefulWidget {
   final String initialValue;
   final Function(String) onSave;
 
-  EditableInfoValueWithNumericKeyboard({required this.initialValue, required this.onSave});
+  EditableInfoValueWithNumericKeyboard(
+      {required this.initialValue, required this.onSave});
 
   @override
-  _EditableInfoValueWithNumericKeyboardState createState() => _EditableInfoValueWithNumericKeyboardState();
+  _EditableInfoValueWithNumericKeyboardState createState() =>
+      _EditableInfoValueWithNumericKeyboardState();
 }
 
-class _EditableInfoValueWithNumericKeyboardState extends State<EditableInfoValueWithNumericKeyboard> {
+class _EditableInfoValueWithNumericKeyboardState
+    extends State<EditableInfoValueWithNumericKeyboard> {
   late TextEditingController _controller;
 
   @override

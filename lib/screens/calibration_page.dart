@@ -17,11 +17,10 @@ class _CalibrationPageState extends State<CalibrationPage> {
      String? active = null;
     
   @override
-  Future<void> initState() async {
-    // TODO: implement initState
-    super.initState();
-   checkActiveNetwork();
-  }
+void initState() {
+  super.initState();
+  checkActiveNetwork(); // Call the asynchronous logic
+}
 
 Future<void> checkActiveNetwork() async {
   try {

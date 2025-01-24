@@ -132,6 +132,12 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
       final message = "INIT"; // Example message format
       serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
       print("Sent to hardware: $message");
+       ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('sent to hardware: $message'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
 
     serialReader.getStream()!.listen((data) {

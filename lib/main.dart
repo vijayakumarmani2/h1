@@ -140,12 +140,16 @@ class _MainScreenState extends State<MainScreen> {
     } else {
       logEvent('info', 'Serial reader initialized successfully.',
           page: 'test_page');
-            Future.delayed(const Duration(seconds: 3), () {
+           Future.delayed(const Duration(seconds: 3), () {
       print("just delay before sending INIT");
     });
   
       if (serialReader != null) {
         final message = "INIT"; // Example message format
+        serialReader.port?.write(Uint8List.fromList(message.codeUnits));
+        Future.delayed(Duration(seconds: 2), () {
+    print("This is executed after a 2-second delay");
+  });
         serialReader.port?.write(Uint8List.fromList(message.codeUnits));
         print("Sent to hardware: $message");
         ScaffoldMessenger.of(context).showSnackBar(

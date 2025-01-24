@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:hba1c_analyzer_1/services/show_ip.dart';
+import 'package:hba1c_analyzer_1/widget/show_ip.dart';
 import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
 import 'package:hba1c_analyzer_1/widget/wifi_configuration_widget.dart';
 
@@ -46,10 +46,10 @@ class _SystemPageState extends State<SystemPage> {
             // Side tabs
             Container(
               width: 130, // Adjust as needed
-              color: Colors.blue.shade100,
+              color: Colors.white,
               child: ListView(
                 children: [
-                  _buildTabItem(Icons.print, 'About', 0),
+                  _buildTabItem(Icons.info, 'About', 0),
                   _buildTabItem(Icons.wifi, 'WiFi', 1),
                   _buildTabItem(Icons.build, 'IP Address', 2),
                   _buildTabItem(Icons.check_circle, 'State', 3),
@@ -77,7 +77,7 @@ class _SystemPageState extends State<SystemPage> {
         });
       },
       child: Container(
-        color: _selectedIndex == index ? Colors.blue.shade300 : Colors.transparent,
+        color: _selectedIndex == index ? Colors.teal.shade300 : Colors.transparent,
         padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
         child: Row(
           children: [

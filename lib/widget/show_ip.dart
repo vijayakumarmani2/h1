@@ -43,13 +43,13 @@ class _IPDisplayScreenState extends State<IPDisplayScreen> {
       body: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.teal.shade300, Colors.teal.shade700],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        // decoration: BoxDecoration(
+        //   gradient: LinearGradient(
+        //     colors: [Colors.teal.shade300, Colors.teal.shade700],
+        //     begin: Alignment.topCenter,
+        //     end: Alignment.bottomCenter,
+        //   ),
+        // ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -75,7 +75,7 @@ class _IPDisplayScreenState extends State<IPDisplayScreen> {
                       ),
                       const SizedBox(height: 16),
                       const Text(
-                        "Your Raspberry Pi IP Address:",
+                        "Your System's Pi IP Address:",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -107,7 +107,7 @@ class _IPDisplayScreenState extends State<IPDisplayScreen> {
               icon: const Icon(Icons.refresh),
               label: const Text("Refresh IP Address"),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),backgroundColor: Colors.teal,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

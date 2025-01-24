@@ -94,17 +94,17 @@ class _WiFiConfigurationWidgetState extends State<WiFiConfigurationWidget> {
                     return Card(
                       elevation: 4,
                       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                      color: isActive ? Colors.blue[100] : null, // Highlight active network
+                      color: isActive ? Colors.teal[100] : null, // Highlight active network
                       child: ListTile(
                         title: Text(
                           network,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: isActive ? Colors.blue : Colors.black,
+                            color: isActive ? Colors.teal : Colors.black,
                           ),
                         ),
                         trailing: isActive
-                            ? Icon(Icons.wifi, color: Colors.blue) // Icon for active network
+                            ? Icon(Icons.wifi, color: Colors.teal) // Icon for active network
                             : ElevatedButton(
                                 onPressed: () {
                                   showPasswordDialog(network); // Show password dialog

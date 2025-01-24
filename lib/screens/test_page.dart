@@ -325,8 +325,13 @@ class _TestPageState extends State<TestPage>
     logEvent('info', 'Data received: $data', page: 'test_page');
     if (data.startsWith("STARTED")) {
       // Extract the sample number from the signal
-      final sampleNumber = int.tryParse(data.split(" ")[1]);
-      if (sampleNumber != null) {
+     // final sampleNumber = int.tryParse(data.split(" ")[1]);
+      // Regular expression to extract numbers at the end of the string
+  RegExp regex = RegExp(r'\d+$');
+ int sampleNumber = regex.firstMatch(data)?.group(0) as int;
+
+  print("sampleNumber=$sampleNumber"); // Output: "1"
+      if (sampleNumber >0) {
         logEvent('info',
             'Sample $sampleNumber started processing. $sampleIds[$sampleNumber - 1]',
             page: 'test_page');
@@ -336,8 +341,9 @@ class _TestPageState extends State<TestPage>
             page: 'test_page');
       }
     } else if (data.startsWith("ENDED")) {
-      final sampleNumber = int.tryParse(data.split(" ")[1]);
-      if (sampleNumber != null) {
+      RegExp regex = RegExp(r'\d+$');
+ int sampleNumber = regex.firstMatch(data)?.group(0) as int;
+      if (sampleNumber >0) {
         print("Hardware ended processing Sample $sampleNumber.");
         logEvent('info',
             'Sample $sampleNumber completed.$sampleIds[$sampleNumber - 1]',

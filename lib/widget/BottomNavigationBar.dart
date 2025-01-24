@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 class CurvedBottomNavigationBar extends StatefulWidget {
   final VoidCallback onBackToMenu;
@@ -56,6 +58,35 @@ void initState() {
     print("Bluetooth ${isBluetoothEnabled ? "Enabled" : "Disabled"}");
   }
 
+  // ************** Show Shutdown Confirmation **************
+  void _showShutdownDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirm Shutdown"), // Dialog title
+          content: Text("Are you sure you want to shut down the application?"),
+          actions: [
+            // Cancel button
+            TextButton(
+              child: const Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            // Confirm button
+            TextButton(
+              child: const Text("Yes"),
+              onPressed: () {
+                exit(0); // Exit the application
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -70,9 +101,9 @@ void initState() {
             height: 50,
             width: 500,
             alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Color.fromARGB(110, 2, 101, 80),
-              borderRadius: const BorderRadius.only(
+            decoration: const BoxDecoration(
+              color: Color.fromARGB(172, 39, 104, 96),
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(30),
                 topRight: Radius.circular(30),
               ),
@@ -119,15 +150,13 @@ void initState() {
                     ),
                   ],
                 ),
-                // Bluetooth Icon
+                // power Icon
                 IconButton(
-                  icon: Icon(
-                    isBluetoothEnabled
-                        ? Icons.bluetooth
-                        : Icons.bluetooth_disabled,
-                    color: Colors.white,
-                  ),
-                  onPressed: toggleBluetooth,
+                  icon: Icon(Icons.power_settings_new),
+                  onPressed: () {
+                    _showShutdownDialog(context); // Show shutdown dialog
+                  },
+                  color: Colors.white,
                 ),
               ],
             ),
@@ -145,7 +174,7 @@ void initState() {
     },
     child: CircleAvatar(
       radius: 35,
-      backgroundColor: const Color.fromARGB(255, 10, 74, 152),
+      backgroundColor: Color.fromARGB(183, 10, 74, 152),
       child: const Icon(
         Icons.home,
         size: 40,

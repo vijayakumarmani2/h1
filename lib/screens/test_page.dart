@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -65,17 +66,68 @@ class _TestPageState extends State<TestPage>
     }
   }
 
-  void _addCals() {
+  Future<void> _addCals() async {
     if (cards.isEmpty) {
       // Ensure room for at least two cards
+
+    var latestDBCal = await DatabaseHelper.instance.fetchLatestDBCal();
+      if (latestDBCal != null) {
+    // Access the fields of the latest DBCal record
+    print("Lot Number: ${latestDBCal['lot_no']}");
+    print("Low Value: ${latestDBCal['low_value']}");
+    print("High Value: ${latestDBCal['high_value']}");
+    print("Low Cal Pos: ${latestDBCal['low_cal_pos']}");
+    print("High Cal Pos: ${latestDBCal['high_cal_pos']}");
+  } else {
+    print("No records found in db_cal table.");
+  }
+    
+    
       setState(() {
         cards.add({
           'sampleName': 'Calibrator 1',
           'type': 'D',
-          'result': '5.5',
+          'result': '${latestDBCal!['low_value']}',
         });
         cards.add({
           'sampleName': 'Calibrator 2',
+          'type': 'D',
+          'result': '${latestDBCal['high_value']}',
+        });
+      });
+
+      // Scroll to the bottom of the ListView
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
+    } else {
+      // Show a SnackBar if the maximum limit is reached
+      logEvent('warning', 'Samples should be empty to add calibrators.',
+          page: 'test_page');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Samples should be empty'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _addQCs() {
+    if (cards.isEmpty) {
+      // Ensure room for at least two cards
+      setState(() {
+        cards.add({
+          'sampleName': 'QC 1',
+          'type': 'D',
+          'result': '5.5',
+        });
+        cards.add({
+          'sampleName': 'QC 2',
           'type': 'D',
           'result': '9.9',
         });
@@ -223,6 +275,10 @@ class _TestPageState extends State<TestPage>
           duration: Duration(seconds: 2),
         ),
       );
+
+      final double area = calculateArea(spots, 80, 95);
+print("Area under the curve from 55 to 60 seconds: $area");
+
       return;
     }
 
@@ -309,6 +365,9 @@ class _TestPageState extends State<TestPage>
     }
   }
 
+  List<Map<String, dynamic>> absorbanceJsonData =
+      []; // List to hold absorbance data
+
   void startSampleReading(int sampleNumber) {
     logEvent('info',
         'Starting sample reading for Sample $sampleNumber. $sampleIds[$sampleNumber - 1]',
@@ -330,7 +389,11 @@ class _TestPageState extends State<TestPage>
             calculateAbsorbance(_adc_value2, _adc_value1).toStringAsFixed(4);
         secs++;
         addFlSpot(secs.toDouble(), double.parse(_absorbance_value));
-
+// Add the current absorbance data to the list
+        absorbanceJsonData.add({
+          "secs": secs,
+          "absorbance_value": _absorbance_value,
+        });
         // Save absorbance value to the database
         // DatabaseHelper.instance.insertAbsorbance({
         //   'sample_id': sampleIds[sampleNumber - 1], // Map to correct sample ID
@@ -339,11 +402,28 @@ class _TestPageState extends State<TestPage>
         // });
 
         if (runningTime == 0) {
+          var sid = cards[sampleNumber - 1]['sampleName'];
+          var typeofsample = cards[sampleNumber - 1]['type'];
+
+          final jsonData = jsonEncode({"data": absorbanceJsonData});
+
+          // Example of saving JSON data to the database
+          DatabaseHelper.instance.insertResult({
+            'sample_no': '$sid',
+            'type': '$typeofsample',
+            'date_time': DateTime.now().toIso8601String(),
+            'hbf': 10.5, // Example HbF value
+            'hba1c': 5.8, // Example HbA1c value
+            'remarks': 'Completed',
+            'json_data': jsonData, // Save the JSON data
+          });
+
           setState(() {
             running_status = "Sample $sampleNumber Completed";
             logEvent('info',
                 'Sample $sampleNumber processing completed.$sampleIds[$sampleNumber - 1]',
                 page: 'test_page');
+            absorbanceJsonData = []; // Clear the absorbance data
           });
           timer.cancel();
         }
@@ -401,6 +481,52 @@ class _TestPageState extends State<TestPage>
 
   List<FlSpot> spots = [];
 
+  List<FlSpot> dataPoints = [
+    FlSpot(5, 0.06),
+    FlSpot(10, 0.67),
+    FlSpot(15, 0.73),
+    FlSpot(20, 0.921),
+    FlSpot(25, 0.07),
+    FlSpot(30, 0.3),
+    FlSpot(35, 0.31),
+    FlSpot(40, 0.006),
+    FlSpot(45, 0.19),
+    FlSpot(50, 0.2),
+    FlSpot(55, 0.05),
+    FlSpot(60, 0.06),
+    FlSpot(65, 0.09),
+    FlSpot(70, 0.1),
+    FlSpot(75, 0.456),
+    FlSpot(80, 0.06),
+    FlSpot(85, 1.75),
+    FlSpot(90, 1.34),
+    FlSpot(95, 0.11),
+    FlSpot(100, 0.96),
+    FlSpot(105, 1.12),
+    FlSpot(110, 0.06),
+    FlSpot(115, 0.06),
+  ];
+
+
+double calculateArea(List<FlSpot> spots, double startX, double endX) {
+  final filteredSpots = dataPoints.where((spot) => spot.x >= startX && spot.x <= endX).toList();
+  if (filteredSpots.length < 2) return 0.0; // Not enough points to calculate area
+
+  double area = 0.0;
+  for (int i = 1; i < filteredSpots.length; i++) {
+    final x1 = filteredSpots[i - 1].x;
+    final y1 = filteredSpots[i - 1].y;
+    final x2 = filteredSpots[i].x;
+    final y2 = filteredSpots[i].y;
+
+    final trapezoidArea = (x2 - x1) * ((y1 + y2) / 2);
+    area += trapezoidArea;
+  }
+
+  return area;
+}
+
+
   void addFlSpot(double x, double y) {
     setState(() {
       spots.add(FlSpot(x, y));
@@ -423,6 +549,22 @@ class _TestPageState extends State<TestPage>
       spots = []; // Clear the data points
     });
     timer?.cancel();
+  }
+
+  Future<void> fetchAndDecodeJsonData() async {
+    final results =
+        await DatabaseHelper.instance.fetchResults(); // Fetch all results
+
+    for (var row in results) {
+      final jsonData = jsonDecode(row['json_data'] as String);
+      print("Sample No: ${row['sample_no']}");
+      print("Absorbance Data: ${jsonData['data']}");
+
+      // Access secs and absorbance values
+      for (var item in jsonData['data']) {
+        print("Secs: ${item['secs']}, Absorbance: ${item['absorbance_value']}");
+      }
+    }
   }
 
   TextEditingController _textController = TextEditingController();
@@ -715,7 +857,7 @@ class _TestPageState extends State<TestPage>
                                                         padding:
                                                             EdgeInsets.all(12),
                                                         decoration:
-                                                            BoxDecoration(
+                                                            const BoxDecoration(
                                                           border: Border(
                                                             bottom: BorderSide(
                                                               color: Color
@@ -1305,49 +1447,56 @@ class _TestPageState extends State<TestPage>
                           ),
                           backgroundColor: const Color.fromARGB(30, 0, 112,
                               110), // Background color for the chart
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: spots,
-                              isCurved: true,
-                              gradient: const LinearGradient(
-                                colors: [
-                                  // Gradient start color
-                                  Colors.teal,
-                                  Colors.teal, // Gradient end color
-                                ],
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                              ),
-                              barWidth: 4,
-                              isStrokeCapRound: true,
-                              belowBarData: BarAreaData(
-                                show: true,
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    // Hex code #224c84
-                                    Color.fromARGB(71, 14, 122, 61),
-                                    Color.fromARGB(63, 34, 77,
-                                        132), // Gradient end (faded)
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
-                              ),
-                              dotData: FlDotData(
-                                show: false,
-                                getDotPainter: (spot, percent, barData, index) {
-                                  return FlDotCirclePainter(
-                                    radius: 4,
-                                    color: Color.fromARGB(255, 255, 255, 255),
-                                    strokeWidth: 2,
-                                    strokeColor:
-                                        Color.fromARGB(159, 0, 136, 122),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
+                           lineBarsData: [
+      LineChartBarData(
+        spots: dataPoints,
+        isCurved: true,
+        gradient: const LinearGradient(
+          colors: [
+            Colors.teal,
+            Colors.teal,
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        barWidth: 2,
+        isStrokeCapRound: true,
+        belowBarData: BarAreaData(
+          show: true,
+          gradient: const LinearGradient(
+            colors: [
+              Color.fromARGB(71, 14, 122, 61),
+              Color.fromARGB(63, 34, 77, 132),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          cutOffY: null,
+          applyCutOffY: false,
+        ),
+        dotData: FlDotData(show: false),
+      ),
+      LineChartBarData(
+        spots: dataPoints.where((e) => e.x >= 80 && e.x <= 95).toList(),
+        isCurved: true,
+        color: Colors.orange,
+        barWidth: 2,
+        belowBarData: BarAreaData(
+          show: true,
+          gradient: LinearGradient(
+            colors: [
+              Colors.orange.withOpacity(0.4),
+              Colors.orange.withOpacity(0.1),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        dotData: FlDotData(show: false),
+      ),
+    ],
+  ),
+
                       ),
                     ),
                   ),
@@ -1598,8 +1747,10 @@ class _TestPageState extends State<TestPage>
       //   elevation: 5,
       // ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar:
-          CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu, wifiStatusNotifier: wifiStatusNotifier,),
+      bottomNavigationBar: CurvedBottomNavigationBar(
+        onBackToMenu: widget.onBackToMenu,
+        wifiStatusNotifier: wifiStatusNotifier,
+      ),
     );
   }
 

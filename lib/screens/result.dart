@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hba1c_analyzer_1/services/DataHandler.dart';
 import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
 
 class ResultPage extends StatefulWidget {
@@ -13,25 +14,28 @@ class ResultPage extends StatefulWidget {
 class _ResultPageState extends State<ResultPage> {
   bool isSearchExpanded = false;
   String searchText = "";
-  String filterColumn = "Number";
+  String filterColumn = "ID";
 
   final ScrollController _verticalScrollController = ScrollController();
 
-  List<Map<String, String>> data = [
-    {"Number": "0010", "Sample No.": "QC2", "Type": "Diluted blood", "Date and Time": "2024-11-29 14:20:01", "HbF(%)": "1.3", "HbA1c(%)": "10.1*", "Remarks": "-"},
-    {"Number": "0009", "Sample No.": "QC1", "Type": "Diluted blood", "Date and Time": "2024-11-29 14:17:50", "HbF(%)": "-", "HbA1c(%)": "-", "Remarks": "-"},
-    {"Number": "0008", "Sample No.": "QC2", "Type": "Diluted blood", "Date and Time": "2024-11-28 15:42:07", "HbF(%)": "1.2", "HbA1c(%)": "9.9*", "Remarks": "-"},
-    {"Number": "0007", "Sample No.": "QC1", "Type": "Diluted blood", "Date and Time": "2024-11-28 15:39:56", "HbF(%)": "0.3", "HbA1c(%)": "5.5*", "Remarks": "-"},
-    {"Number": "0006", "Sample No.": "C2", "Type": "Diluted blood", "Date and Time": "2024-11-28 14:23:40", "HbF(%)": "1.1", "HbA1c(%)": "8.8*", "Remarks": "-"},
-    {"Number": "0005", "Sample No.": "C2", "Type": "Diluted blood", "Date and Time": "2024-11-28 14:21:30", "HbF(%)": "1.1", "HbA1c(%)": "8.9*", "Remarks": "-"},
-    {"Number": "0004", "Sample No.": "C1", "Type": "Diluted blood", "Date and Time": "2024-11-28 14:19:20", "HbF(%)": "0.2", "HbA1c(%)": "4.8", "Remarks": "-"},
-    {"Number": "0003", "Sample No.": "C1", "Type": "Diluted blood", "Date and Time": "2024-11-28 14:17:10", "HbF(%)": "0.3", "HbA1c(%)": "4.7", "Remarks": "-"},
-    {"Number": "0002", "Sample No.": "S2", "Type": "Whole blood", "Date and Time": "2024-11-28 13:54:55", "HbF(%)": "-", "HbA1c(%)": "-", "Remarks": "e1"},
-    {"Number": "0001", "Sample No.": "S1", "Type": "Whole blood", "Date and Time": "2024-11-28 13:52:46", "HbF(%)": "-", "HbA1c(%)": "-", "Remarks": "e1"},
-  ];
+  List<Map<String, dynamic>> data = []; // List to hold the fetched data
+  List<int> selectedRows = []; // List of selected row IDs
 
-  List<int> selectedRows = [];
+  @override
+  void initState() {
+    super.initState();
+    _fetchResults(); // Fetch data from DB
+  }
 
+  // Fetch results from the database
+  Future<void> _fetchResults() async {
+    final results = await DatabaseHelper.instance.fetchResults(); // Fetch all rows
+    setState(() {
+      data = results; // Assign fetched data to the list
+    });
+  }
+
+  // Show confirmation dialog
   Future<void> _showConfirmationDialog({
     required String title,
     required String content,
@@ -46,11 +50,11 @@ class _ResultPageState extends State<ResultPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text("No"),
+              child: const Text("No"),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text("Yes"),
+              child: const Text("Yes"),
             ),
           ],
         );
@@ -62,28 +66,34 @@ class _ResultPageState extends State<ResultPage> {
     }
   }
 
+  // Delete selected rows
   void _deleteSelectedRows() {
     _showConfirmationDialog(
       title: "Delete Selected Rows",
       content: "Are you sure you want to delete the selected rows?",
-      onConfirm: () {
+      onConfirm: () async {
+        for (int id in selectedRows) {
+          await DatabaseHelper.instance.deleteResultByID(id); // Delete from database
+        }
         setState(() {
-          data.removeWhere((row) => selectedRows.contains(data.indexOf(row)));
-          selectedRows.clear();
+          selectedRows.clear(); // Clear selected rows
         });
+        _fetchResults(); // Refresh the data
       },
     );
   }
 
+  // Delete all rows
   void _deleteAllRows() {
     _showConfirmationDialog(
       title: "Delete All Rows",
       content: "Are you sure you want to delete all rows?",
-      onConfirm: () {
+      onConfirm: () async {
+        await DatabaseHelper.instance.deleteAllResults(); // Delete all from database
         setState(() {
-          data.clear();
-          selectedRows.clear();
+          selectedRows.clear(); // Clear selected rows
         });
+        _fetchResults(); // Refresh the data
       },
     );
   }
@@ -93,8 +103,9 @@ class _ResultPageState extends State<ResultPage> {
     _verticalScrollController.dispose();
     super.dispose();
   }
-  
+
   final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,7 +128,7 @@ class _ResultPageState extends State<ResultPage> {
                             searchText = value;
                           });
                         },
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: "Search",
                           border: OutlineInputBorder(),
                         ),
@@ -140,8 +151,15 @@ class _ResultPageState extends State<ResultPage> {
                       filterColumn = newValue!;
                     });
                   },
-                  items: <String>["Number", "Sample No.", "Type", "Date and Time", "HbF(%)", "HbA1c(%)", "Remarks"]
-                      .map<DropdownMenuItem<String>>((String value) {
+                  items: <String>[
+                    "ID",
+                    "Sample No.",
+                    "Type",
+                    "Date and Time",
+                    "HbF(%)",
+                    "HbA1c(%)",
+                    "Remarks"
+                  ].map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -156,14 +174,28 @@ class _ResultPageState extends State<ResultPage> {
             color: Colors.grey[300],
             padding: const EdgeInsets.all(8.0),
             child: Row(
-              children: [
-                Expanded(child: Text("Number", style: TextStyle(fontWeight: FontWeight.bold))),
-                Expanded(child: Text("Sample No.", style: TextStyle(fontWeight: FontWeight.bold))),
-                Expanded(child: Text("Type", style: TextStyle(fontWeight: FontWeight.bold))),
-                Expanded(child: Text("Date and Time", style: TextStyle(fontWeight: FontWeight.bold))),
-                Expanded(child: Text("HbF(%)", style: TextStyle(fontWeight: FontWeight.bold))),
-                Expanded(child: Text("HbA1c(%)", style: TextStyle(fontWeight: FontWeight.bold))),
-                Expanded(child: Text("Remarks", style: TextStyle(fontWeight: FontWeight.bold))),
+              children: const [
+                Expanded(
+                    child: Text("ID",
+                        style: TextStyle(fontWeight: FontWeight.bold))),
+                Expanded(
+                    child: Text("Sample No.",
+                        style: TextStyle(fontWeight: FontWeight.bold))),
+                Expanded(
+                    child: Text("Type",
+                        style: TextStyle(fontWeight: FontWeight.bold))),
+                Expanded(
+                    child: Text("Date and Time",
+                        style: TextStyle(fontWeight: FontWeight.bold))),
+                Expanded(
+                    child: Text("HbF(%)",
+                        style: TextStyle(fontWeight: FontWeight.bold))),
+                Expanded(
+                    child: Text("HbA1c(%)",
+                        style: TextStyle(fontWeight: FontWeight.bold))),
+                Expanded(
+                    child: Text("Remarks",
+                        style: TextStyle(fontWeight: FontWeight.bold))),
               ],
             ),
           ),
@@ -177,30 +209,36 @@ class _ResultPageState extends State<ResultPage> {
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   final row = data[index];
+                  final int id = row["id"]; // Ensure ID is an integer
+
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        if (selectedRows.contains(index)) {
-                          selectedRows.remove(index);
+                        if (selectedRows.contains(id)) {
+                          selectedRows.remove(id);
                         } else {
-                          selectedRows.add(index);
+                          selectedRows.add(id);
                         }
                       });
                     },
                     child: Container(
                       color: index % 2 == 0
-                          ? (selectedRows.contains(index) ? const Color.fromARGB(255, 187, 251, 218) : Colors.grey[100])
-                          : (selectedRows.contains(index) ? const Color.fromARGB(255, 187, 251, 218) : Colors.white),
+                          ? (selectedRows.contains(id)
+                              ? const Color.fromARGB(255, 187, 251, 218)
+                              : Colors.grey[100])
+                          : (selectedRows.contains(id)
+                              ? const Color.fromARGB(255, 187, 251, 218)
+                              : Colors.white),
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
-                          Expanded(child: Text(row["Number"]!)),
-                          Expanded(child: Text(row["Sample No."]!)),
-                          Expanded(child: Text(row["Type"]!)),
-                          Expanded(child: Text(row["Date and Time"]!)),
-                          Expanded(child: Text(row["HbF(%)"]!)),
-                          Expanded(child: Text(row["HbA1c(%)"]!)),
-                          Expanded(child: Text(row["Remarks"]!)),
+                          Expanded(child: Text(id.toString())),
+                          Expanded(child: Text(row["sample_no"] ?? "")),
+                          Expanded(child: Text(row["type"] ?? "")),
+                          Expanded(child: Text(row["date_time"] ?? "")),
+                          Expanded(child: Text(row["hbf"].toString())),
+                          Expanded(child: Text(row["hba1c"].toString())),
+                          Expanded(child: Text(row["remarks"] ?? "")),
                         ],
                       ),
                     ),
@@ -216,34 +254,31 @@ class _ResultPageState extends State<ResultPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  if (selectedRows.isNotEmpty )
+                  if (selectedRows.isNotEmpty)
                     ElevatedButton(
                       onPressed: _deleteSelectedRows,
-                      child: Text("Delete Selected Rows"),style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Color.fromARGB(162, 67, 154, 93),
-                                  ),
+                      child: const Text("Delete Selected Rows"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(162, 67, 154, 93),
+                      ),
                     ),
-                  if (selectedRows.isNotEmpty )
+                  if (data.isNotEmpty)
                     ElevatedButton(
                       onPressed: _deleteAllRows,
-                      child: Text("Delete All Rows"),style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Color.fromARGB(162, 29, 60, 139),
-                                  ),
+                      child: const Text("Delete All Rows"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(162, 29, 60, 139),
+                      ),
                     ),
                 ],
               ),
             ),
-       
-
         ],
       ),
-      bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu, wifiStatusNotifier: wifiStatusNotifier,),
+      bottomNavigationBar: CurvedBottomNavigationBar(
+        onBackToMenu: widget.onBackToMenu,
+        wifiStatusNotifier: wifiStatusNotifier,
+      ),
     );
   }
 }
-
-
-
-

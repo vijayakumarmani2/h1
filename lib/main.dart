@@ -2,6 +2,7 @@ import 'dart:async'; // For Timer functionality
 import 'dart:io'; // For exit function
 
 import 'package:flutter/material.dart'; // For building the UI
+import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
 import 'package:intl/intl.dart'; // For formatting the date and time
 
 // Import custom screen files
@@ -28,13 +29,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // Disable debug banner
-      home: MainScreen(), // Set MainScreen as the home page
+      home: MainScreen(onBackToMenu: () {  },), // Set MainScreen as the home page
     );
   }
 }
 
 // MainScreen Stateful Widget
 class MainScreen extends StatefulWidget {
+  const MainScreen({Key? key, required this.onBackToMenu}) : super(key: key);
+  final VoidCallback onBackToMenu;
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -58,6 +61,9 @@ class _MainScreenState extends State<MainScreen> {
     "Log",
     "Setting"
   ];
+
+
+final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
 
   // ****************** InitState ******************
   @override
@@ -115,34 +121,7 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  // ************** Show Shutdown Confirmation **************
-  void _showShutdownDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Confirm Shutdown"), // Dialog title
-          content: Text("Are you sure you want to shut down the application?"),
-          actions: [
-            // Cancel button
-            TextButton(
-              child: const Text("No"),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            // Confirm button
-            TextButton(
-              child: const Text("Yes"),
-              onPressed: () {
-                exit(0); // Exit the application
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  
 
   // ************** Build Selected Page **************
   Widget _buildSelectedPage(int selectedIndex) {
@@ -154,78 +133,82 @@ class _MainScreenState extends State<MainScreen> {
 
   // ************** Build Grid Menu **************
   Widget buildGridMenu() {
-    return Padding(
-      padding: const EdgeInsets.all(30.0),
-      child: Center(
-        child: Container(
-          height: 800,
-          width: 700,
-          child: Center(
-            child: GridView.builder(
-              shrinkWrap: true, // Ensures the grid takes only as much space as needed
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, // Number of columns
-                crossAxisSpacing: 35.0, // Spacing between columns
-                mainAxisSpacing: 35.0, // Spacing between rows
-              ),
-              itemCount: _menuItems.length, // Number of menu items
-              itemBuilder: (context, index) {
-                final menuItem = _menuItems[index];
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedIndex = index + 1; // Navigate to the page
-                    });
-                  },
-                  child: Column(
-                    children: [
-                      // Icon container
-                      Container(
-                        width: 200,
-                        height: 170,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color.fromARGB(233, 28, 61, 107),
-                              Color(0xFF00706e)
-                            ], // Gradient colors
-                            begin: Alignment.topLeft ,stops: 
-                             [0.0, 0.4],
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black26, // Shadow color
-                              blurRadius: 4,
-                              offset: Offset(2, 2),
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(30.0),
+        child: Center(
+          child: Container(
+            height: 800,
+            width: 700,
+            child: Center(
+              child: GridView.builder(
+                shrinkWrap: true, // Ensures the grid takes only as much space as needed
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3, // Number of columns
+                  crossAxisSpacing: 35.0, // Spacing between columns
+                  mainAxisSpacing: 35.0, // Spacing between rows
+                ),
+                itemCount: _menuItems.length, // Number of menu items
+                itemBuilder: (context, index) {
+                  final menuItem = _menuItems[index];
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedIndex = index + 1; // Navigate to the page
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        // Icon container
+                        Container(
+                          width: 200,
+                          height: 170,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFF276860),
+                                Color(0xFF276860)
+                              ], // Gradient colors
+                              begin: Alignment.topLeft ,stops: 
+                               [0.0, 0.4],
+                              end: Alignment.bottomRight,
                             ),
-                          ],
+                            borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black26, // Shadow color
+                                blurRadius: 4,
+                                offset: Offset(2, 2),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            menuItem['icon'], // Display menu icon
+                            size: 70,
+                            color: Colors.white,
+                          ),
                         ),
-                        child: Icon(
-                          menuItem['icon'], // Display menu icon
-                          size: 70,
-                          color: Colors.white,
+                        // Label
+                        Text(
+                          menuItem['label'],
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF00706e),
+                          ),
                         ),
-                      ),
-                      // Label
-                      Text(
-                        menuItem['label'],
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF00706e),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ),
       ),
+      bottomNavigationBar:
+          CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu, wifiStatusNotifier: wifiStatusNotifier,),
     );
   }
 
@@ -277,8 +260,8 @@ class _MainScreenState extends State<MainScreen> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 26, 57, 99),
-                Color.fromARGB(255, 9, 78, 39)
+                Color.fromARGB(255, 38, 64, 105),
+                                Color.fromARGB(255, 24, 96, 55)
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -309,13 +292,7 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   ],
                 ),
-                IconButton(
-                  icon: Icon(Icons.power_settings_new),
-                  onPressed: () {
-                    _showShutdownDialog(context); // Show shutdown dialog
-                  },
-                  color: Colors.white,
-                ),
+                
               ],
             ),
           ),
@@ -323,6 +300,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
       // ************** Body **************
       body: _buildSelectedPage(_selectedIndex),
+      
     );
   }
 }

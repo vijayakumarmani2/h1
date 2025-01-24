@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hba1c_analyzer_1/services/DataHandler.dart';
 import 'package:hba1c_analyzer_1/services/linux_wif_manager.dart';
 import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
 import 'package:virtual_keyboard_multi_language/virtual_keyboard_multi_language.dart';
@@ -23,6 +24,8 @@ class _CalibrationPageState extends State<CalibrationPage> {
   }
 
   Future<void> checkActiveNetwork() async {
+    // await DatabaseHelper.instance.insertLatestDBCal();
+    print(await DatabaseHelper.instance.fetchLatestDBCal());
     try {
       active = await LinuxWiFiManager.getActiveNetwork();
       setState(() {
@@ -32,7 +35,6 @@ class _CalibrationPageState extends State<CalibrationPage> {
         } else {
           wifiStatusNotifier.value = false;
         }
-        
       });
     } catch (e) {
       setState(() {
@@ -55,116 +57,169 @@ class _CalibrationPageState extends State<CalibrationPage> {
                 Row(
                   children: [
                     Expanded(
-                      child: Column(
-                        children: [
-                          Text(
-                            'Calibration Info',
-                            style: TextStyle(
-                              color: Colors.teal,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Container(
-                            height: 120,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: const Color.fromARGB(0, 0, 150, 135),
-                                  width: 1.5),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      InfoRowLabel(label: "Date"),
-                                      InfoRowLabel(label: "Lot No."),
-                                      InfoRowLabel(label: "K"),
-                                      InfoRowLabel(label: "B"),
-                                    ],
-                                  ),
+                      child: FutureBuilder<Map<String, dynamic>?>(
+                        future: DatabaseHelper.instance.fetchCalibrationInfo(),
+                        builder: (context, snapshot) {
+                          // Provide default values when no data is available
+                          final data = snapshot.data ??
+                              {
+                                'date': '',
+                                'lot_no': '',
+                                'k_value': '',
+                                'b_value': '',
+                              };
+
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            print("Error fetching data: ${snapshot.error}");
+                          }
+
+                          return Column(
+                            children: [
+                              Text(
+                                'Latest Calibration Info',
+                                style: TextStyle(
+                                  color: Colors.teal,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                VerticalDivider(
-                                    color: Colors.teal, thickness: 1),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      InfoRowValue(
-                                          value: "2024/11/28 14:23:40"),
-                                      InfoRowValue(value: "GSX1240020"),
-                                      InfoRowValue(value: "1.0725"),
-                                      InfoRowValue(value: "0.4338"),
-                                    ],
-                                  ),
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                height: 120,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color:
+                                          const Color.fromARGB(0, 0, 150, 135),
+                                      width: 1.5),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ],
+                                padding: EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          InfoRowLabel(label: "Date"),
+                                          InfoRowLabel(label: "Lot No."),
+                                          InfoRowLabel(label: "K"),
+                                          InfoRowLabel(label: "B"),
+                                        ],
+                                      ),
+                                    ),
+                                    VerticalDivider(
+                                        color: Colors.teal, thickness: 1),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          InfoRowValue(value: data['date']),
+                                          InfoRowValue(value: data['lot_no']),
+                                          InfoRowValue(
+                                              value:
+                                                  data['k_value'].toString()),
+                                          InfoRowValue(
+                                              value:
+                                                  data['b_value'].toString()),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                     SizedBox(width: 16),
                     Expanded(
-                      child: Column(
-                        children: [
-                          Text(
-                            'Last Time',
-                            style: TextStyle(
-                              color: Colors.teal,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Container(
-                            height: 120,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: const Color.fromARGB(0, 0, 150, 135),
-                                  width: 1.5),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      InfoRowLabel(label: "Date"),
-                                      InfoRowLabel(label: "Lot No."),
-                                      InfoRowLabel(label: "K"),
-                                      InfoRowLabel(label: "B"),
-                                    ],
-                                  ),
+                      child: FutureBuilder<Map<String, dynamic>?>(
+                        future:
+                            DatabaseHelper.instance.fetchLastCalibrationInfo(),
+                        builder: (context, snapshot) {
+                          // Provide default values when no data is available
+                          final data = snapshot.data ??
+                              {
+                                'date': '',
+                                'lot_no': '',
+                                'k_value': '',
+                                'b_value': '',
+                              };
+
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            print("Error fetching data: ${snapshot.error}");
+                          }
+
+                          return Column(
+                            children: [
+                              Text(
+                                'Last Calibration Info',
+                                style: TextStyle(
+                                  color: Colors.teal,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                VerticalDivider(
-                                    color: Colors.teal, thickness: 1),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      InfoRowValue(
-                                          value: "2024/08/26 09:43:05"),
-                                      InfoRowValue(value: "GSX1230020"),
-                                      InfoRowValue(value: "1.1517"),
-                                      InfoRowValue(value: "0.0930"),
-                                    ],
-                                  ),
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                height: 120,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color:
+                                          const Color.fromARGB(0, 0, 150, 135),
+                                      width: 1.5),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ],
+                                padding: EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          InfoRowLabel(label: "Date"),
+                                          InfoRowLabel(label: "Lot No."),
+                                          InfoRowLabel(label: "K"),
+                                          InfoRowLabel(label: "B"),
+                                        ],
+                                      ),
+                                    ),
+                                    VerticalDivider(
+                                        color: Colors.teal, thickness: 1),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          InfoRowValue(value: data['date']),
+                                          InfoRowValue(value: data['lot_no']),
+                                          InfoRowValue(
+                                              value:
+                                                  data['k_value'].toString()),
+                                          InfoRowValue(
+                                              value:
+                                                  data['b_value'].toString()),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -173,24 +228,172 @@ class _CalibrationPageState extends State<CalibrationPage> {
                 Row(
                   children: [
                     Expanded(
-                      child: Column(
+                      child: FutureBuilder<Map<String, dynamic>?>(
+                        future: DatabaseHelper.instance.fetchLatestDBCal(),
+                        builder: (context, snapshot) {
+                          // Provide default values when no data is available
+                          final data = snapshot.data ??
+                              {
+                                'lot_no': '123456',
+                                'low_value': '0',
+                                'high_value': '0',
+                                'low_cal_pos': '1',
+                                'high_cal_pos': '2',
+                              };
+
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            print("Error fetching data: ${snapshot.error}");
+                          }
+
+                          return Column(
+                            children: [
+                              Text(
+                                'D.B. Cal.',
+                                style: TextStyle(
+                                  color: Colors.teal,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                height: 150,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color:
+                                          const Color.fromARGB(0, 0, 150, 135),
+                                      width: 1.5),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          InfoRowLabel(label: "Lot No."),
+                                          InfoRowLabel(label: "Low"),
+                                          InfoRowLabel(label: "High"),
+                                          InfoRowLabel(label: "Low Cal Pos."),
+                                          InfoRowLabel(label: "High Cal Pos."),
+                                        ],
+                                      ),
+                                    ),
+                                    VerticalDivider(
+                                        color: Colors.teal, thickness: 1),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          EditableInfoValueWithKeyboard(
+                                            initialValue: data['lot_no'],
+                                            onSave: (newValue) async {
+                                              await DatabaseHelper.instance
+                                                  .updateDBCalLotNo(
+                                                      1, newValue);
+                                              print(
+                                                  "Updated Lot No. Value: $newValue");
+                                              // Add logic to save the new value
+                                            },
+                                          ),
+                                          EditableInfoValueWithNumericKeyboard(
+                                            initialValue:
+                                                data['low_value'].toString(),
+                                            onSave: (newValue) async {
+                                              await DatabaseHelper.instance
+                                                  .updateDBCalLowValue(
+                                                      1, newValue);
+                                              print(
+                                                  "Updated Low Value: $newValue");
+                                              // Add logic to save the new value
+                                            },
+                                          ),
+                                          EditableInfoValueWithNumericKeyboard(
+                                            initialValue:
+                                                data['high_value'].toString(),
+                                            onSave: (newValue) {
+                                              DatabaseHelper.instance
+                                                  .updateDBCalHighValue(
+                                                      1, newValue);
+                                              print(
+                                                  "Updated High Value: $newValue");
+                                              // Add logic to save the new value
+                                            },
+                                          ),
+                                          InfoRowValue(
+                                              value: data['low_cal_pos']
+                                                  .toString()),
+                                          InfoRowValue(
+                                              value: data['high_cal_pos']
+                                                  .toString()),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                  ],
+                ),
+                Container(
+                  height: 140,
+                  width: 400,
+                  child: FutureBuilder<Map<String, dynamic>?>(
+                    future: DatabaseHelper.instance.fetchManualData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text("Error: ${snapshot.error}"));
+                      }
+
+                      // Default data with '-'
+                      final data = snapshot.data ??
+                          {
+                            'hba1c_k': '-',
+                            'hba1c_b': '-',
+                          };
+
+                      final TextEditingController hba1cKController =
+                          TextEditingController(
+                        text: data['hba1c_k']?.toString() ?? '-',
+                      );
+                      final TextEditingController hba1cBController =
+                          TextEditingController(
+                        text: data['hba1c_b']?.toString() ?? '-',
+                      );
+
+                      return Column(
                         children: [
                           Text(
-                            'D.B. Cal.',
+                            'Manual',
                             style: TextStyle(
                               color: Colors.teal,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 10),
+                          SizedBox(height: 5),
                           Container(
-                            height: 150,
+                            height: 60,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                  color: const Color.fromARGB(0, 0, 150, 135),
-                                  width: 1.5),
+                                color: const Color.fromARGB(0, 0, 150, 135),
+                                width: 1.5,
+                              ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             padding: EdgeInsets.all(8.0),
@@ -200,11 +403,8 @@ class _CalibrationPageState extends State<CalibrationPage> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      InfoRowLabel(label: "Lot No."),
-                                      InfoRowLabel(label: "Low"),
-                                      InfoRowLabel(label: "High"),
-                                      InfoRowLabel(label: "Low Cal Pos."),
-                                      InfoRowLabel(label: "High Cal Pos."),
+                                      InfoRowLabel(label: "HbA1c K"),
+                                      InfoRowLabel(label: "HbA1c B"),
                                     ],
                                   ),
                                 ),
@@ -215,31 +415,62 @@ class _CalibrationPageState extends State<CalibrationPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      EditableInfoValueWithKeyboard(
-                                        initialValue: "GSX1240020",
-                                        onSave: (newValue) {
-                                          print(
-                                              "Updated Lot No. Value: $newValue");
-                                          // Add logic to save the new value
+                                      EditableInfoValueWithNumericKeyboard(
+                                        initialValue: hba1cKController.text,
+                                        onSave: (newValue) async {
+                                          final id = data['id'];
+                                          if (data != null) {
+                                            await DatabaseHelper.instance
+                                                .updateManualData(id, {
+                                              'hba1c_k': newValue == '-'
+                                                  ? null
+                                                  : double.tryParse(newValue),
+                                            });
+                                          } else {
+                                            await DatabaseHelper.instance
+                                                .insertManualData({
+                                              'hba1c_k': newValue == '-'
+                                                  ? null
+                                                  : double.tryParse(newValue),
+                                              'hba1c_b': hba1cBController
+                                                          .text ==
+                                                      '-'
+                                                  ? null
+                                                  : double.tryParse(
+                                                      hba1cBController.text),
+                                            });
+                                          }
+                                          print("Updated hba1c_k: $newValue");
                                         },
                                       ),
                                       EditableInfoValueWithNumericKeyboard(
-                                        initialValue: "5.50",
-                                        onSave: (newValue) {
-                                          print("Updated Low Value: $newValue");
-                                          // Add logic to save the new value
+                                        initialValue: hba1cBController.text,
+                                        onSave: (newValue) async {
+                                          final id = data['id'];
+                                          if (data != null) {
+                                            await DatabaseHelper.instance
+                                                .updateManualData(id, {
+                                              'hba1c_b': newValue == '-'
+                                                  ? null
+                                                  : double.tryParse(newValue),
+                                            });
+                                          } else {
+                                            await DatabaseHelper.instance
+                                                .insertManualData({
+                                              'hba1c_k': hba1cKController
+                                                          .text ==
+                                                      '-'
+                                                  ? null
+                                                  : double.tryParse(
+                                                      hba1cKController.text),
+                                              'hba1c_b': newValue == '-'
+                                                  ? null
+                                                  : double.tryParse(newValue),
+                                            });
+                                          }
+                                          print("Updated hba1c_b: $newValue");
                                         },
                                       ),
-                                      EditableInfoValueWithNumericKeyboard(
-                                        initialValue: "9.90",
-                                        onSave: (newValue) {
-                                          print(
-                                              "Updated High Value: $newValue");
-                                          // Add logic to save the new value
-                                        },
-                                      ),
-                                      InfoRowValue(value: "1"),
-                                      InfoRowValue(value: "2"),
                                     ],
                                   ),
                                 ),
@@ -247,88 +478,8 @@ class _CalibrationPageState extends State<CalibrationPage> {
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                  ],
-                ),
-                Container(
-                  height: 157,
-                  width: 400,
-                  child: Column(
-                    children: [
-                      Text(
-                        'Manual',
-                        style: TextStyle(
-                          color: Colors.teal,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Container(
-                        height: 125,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: const Color.fromARGB(0, 0, 150, 135),
-                              width: 1.5),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: EdgeInsets.all(4.0),
-                        child: Column(
-                          children: [
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text("HbA1c K"),
-                                SizedBox(width: 8),
-                                SizedBox(
-                                  width: 190,
-                                  height: 30,
-                                  child: TextField(
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 5),
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text("HbA1c B"),
-                                SizedBox(width: 8),
-                                SizedBox(
-                                  width: 190,
-                                  height: 30,
-                                  child: TextField(
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 5),
-                            Align(
-                              alignment: Alignment.center,
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.teal,
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                ),
-                                child: Text("Save"),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ],
@@ -545,7 +696,7 @@ class _EditableInfoValueWithNumericKeyboardState
                 onPressed: () {
                   widget.onSave(_controller.text);
                   Navigator.pop(context);
-                },
+                }, style: ButtonStyle(  backgroundColor: MaterialStateProperty.all<Color>(Colors.teal),),
                 child: const Text('Save'),
               ),
             ],

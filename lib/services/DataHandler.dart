@@ -16,7 +16,12 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'app_database.db');
+    String path = join(await getDatabasesPath(), 'hba1c_database.db');
+
+     // Delete the old database (for development purposes only)
+  // await deleteDatabase(path);
+  // print("Old database deleted");
+
     return await openDatabase(
       path,
       version: 1,
@@ -57,6 +62,78 @@ class DatabaseHelper {
         type TEXT NOT NULL -- 'info', 'error', or 'warning'
       )
     ''');
+
+   // Create calibration_info table
+    await db.execute('''
+      CREATE TABLE calibration_info (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT NOT NULL,
+        lot_no TEXT NOT NULL,
+        k_value REAL NOT NULL,
+        b_value REAL NOT NULL
+      )
+    ''');
+
+    // Create last_calibration_info table
+    await db.execute('''
+      CREATE TABLE last_calibration_info (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT NOT NULL,
+        lot_no TEXT NOT NULL,
+        k_value REAL NOT NULL,
+        b_value REAL NOT NULL
+      )
+    ''');
+
+    // create db_cal table
+    await db.execute('''
+      CREATE TABLE db_cal (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        lot_no TEXT NOT NULL,
+        low_value REAL NOT NULL,
+        high_value REAL NOT NULL,
+        low_cal_pos INTEGER NOT NULL,
+        high_cal_pos INTEGER NOT NULL
+      )
+    ''');
+
+ 
+
+
+    // create manual table
+    await db.execute('''
+      CREATE TABLE manual (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        hba1c_k REAL,
+        hba1c_b REAL
+      )
+    ''');
+
+    // result table
+   await db.execute('''
+  CREATE TABLE result_table (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sample_no TEXT NOT NULL,
+    type TEXT NOT NULL,
+    date_time TEXT NOT NULL,
+    hbf REAL NOT NULL,
+    hba1c REAL NOT NULL,
+    remarks TEXT,
+    abs_data TEXT -- Column to store JSON
+  )
+''');
+
+ // Create qc_target table
+  await db.execute('''
+    CREATE TABLE qc_target (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      low_target REAL NOT NULL,
+      high_target REAL NOT NULL,
+      modified_date TEXT NOT NULL
+    )
+  ''');
+
+
     print("database created");
   }
 
@@ -94,6 +171,181 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db.insert('logs', log);
   }
+
+  // Insert calibration info
+    Future<int> insertCalibrationInfo(Map<String, dynamic> data) async {
+    final db = await instance.database;
+    return await db.insert('calibration_info', data);
+  }
+  
+  // Insert db_cal
+  Future<int> insertDBCal(Map<String, dynamic> data) async {
+    final db = await instance.database;
+    return await db.insert('db_cal', data);
+  }
+
+// Insert QC Target
+Future<int> insertQCTarget(Map<String, dynamic> data) async {
+  final db = await instance.database;
+  return await db.insert('qc_target', data);
+}
+
+Future<void> insertNewQCTarget() async {
+  final data = {
+    'low_target': 0.0, // Example low target value
+    'high_target': 0.0, // Example high target value
+    'modified_date': DateTime.now().toIso8601String(), // Current date and time
+  };
+
+  final id = await DatabaseHelper.instance.insertQCTarget(data);
+  print("Inserted new QC Target record with ID: $id");
+}
+
+Future<Map<String, dynamic>?> fetchLatestQCTarget() async {
+  final db = await instance.database;
+  final result = await db.query(
+    'qc_target',
+    orderBy: 'id DESC',
+    limit: 1,
+  );
+  return result.isNotEmpty ? result.first : null;
+}
+
+Future<int> updateQCTarget( Map<String, dynamic> updatedData) async {
+  final db = await instance.database;
+  return await db.update(
+    'qc_target',
+    updatedData,
+    where: 'id = 1'
+  );
+}
+
+
+Future<void> insertLatestDBCal() async {
+  final data = {
+    'lot_no': 'LOT12345',
+    'low_value': '0',       // Example low value
+    'high_value': '0',      // Example high value
+    'low_cal_pos': '1',         // Example low calibration position
+    'high_cal_pos': '2',        // Example high calibration position
+  };
+
+  final id = await DatabaseHelper.instance.insertDBCal(data);
+  print("Inserted new record into db_cal with ID: $id");
+}
+
+  // Insert manual
+  Future<int> insertManual(Map<String, dynamic> data) async {
+    final db = await instance.database;
+    return await db.insert('manual', data);
+  }
+
+
+  // Fetch  calibration info
+    Future<Map<String, dynamic>?> fetchCalibrationInfo() async {
+  final db = await instance.database;
+  final result = await db.query(
+    'calibration_info',
+    orderBy: 'id DESC',
+    limit: 1,
+  );
+  return result.isNotEmpty ? result.first : null;
+}
+
+  // Fetch last calibration info
+  Future<Map<String, dynamic>?> fetchLastCalibrationInfo() async {
+  final db = await instance.database;
+  final result = await db.query(
+    'last_calibration_info',
+    orderBy: 'id DESC',
+    limit: 1,
+  );
+  return result.isNotEmpty ? result.first : null;
+}
+
+// Fetch db_cal
+Future<Map<String, dynamic>?> fetchLatestDBCal() async {
+  final db = await instance.database;
+  final result = await db.query(
+    'db_cal',
+    orderBy: 'id DESC',
+    
+  );
+  return result.isNotEmpty ? result.first : null;
+}
+
+// insert manual data
+Future<int> insertManualData(Map<String, dynamic> data) async {
+  final db = await instance.database;
+  return await db.insert('manual', data);
+}
+
+// Update manual data
+Future<int> updateManualData(int id, Map<String, dynamic> data) async {
+  final db = await instance.database;
+  return await db.update(
+    'manual',
+    data,
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+}
+
+// Fetch manual data
+Future<Map<String, dynamic>?> fetchManualData() async {
+  final db = await instance.database;
+  final result = await db.query(
+    'manual',
+    orderBy: 'id DESC',
+    limit: 1,
+  );
+  return result.isNotEmpty ? result.first : null;
+}
+
+// Update calibration info
+Future<int> updateDBCal(int id, Map<String, dynamic> data) async {
+  final db = await instance.database;
+  return await db.update(
+    'db_cal',
+    data,
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+}
+
+
+Future<int> updateDBCalLotNo(int id, String newLotNo) async {
+  final db = await instance.database;
+  return await db.update(
+    'db_cal',
+    {'lot_no': newLotNo},
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+}
+
+Future<int> updateDBCalLowValue(int id, String newLowValue) async {
+  final db = await instance.database;
+  return await db.update(
+    'db_cal',
+    {'low_value': newLowValue},
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+  print("Inserted new record into db_cal with ID: $id");
+}
+
+Future<int> updateDBCalHighValue(int id, String newHighValue) async {
+  final db = await instance.database;
+  return await db.update(
+    'db_cal',
+    {'high_value': newHighValue},
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+  print("Inserted new record into db_cal with ID: $id");
+}
+
 
   // Fetch all logs
   Future<List<Map<String, dynamic>>> getAllLogs() async {
@@ -154,4 +406,48 @@ class DatabaseHelper {
     // Print log to the console
     print("$type Logged: $message (Date: $date, Time: $time)");
   }
+
+  // Insert result
+   Future<int> insertResult(Map<String, dynamic> result) async {
+  final db = await instance.database;
+  return await db.insert('result_table', result);
+}
+
+// Fetch results
+Future<List<Map<String, dynamic>>> fetchResults() async {
+  final db = await instance.database;
+  return await db.query('result_table', orderBy: 'id ASC');
+}
+
+// Update result remarks
+Future<int> updateResultRemarks(int id, Map<String, dynamic> updatedResult) async {
+  final db = await instance.database;
+  return await db.update(
+    'result_table',
+    updatedResult,
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+}
+
+// Delete result by ID
+Future<int> deleteResultByID(int id) async {
+  final db = await instance.database;
+  return await db.delete(
+    'result_table',
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+}
+
+
+// Delete all results
+Future<int> deleteAllResults() async {
+  final db = await instance.database;
+  return await db.delete(
+    'result_table',
+  );
+}
+
+
 }

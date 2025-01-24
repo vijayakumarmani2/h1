@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -263,6 +264,7 @@ class _TestPageState extends State<TestPage>
   // Save samples and get their IDs
   List<int> sampleIds = [];
   void startProcess() async {
+    _updateYValues();
     if (cards.isEmpty) {
       // Show error if no cards are added
       logEvent('error', 'No samples added. Cannot start process.',
@@ -313,7 +315,7 @@ print("Area under the curve from 55 to 60 seconds: $area");
     // }
 
     // Send sample count to hardware
-    sendSampleCountToHardware(2);
+    sendSampleCountToHardware(cards.length);
 
     // Wait for "Started 1" signal from hardware
     logEvent('info', 'Process started with ${cards.length} samples.',
@@ -505,6 +507,16 @@ print("Area under the curve from 55 to 60 seconds: $area");
     FlSpot(115, 0.06),
   ];
 
+void _updateYValues() {
+    final random = Random();
+    setState(() {
+      dataPoints = dataPoints.map((point) {
+        // Generate a new random Y value in a range (e.g., 0 to 2)
+        double newY = random.nextDouble() * 2;
+        return FlSpot(point.x, newY);
+      }).toList();
+    });
+  }
 
 double calculateArea(List<FlSpot> spots, double startX, double endX) {
   final filteredSpots = dataPoints.where((spot) => spot.x >= startX && spot.x <= endX).toList();
@@ -1452,7 +1464,7 @@ double calculateArea(List<FlSpot> spots, double startX, double endX) {
                               110), // Background color for the chart
                            lineBarsData: [
       LineChartBarData(
-        spots: dataPoints,
+        spots: spots,
         isCurved: true,
         gradient: const LinearGradient(
           colors: [
@@ -1480,7 +1492,7 @@ double calculateArea(List<FlSpot> spots, double startX, double endX) {
         dotData: FlDotData(show: false),
       ),
       LineChartBarData(
-        spots: dataPoints.where((e) => e.x >= 80 && e.x <= 95).toList(),
+        spots: spots.where((e) => e.x >= 80 && e.x <= 95).toList(),
         isCurved: true,
         color: Colors.orange,
         barWidth: 2,

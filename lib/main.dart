@@ -160,15 +160,16 @@ class _MainScreenState extends State<MainScreen> {
         );
       }
 
-     
+     String buffer = '';
 
       serialReader.getStream()!.listen((data) {
         // Append received data to the buffer
-        String buffer = '';
-        buffer = String.fromCharCodes(data);
+        
+        buffer += String.fromCharCodes(data);
         print("buffer: $buffer");
         if (buffer.contains("INI_CMPT")) {
           print("Initialization complete-${buffer}");
+          buffer = '';
           serialReader.port?.close();
         }
         // Extract data between `<` and `>` and add to the queue

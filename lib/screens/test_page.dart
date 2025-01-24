@@ -36,8 +36,7 @@ class _TestPageState extends State<TestPage>
   int _adc_value2 = 1;
   var _absorbance_value = "0.0";
 
-
- @override
+  @override
   void initState() {
     super.initState();
     logEvent('info', 'TestPage initialized.', page: 'test_page');
@@ -48,7 +47,6 @@ class _TestPageState extends State<TestPage>
     )..repeat(); // Repeat the ripple animation
   }
 
-  
   void _addCard() {
     if (_isStarted || isCalSwitched)
       return; // Disable button if action has started
@@ -84,9 +82,8 @@ class _TestPageState extends State<TestPage>
     if (cards.isEmpty) {
       // Ensure room for at least two cards
 
-    var latestDBCal = await DatabaseHelper.instance.fetchLatestDBCal();
-        
-    
+      var latestDBCal = await DatabaseHelper.instance.fetchLatestDBCal();
+
       setState(() {
         cards.add({
           'sampleName': 'Calibrator 1',
@@ -125,9 +122,8 @@ class _TestPageState extends State<TestPage>
     if (cards.isEmpty) {
       // Ensure room for at least two cards
 
-    var latestQC = await DatabaseHelper.instance.fetchLatestQCTarget();
-        
-    
+      var latestQC = await DatabaseHelper.instance.fetchLatestQCTarget();
+
       setState(() {
         cards.add({
           'sampleName': 'QC 1',
@@ -197,8 +193,6 @@ class _TestPageState extends State<TestPage>
   List<String> log = [];
   String buffer = '';
 
- 
-
   void logEvent(String type, String message, {required String page}) async {
     await DatabaseHelper.instance.logEvent(type, message, page: page);
     print("$type: $message");
@@ -255,7 +249,8 @@ class _TestPageState extends State<TestPage>
 
   void sendSampleCountToHardware(int sampleCount) {
     if (serialReader != null) {
-      final message = "S$sampleCount"; // Example message format
+      final message =
+          "S${sampleCount.toString().padLeft(4, '0')}"; // Example message format
       serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
       print("Sent to hardware: $message");
     }
@@ -277,7 +272,7 @@ class _TestPageState extends State<TestPage>
       );
 
       final double area = calculateArea(spots, 80, 95);
-print("Area under the curve from 55 to 60 seconds: $area");
+      print("Area under the curve from 55 to 60 seconds: $area");
 
       return;
     }
@@ -507,7 +502,7 @@ print("Area under the curve from 55 to 60 seconds: $area");
     FlSpot(115, 0.06),
   ];
 
-void _updateYValues() {
+  void _updateYValues() {
     final random = Random();
     setState(() {
       dataPoints = dataPoints.map((point) {
@@ -518,24 +513,25 @@ void _updateYValues() {
     });
   }
 
-double calculateArea(List<FlSpot> spots, double startX, double endX) {
-  final filteredSpots = dataPoints.where((spot) => spot.x >= startX && spot.x <= endX).toList();
-  if (filteredSpots.length < 2) return 0.0; // Not enough points to calculate area
+  double calculateArea(List<FlSpot> spots, double startX, double endX) {
+    final filteredSpots =
+        dataPoints.where((spot) => spot.x >= startX && spot.x <= endX).toList();
+    if (filteredSpots.length < 2)
+      return 0.0; // Not enough points to calculate area
 
-  double area = 0.0;
-  for (int i = 1; i < filteredSpots.length; i++) {
-    final x1 = filteredSpots[i - 1].x;
-    final y1 = filteredSpots[i - 1].y;
-    final x2 = filteredSpots[i].x;
-    final y2 = filteredSpots[i].y;
+    double area = 0.0;
+    for (int i = 1; i < filteredSpots.length; i++) {
+      final x1 = filteredSpots[i - 1].x;
+      final y1 = filteredSpots[i - 1].y;
+      final x2 = filteredSpots[i].x;
+      final y2 = filteredSpots[i].y;
 
-    final trapezoidArea = (x2 - x1) * ((y1 + y2) / 2);
-    area += trapezoidArea;
+      final trapezoidArea = (x2 - x1) * ((y1 + y2) / 2);
+      area += trapezoidArea;
+    }
+
+    return area;
   }
-
-  return area;
-}
-
 
   void addFlSpot(double x, double y) {
     setState(() {
@@ -1462,56 +1458,57 @@ double calculateArea(List<FlSpot> spots, double startX, double endX) {
                           ),
                           backgroundColor: const Color.fromARGB(30, 0, 112,
                               110), // Background color for the chart
-                           lineBarsData: [
-      LineChartBarData(
-        spots: spots,
-        isCurved: true,
-        gradient: const LinearGradient(
-          colors: [
-            Colors.teal,
-            Colors.teal,
-          ],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        barWidth: 2,
-        isStrokeCapRound: true,
-        belowBarData: BarAreaData(
-          show: true,
-          gradient: const LinearGradient(
-            colors: [
-              Color.fromARGB(71, 14, 122, 61),
-              Color.fromARGB(63, 34, 77, 132),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          cutOffY: null,
-          applyCutOffY: false,
-        ),
-        dotData: FlDotData(show: false),
-      ),
-      LineChartBarData(
-        spots: spots.where((e) => e.x >= 80 && e.x <= 95).toList(),
-        isCurved: true,
-        color: Colors.orange,
-        barWidth: 2,
-        belowBarData: BarAreaData(
-          show: true,
-          gradient: LinearGradient(
-            colors: [
-              Colors.orange.withOpacity(0.4),
-              Colors.orange.withOpacity(0.1),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        dotData: FlDotData(show: false),
-      ),
-    ],
-  ),
-
+                          lineBarsData: [
+                            LineChartBarData(
+                              spots: spots,
+                              isCurved: true,
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Colors.teal,
+                                  Colors.teal,
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                              barWidth: 2,
+                              isStrokeCapRound: true,
+                              belowBarData: BarAreaData(
+                                show: true,
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color.fromARGB(71, 14, 122, 61),
+                                    Color.fromARGB(63, 34, 77, 132),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                                cutOffY: null,
+                                applyCutOffY: false,
+                              ),
+                              dotData: FlDotData(show: false),
+                            ),
+                            LineChartBarData(
+                              spots: spots
+                                  .where((e) => e.x >= 80 && e.x <= 95)
+                                  .toList(),
+                              isCurved: true,
+                              color: Colors.orange,
+                              barWidth: 2,
+                              belowBarData: BarAreaData(
+                                show: true,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.orange.withOpacity(0.4),
+                                    Colors.orange.withOpacity(0.1),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                              dotData: FlDotData(show: false),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

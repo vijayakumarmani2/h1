@@ -1,7 +1,10 @@
 import 'dart:async'; // For Timer functionality
 import 'dart:io'; // For exit function
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart'; // For building the UI
+import 'package:hba1c_analyzer_1/services/DataHandler.dart';
+import 'package:hba1c_analyzer_1/services/serial_port_service.dart';
 import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
 import 'package:intl/intl.dart'; // For formatting the date and time
 
@@ -102,6 +105,40 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
       },
     ];
   }
+
+  void logEvent(String type, String message, {required String page}) async {
+    await DatabaseHelper.instance.logEvent(type, message, page: page);
+    print("$type: $message");
+  }
+  
+   void initializeSerialReader() {
+    logEvent('info', 'Serial reader initialization started.',
+        page: 'test_page');
+    var serialReader = SerialReader('/dev/ttyUSB0');
+    // serialReader = SerialReader('COM5');
+    if (!serialReader!.init()) {
+      print(
+          'Failed to open serial port /dev/ttyUSB0. Please check the connection.');
+      // Show a SnackBar if the maximum limit is reached
+      logEvent('error',
+          'Failed to open serial port /dev/ttyUSB0. Please check the connection.',
+          page: 'test_page');
+
+      print('Failed to open serial port. Please check the connection.');
+    } else {
+      logEvent('info', 'Serial reader initialized successfully.',
+          page: 'test_page');
+      if (serialReader != null) {
+      final message = "RUN"; // Example message format
+      serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
+      print("Sent to hardware: $message");
+    }
+    serialReader.port?.close();
+        
+    }
+  }
+
+ 
 
   // **************** Update Time ****************
   void _updateTime() {

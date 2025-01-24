@@ -170,7 +170,7 @@ class _MainScreenState extends State<MainScreen> {
         if (buffer == "INI_CMPT") {
           print("Initialization completed - ${buffer}");
           buffer = '';
-          serialReader.port?.close();
+          serialReader.reader?.close();
         }
         // Extract data between `<` and `>` and add to the queue
         // while (buffer.contains('<') && buffer.contains('>')) {

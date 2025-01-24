@@ -152,6 +152,10 @@ class _MainScreenState extends State<MainScreen> {
         );
       }
 
+       Future.delayed(const Duration(seconds: 8), () {
+      initializeSerialReader(); // Prints after 1 second.
+    });
+
       serialReader.getStream()!.listen((data) {
         // Append received data to the buffer
         String buffer = '';

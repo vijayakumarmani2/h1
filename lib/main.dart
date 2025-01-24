@@ -167,8 +167,8 @@ class _MainScreenState extends State<MainScreen> {
         
         buffer += String.fromCharCodes(data);
         print("buffer: $buffer");
-        if (buffer.contains("INI_CMPT")) {
-          print("Initialization complete-${buffer}");
+        if (buffer == "INI_CMPT") {
+          print("Initialization completed - ${buffer}");
           buffer = '';
           serialReader.port?.close();
         }

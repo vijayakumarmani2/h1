@@ -128,7 +128,7 @@ class _MainScreenState extends State<MainScreen> {
         page: 'test_page');
     var serialReader = SerialReader('/dev/ttyUSB-static');
     // serialReader = SerialReader('COM5');
-    if (!serialReader!.init()) {
+    if (!serialReader.init()) {
       print(
           'Failed to open serial port /dev/ttyUSB-static. Please check the connection.');
       // Show a SnackBar if the maximum limit is reached
@@ -140,26 +140,22 @@ class _MainScreenState extends State<MainScreen> {
     } else {
       logEvent('info', 'Serial reader initialized successfully.',
           page: 'test_page');
-           Future.delayed(const Duration(seconds: 3), () {
-      print("just delay before sending INIT");
-    });
+       
   
-      if (serialReader != null) {
-        final message = "INITS"; // Example message format
-        serialReader.port?.write(Uint8List.fromList(message.codeUnits));
-        Future.delayed(Duration(seconds: 2), () {
-    print("This is executed after a 2-second delay");
-  });
-        serialReader.port?.write(Uint8List.fromList(message.codeUnits));
-        print("Sent to hardware: $message");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('sent to hardware: $message'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-
+      final message = "INITS"; // Example message format
+      serialReader.port?.write(Uint8List.fromList(message.codeUnits));
+      Future.delayed(Duration(seconds: 2), () {
+  print("This is executed after a 2-second delay");
+});
+      serialReader.port?.write(Uint8List.fromList(message.codeUnits));
+      print("Sent to hardware: $message");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('sent to hardware: $message'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    
      String buffer = '';
 
       serialReader.getStream()!.listen((data) {
@@ -170,7 +166,7 @@ class _MainScreenState extends State<MainScreen> {
         if (buffer == "INI_CMPT") {
           print("Initialization completed - ${buffer}");
           buffer = '';
-          serialReader.reader?.close();
+          serialReader.port?.close();
         }
         // Extract data between `<` and `>` and add to the queue
         // while (buffer.contains('<') && buffer.contains('>')) {

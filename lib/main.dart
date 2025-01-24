@@ -152,30 +152,34 @@ class _MainScreenState extends State<MainScreen> {
         );
       }
 
-       Future.delayed(const Duration(seconds: 8), () {
-      initializeSerialReader(); // Prints after 1 second.
-    });
+      Future.delayed(const Duration(seconds: 8), () {
+        initializeSerialReader(); // Prints after 1 second.
+      });
 
       serialReader.getStream()!.listen((data) {
         // Append received data to the buffer
         String buffer = '';
         buffer += String.fromCharCodes(data);
-
-        // Extract data between `<` and `>` and add to the queue
-        while (buffer.contains('<') && buffer.contains('>')) {
-          final start = buffer.indexOf('<');
-          final end = buffer.indexOf('>', start);
-          if (end > start) {
-            if (buffer.substring(start + 1, end).contains("INI_CMPT")) {
-              print(
-                  "Initialization complete-${buffer.substring(start + 1, end)}");
-              serialReader.port?.close();
-            }
-            buffer = buffer.substring(end + 1);
-          } else {
-            break;
-          }
+        print("buffer: $buffer");
+        if (buffer.contains("INI_CMPT")) {
+          print("Initialization complete-${buffer}");
+          serialReader.port?.close();
         }
+        // Extract data between `<` and `>` and add to the queue
+        // while (buffer.contains('<') && buffer.contains('>')) {
+        //   final start = buffer.indexOf('<');
+        //   final end = buffer.indexOf('>', start);
+        //   if (end > start) {
+        //     if (buffer.substring(start + 1, end).contains("INI_CMPT")) {
+        //       print(
+        //           "Initialization complete-${buffer.substring(start + 1, end)}");
+        //       serialReader.port?.close();
+        //     }
+        //     buffer = buffer.substring(end + 1);
+        //   } else {
+        //     break;
+        //   }
+        // }
       }, onError: (error) {
         print('Error reading serial port: $error');
         logEvent('error', 'Error reading serial port: $error',

@@ -72,7 +72,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    initializeSerialReader();
+    
     // Initialize time and date updates
     _updateTime();
     _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
@@ -112,6 +112,8 @@ class _MainScreenState extends State<MainScreen> {
         'page': SystemPage(onBackToMenu: _goToMenu) // System Settings Page
       },
     ];
+
+    initializeSerialReader();
   }
 
   void logEvent(String type, String message, {required String page}) async {
@@ -159,6 +161,7 @@ class _MainScreenState extends State<MainScreen> {
           final end = buffer.indexOf('>', start);
           if (end > start) {
             if (buffer.substring(start + 1, end).contains("INI_CMPT")) {
+              print("Initialization complete-${buffer.substring(start + 1, end)}");
               serialReader.port?.close();
             }
             buffer = buffer.substring(end + 1);

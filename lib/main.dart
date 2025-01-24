@@ -145,7 +145,7 @@ class _MainScreenState extends State<MainScreen> {
     });
   
       if (serialReader != null) {
-        final message = "INIT"; // Example message format
+        final message = "INITS"; // Example message format
         serialReader.port?.write(Uint8List.fromList(message.codeUnits));
         Future.delayed(Duration(seconds: 2), () {
     print("This is executed after a 2-second delay");

@@ -255,7 +255,7 @@ class _TestPageState extends State<TestPage>
 
   void sendSampleCountToHardware(int sampleCount) {
     if (serialReader != null) {
-      final message = "SAMPLES:$sampleCount\n"; // Example message format
+      final message = "S$sampleCount"; // Example message format
       serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
       print("Sent to hardware: $message");
     }
@@ -328,7 +328,7 @@ print("Area under the curve from 55 to 60 seconds: $area");
 
   void processData(String data) {
     logEvent('info', 'Data received: $data', page: 'test_page');
-    if (data.startsWith("Started")) {
+    if (data.startsWith("STARTED")) {
       // Extract the sample number from the signal
       final sampleNumber = int.tryParse(data.split(" ")[1]);
       if (sampleNumber != null) {
@@ -340,7 +340,7 @@ print("Area under the curve from 55 to 60 seconds: $area");
         logEvent('error', 'Failed to parse sample number from: $data',
             page: 'test_page');
       }
-    } else if (data.startsWith("Ended")) {
+    } else if (data.startsWith("ENDED")) {
       final sampleNumber = int.tryParse(data.split(" ")[1]);
       if (sampleNumber != null) {
         print("Hardware ended processing Sample $sampleNumber.");

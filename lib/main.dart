@@ -17,9 +17,8 @@ import 'screens/system_page.dart';
 import 'screens/result.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-
- void main() {
-   // Initialize FFI for desktop platforms
+void main() {
+  // Initialize FFI for desktop platforms
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
 
@@ -32,7 +31,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // Disable debug banner
-      home: MainScreen(onBackToMenu: () {  },), // Set MainScreen as the home page
+      home: MainScreen(
+        onBackToMenu: () {},
+      ), // Set MainScreen as the home page
     );
   }
 }
@@ -65,14 +66,13 @@ class _MainScreenState extends State<MainScreen> {
     "Setting"
   ];
 
-
-final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
+  final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
 
   // ****************** InitState ******************
   @override
   void initState() {
     super.initState();
-
+    initializeSerialReader();
     // Initialize time and date updates
     _updateTime();
     _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
@@ -96,8 +96,16 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
         'label': 'Calibration',
         'page': CalibrationPage(onBackToMenu: _goToMenu) // Calibration Page
       },
-      {'icon': Icons.check_circle, 'label': 'QC', 'page': QCPage(onBackToMenu: _goToMenu)}, // QC Page
-      {'icon': Icons.book, 'label': 'Log', 'page': LogPage(onBackToMenu: _goToMenu)}, // Log Page
+      {
+        'icon': Icons.check_circle,
+        'label': 'QC',
+        'page': QCPage(onBackToMenu: _goToMenu)
+      }, // QC Page
+      {
+        'icon': Icons.book,
+        'label': 'Log',
+        'page': LogPage(onBackToMenu: _goToMenu)
+      }, // Log Page
       {
         'icon': Icons.settings,
         'label': 'System',
@@ -110,8 +118,8 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
     await DatabaseHelper.instance.logEvent(type, message, page: page);
     print("$type: $message");
   }
-  
-   void initializeSerialReader() {
+
+  void initializeSerialReader() {
     logEvent('info', 'Serial reader initialization started.',
         page: 'test_page');
     var serialReader = SerialReader('/dev/ttyUSB0');
@@ -129,18 +137,18 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
       logEvent('info', 'Serial reader initialized successfully.',
           page: 'test_page');
       if (serialReader != null) {
-      final message = "INIT"; // Example message format
-      serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
-      print("Sent to hardware: $message");
-       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('sent to hardware: $message'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
+        final message = "INIT"; // Example message format
+        serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
+        print("Sent to hardware: $message");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('sent to hardware: $message'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
 
-    serialReader.getStream()!.listen((data) {
+      serialReader.getStream()!.listen((data) {
         // Append received data to the buffer
         String buffer = '';
         buffer += String.fromCharCodes(data);
@@ -150,16 +158,14 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
           final start = buffer.indexOf('<');
           final end = buffer.indexOf('>', start);
           if (end > start) {
-            if(buffer.substring(start + 1, end).contains("INI_CMPT")){
-                serialReader.port?.close();
+            if (buffer.substring(start + 1, end).contains("INI_CMPT")) {
+              serialReader.port?.close();
             }
             buffer = buffer.substring(end + 1);
           } else {
             break;
           }
         }
-
-       
       }, onError: (error) {
         print('Error reading serial port: $error');
         logEvent('error', 'Error reading serial port: $error',
@@ -169,12 +175,8 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
         logEvent('warning', 'Serial port communication ended unexpectedly.',
             page: 'test_page');
       });
-    
-        
     }
   }
-
- 
 
   // **************** Update Time ****************
   void _updateTime() {
@@ -193,8 +195,6 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
       _selectedIndex = 0; // Reset to the main menu
     });
   }
-
-  
 
   // ************** Build Selected Page **************
   Widget _buildSelectedPage(int selectedIndex) {
@@ -215,7 +215,8 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
             width: 700,
             child: Center(
               child: GridView.builder(
-                shrinkWrap: true, // Ensures the grid takes only as much space as needed
+                shrinkWrap:
+                    true, // Ensures the grid takes only as much space as needed
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3, // Number of columns
                   crossAxisSpacing: 35.0, // Spacing between columns
@@ -242,11 +243,11 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
                                 Color(0xFF276860),
                                 Color(0xFF276860)
                               ], // Gradient colors
-                              begin: Alignment.topLeft ,stops: 
-                               [0.0, 0.4],
+                              begin: Alignment.topLeft, stops: [0.0, 0.4],
                               end: Alignment.bottomRight,
                             ),
-                            borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                            borderRadius:
+                                BorderRadius.circular(12.0), // Rounded corners
                             boxShadow: const [
                               BoxShadow(
                                 color: Colors.black26, // Shadow color
@@ -280,8 +281,10 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
           ),
         ),
       ),
-      bottomNavigationBar:
-          CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu, wifiStatusNotifier: wifiStatusNotifier,),
+      bottomNavigationBar: CurvedBottomNavigationBar(
+        onBackToMenu: widget.onBackToMenu,
+        wifiStatusNotifier: wifiStatusNotifier,
+      ),
     );
   }
 
@@ -317,9 +320,9 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
                   _pageTitles[_selectedIndex],
                   style: TextStyle(
                     foreground: Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.7
-          ..color = const Color.fromARGB(255, 255, 255, 255),
+                      ..style = PaintingStyle.stroke
+                      ..strokeWidth = 0.7
+                      ..color = const Color.fromARGB(255, 255, 255, 255),
                     fontWeight: FontWeight.bold,
                     fontSize: 24,
                   ),
@@ -334,7 +337,7 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
             gradient: LinearGradient(
               colors: [
                 Color.fromARGB(255, 38, 64, 105),
-                                Color.fromARGB(255, 24, 96, 55)
+                Color.fromARGB(255, 24, 96, 55)
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -365,7 +368,6 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
                     ),
                   ],
                 ),
-                
               ],
             ),
           ),
@@ -373,7 +375,6 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
       ),
       // ************** Body **************
       body: _buildSelectedPage(_selectedIndex),
-      
     );
   }
 }

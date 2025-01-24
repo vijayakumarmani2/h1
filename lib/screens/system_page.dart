@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:hba1c_analyzer_1/services/show_ip.dart';
 import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
 import 'package:hba1c_analyzer_1/widget/wifi_configuration_widget.dart';
 
@@ -29,9 +30,10 @@ class _SystemPageState extends State<SystemPage> {
   Widget build(BuildContext context) {
 
     final List<Widget> _pages = [
-    WiFiConfigurationWidget(wifiStatusNotifier: wifiStatusNotifier,), // WiFi Section
-    Center(child: Text('Print Settings')),
-    Center(child: Text('Calibration Settings')),
+   
+    Center(child: Text('About')), // About Section
+     WiFiConfigurationWidget(wifiStatusNotifier: wifiStatusNotifier,), // WiFi Section
+    IPDisplayScreen(), // IP Address Section
     Center(child: Text('State Check Status')),
   ];
 
@@ -47,9 +49,9 @@ class _SystemPageState extends State<SystemPage> {
               color: Colors.blue.shade100,
               child: ListView(
                 children: [
-                  _buildTabItem(Icons.wifi, 'WiFi', 0),
-                  _buildTabItem(Icons.print, 'Print', 1),
-                  _buildTabItem(Icons.build, 'Calibration', 2),
+                  _buildTabItem(Icons.print, 'About', 0),
+                  _buildTabItem(Icons.wifi, 'WiFi', 1),
+                  _buildTabItem(Icons.build, 'IP Address', 2),
                   _buildTabItem(Icons.check_circle, 'State', 3),
                 ],
               ),

@@ -35,6 +35,19 @@ class _TestPageState extends State<TestPage>
   int _adc_value2 = 1;
   var _absorbance_value = "0.0";
 
+
+ @override
+  void initState() {
+    super.initState();
+    logEvent('info', 'TestPage initialized.', page: 'test_page');
+    initializeSerialReader();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3), // Duration of the ripple animation
+    )..repeat(); // Repeat the ripple animation
+  }
+
+  
   void _addCard() {
     if (_isStarted || isCalSwitched)
       return; // Disable button if action has started
@@ -71,17 +84,7 @@ class _TestPageState extends State<TestPage>
       // Ensure room for at least two cards
 
     var latestDBCal = await DatabaseHelper.instance.fetchLatestDBCal();
-      if (latestDBCal != null) {
-    // Access the fields of the latest DBCal record
-    print("Lot Number: ${latestDBCal['lot_no']}");
-    print("Low Value: ${latestDBCal['low_value']}");
-    print("High Value: ${latestDBCal['high_value']}");
-    print("Low Cal Pos: ${latestDBCal['low_cal_pos']}");
-    print("High Cal Pos: ${latestDBCal['high_cal_pos']}");
-  } else {
-    print("No records found in db_cal table.");
-  }
-    
+        
     
       setState(() {
         cards.add({
@@ -117,19 +120,23 @@ class _TestPageState extends State<TestPage>
     }
   }
 
-  void _addQCs() {
+  Future<void> _addQC() async {
     if (cards.isEmpty) {
       // Ensure room for at least two cards
+
+    var latestQC = await DatabaseHelper.instance.fetchLatestQCTarget();
+        
+    
       setState(() {
         cards.add({
           'sampleName': 'QC 1',
           'type': 'D',
-          'result': '5.5',
+          'result': '${latestQC?['low_target']}',
         });
         cards.add({
           'sampleName': 'QC 2',
           'type': 'D',
-          'result': '9.9',
+          'result': '${latestQC?['high_target']}',
         });
       });
 
@@ -143,7 +150,7 @@ class _TestPageState extends State<TestPage>
       });
     } else {
       // Show a SnackBar if the maximum limit is reached
-      logEvent('warning', 'Samples should be empty to add calibrators.',
+      logEvent('warning', 'Samples should be empty to add QC.',
           page: 'test_page');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -189,16 +196,7 @@ class _TestPageState extends State<TestPage>
   List<String> log = [];
   String buffer = '';
 
-  @override
-  void initState() {
-    super.initState();
-    logEvent('info', 'TestPage initialized.', page: 'test_page');
-    initializeSerialReader();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3), // Duration of the ripple animation
-    )..repeat(); // Repeat the ripple animation
-  }
+ 
 
   void logEvent(String type, String message, {required String page}) async {
     await DatabaseHelper.instance.logEvent(type, message, page: page);
@@ -1050,6 +1048,11 @@ double calculateArea(List<FlSpot> spots, double startX, double endX) {
                                           onChanged: (value) {
                                             setState(() {
                                               isQcSwitched = value;
+                                              if (isQcSwitched) {
+                                                _addQC();
+                                              } else {
+                                                _removeAll();
+                                              }
                                             });
                                           },
                                         ),

@@ -129,11 +129,41 @@ final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
       logEvent('info', 'Serial reader initialized successfully.',
           page: 'test_page');
       if (serialReader != null) {
-      final message = "RUN"; // Example message format
+      final message = "INIT"; // Example message format
       serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
       print("Sent to hardware: $message");
     }
-    serialReader.port?.close();
+
+    serialReader.getStream()!.listen((data) {
+        // Append received data to the buffer
+        String buffer = '';
+        buffer += String.fromCharCodes(data);
+
+        // Extract data between `<` and `>` and add to the queue
+        while (buffer.contains('<') && buffer.contains('>')) {
+          final start = buffer.indexOf('<');
+          final end = buffer.indexOf('>', start);
+          if (end > start) {
+            if(buffer.substring(start + 1, end).contains("INI_CMPT")){
+                serialReader.port?.close();
+            }
+            buffer = buffer.substring(end + 1);
+          } else {
+            break;
+          }
+        }
+
+       
+      }, onError: (error) {
+        print('Error reading serial port: $error');
+        logEvent('error', 'Error reading serial port: $error',
+            page: 'test_page');
+      }, onDone: () {
+        print('Serial port communication ended unexpectedly.');
+        logEvent('warning', 'Serial port communication ended unexpectedly.',
+            page: 'test_page');
+      });
+    
         
     }
   }

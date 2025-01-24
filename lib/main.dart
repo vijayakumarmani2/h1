@@ -126,14 +126,14 @@ class _MainScreenState extends State<MainScreen> {
   void initializeSerialReader() {
     logEvent('info', 'Serial reader initialization started.',
         page: 'test_page');
-    var serialReader = SerialReader('/dev/ttyUSB0');
+    var serialReader = SerialReader('/dev/ttyUSB-static');
     // serialReader = SerialReader('COM5');
     if (!serialReader!.init()) {
       print(
-          'Failed to open serial port /dev/ttyUSB0. Please check the connection.');
+          'Failed to open serial port /dev/ttyUSB-static. Please check the connection.');
       // Show a SnackBar if the maximum limit is reached
       logEvent('error',
-          'Failed to open serial port /dev/ttyUSB0. Please check the connection.',
+          'Failed to open serial port /dev/ttyUSB-static. Please check the connection.',
           page: 'test_page');
 
       print('Failed to open serial port. Please check the connection.');

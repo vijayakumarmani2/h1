@@ -142,7 +142,7 @@ class _MainScreenState extends State<MainScreen> {
           page: 'test_page');
       if (serialReader != null) {
         final message = "INIT"; // Example message format
-        serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
+        serialReader.port?.write(Uint8List.fromList(message.codeUnits));
         print("Sent to hardware: $message");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -157,7 +157,7 @@ class _MainScreenState extends State<MainScreen> {
       serialReader.getStream()!.listen((data) {
         // Append received data to the buffer
         String buffer = '';
-        buffer += String.fromCharCodes(data);
+        buffer = String.fromCharCodes(data);
         print("buffer: $buffer");
         if (buffer.contains("INI_CMPT")) {
           print("Initialization complete-${buffer}");

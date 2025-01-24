@@ -143,7 +143,7 @@ class _MainScreenState extends State<MainScreen> {
             Future.delayed(const Duration(seconds: 3), () {
       print("just delay before sending INIT");
     });
-  }
+  
       if (serialReader != null) {
         final message = "INIT"; // Example message format
         serialReader.port?.write(Uint8List.fromList(message.codeUnits));

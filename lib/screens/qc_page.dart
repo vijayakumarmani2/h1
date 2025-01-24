@@ -23,7 +23,7 @@ class QCPage extends StatefulWidget {
 }
 
 class _QCPageState extends State<QCPage> {
-  String lotNumber = "GSX1230020";
+  String lotNumber = "";
   String low_target = "0.0";
   String high_target = "0.0";
    double mean = 5.5, sd = 0.3, cv = 0.0;
@@ -91,6 +91,7 @@ class _QCPageState extends State<QCPage> {
 
     setState(() {
       if (latestQCTarget != null) {
+        lotNumber = latestQCTarget['lotnumber'].toString();
         low_target = latestQCTarget['low_target'].toString();
         high_target = latestQCTarget['high_target'].toString();
       } else {
@@ -99,10 +100,11 @@ class _QCPageState extends State<QCPage> {
     });
   }
 
-  Future<void> updateExistingQCTarget(String low, high) async {
+  Future<void> updateExistingQCTarget(String low, high, lotnumber) async {
     final updatedData = {
       'low_target': low, // Updated low target value
       'high_target': high, // Updated high target value
+      'lotnumber': lotnumber,
       'modified_date': DateTime.now().toIso8601String(), // Updated date
     };
 
@@ -285,6 +287,7 @@ class _QCPageState extends State<QCPage> {
   final ValueNotifier<bool> wifiStatusNotifier = ValueNotifier(false);
 
   void _showPopupDialog() {
+    final TextEditingController lotnumberController = TextEditingController();
     final TextEditingController lowController = TextEditingController();
     final TextEditingController highController = TextEditingController();
 
@@ -299,6 +302,29 @@ class _QCPageState extends State<QCPage> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // TextField for Lot Number
+                  TextField(
+                    controller: lotnumberController,
+                    readOnly: true, // Use virtual keyboard only
+                    decoration: InputDecoration(
+                      labelText: 'Lot Number',
+                      labelStyle: TextStyle(color: Colors.teal),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.teal),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.teal, width: 2),
+                      ),
+                    ),
+                    onTap: () {
+                      _showVirtualKeyboard(
+                        controller: lotnumberController,
+                        setState: setState,
+                      );
+                    },
+                    cursorColor: Colors.teal,
+                  ),
+                  const SizedBox(height: 10),
                   // TextField for Low Value
                   TextField(
                     controller: lowController,
@@ -358,7 +384,7 @@ class _QCPageState extends State<QCPage> {
                     setState(() {
                       
                       updateExistingQCTarget(
-                          lowController.text, highController.text);
+                          lowController.text, highController.text, lotnumberController.text);
                     });
                     Navigator.of(context).pop();
                   },

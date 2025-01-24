@@ -19,8 +19,8 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'hba1c_database.db');
 
      // Delete the old database (for development purposes only)
-  // await deleteDatabase(path);
-  // print("Old database deleted");
+   await deleteDatabase(path);
+   print("Old database deleted");
 
     return await openDatabase(
       path,
@@ -129,10 +129,29 @@ class DatabaseHelper {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       low_target REAL NOT NULL,
       high_target REAL NOT NULL,
+      lotnumber REAL NOT NULL,
       modified_date TEXT NOT NULL
     )
   ''');
 
+ final caldata = {
+    'lot_no': 'LOT12345',
+    'low_value': '0',       // Example low value
+    'high_value': '0',      // Example high value
+    'low_cal_pos': '1',         // Example low calibration position
+    'high_cal_pos': '2',        // Example high calibration position
+  };
+
+  await db.insert('db_cal', caldata);
+
+   final qcdata = {
+    'low_target': "0.0", // Updated low target value
+      'high_target': "0.0", // Updated high target value
+      'lotnumber': "LOT12345", // Updated lot number
+      'modified_date': DateTime.now().toIso8601String(), // Updated date
+  };
+
+  await db.insert('qc_target', qcdata);
 
     print("database created");
   }

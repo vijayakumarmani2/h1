@@ -341,7 +341,7 @@ SizedBox(
             ),
     ],
     ),
-     bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu, wifiStatusNotifier: wifiStatusNotifier,),
+     bottomNavigationBar: CurvedBottomNavigationBar(onBackToMenu: widget.onBackToMenu, wifiStatusNotifier: wifiStatusNotifier, isStarted: false,),
   );
 }
 }

@@ -6,19 +6,15 @@ class CurvedBottomNavigationBar extends StatefulWidget {
   final VoidCallback onBackToMenu;
 
    final ValueNotifier<bool> wifiStatusNotifier;
+   bool isStarted;
 
-  CurvedBottomNavigationBar({required this.onBackToMenu, required this.wifiStatusNotifier});
+  CurvedBottomNavigationBar({super.key, required this.onBackToMenu, required this.wifiStatusNotifier, required this.isStarted});
 
 
   @override
   _CurvedBottomNavigationBarState createState() =>
       _CurvedBottomNavigationBarState();
 }
-    
-  
-  
-
-
 
 class _CurvedBottomNavigationBarState extends State<CurvedBottomNavigationBar> {
   bool isWiFiEnabled = false; // WiFi state
@@ -114,7 +110,7 @@ void initState() {
                 // WiFi Icon
                 IconButton(
                   icon: Icon(
-                   widget.wifiStatusNotifier.value ? Icons.wifi : Icons.wifi_off,
+                   widget.wifiStatusNotifier.value ? Icons.wifi : Icons.wifi,
                     color: Colors.white,
                   ),
                   onPressed: toggleWiFi,
@@ -143,7 +139,7 @@ void initState() {
                         width: 10,
                         height: 10,
                         decoration: BoxDecoration(
-                          color: isCableConnected ? Colors.green : Colors.red,
+                          color: isCableConnected ? Colors.green : Colors.green,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -169,7 +165,10 @@ void initState() {
     onTap: () {
       // Define your action here
       print("Home icon tapped");
-     widget.onBackToMenu();
+      if(widget.isStarted == false){
+        widget.onBackToMenu();
+      }
+     
       // You can navigate, show a dialog, or perform any other action here
     },
     child: CircleAvatar(

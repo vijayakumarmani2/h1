@@ -1496,7 +1496,7 @@ class _TestPageState extends State<TestPage>
                             ),
                             LineChartBarData(
                               spots: spots
-                                  .where((e) => e.x >= 80 && e.x <= 95)
+                                  .where((e) => e.x >= 49 && e.x <= 61)
                                   .toList(),
                               isCurved: true,
                               color: Colors.orange,
@@ -1768,7 +1768,7 @@ class _TestPageState extends State<TestPage>
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CurvedBottomNavigationBar(
         onBackToMenu: widget.onBackToMenu,
-        wifiStatusNotifier: wifiStatusNotifier,
+        wifiStatusNotifier: wifiStatusNotifier, isStarted: _isStarted, 
       ),
     );
   }

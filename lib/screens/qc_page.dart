@@ -627,7 +627,7 @@ class _QCPageState extends State<QCPage> {
       ),
       bottomNavigationBar: CurvedBottomNavigationBar(
         onBackToMenu: widget.onBackToMenu,
-        wifiStatusNotifier: wifiStatusNotifier,
+        wifiStatusNotifier: wifiStatusNotifier, isStarted: false,
       ),
     );
   }

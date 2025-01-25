@@ -277,7 +277,7 @@ class _ResultPageState extends State<ResultPage> {
       ),
       bottomNavigationBar: CurvedBottomNavigationBar(
         onBackToMenu: widget.onBackToMenu,
-        wifiStatusNotifier: wifiStatusNotifier,
+        wifiStatusNotifier: wifiStatusNotifier, isStarted: false,
       ),
     );
   }

@@ -280,7 +280,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
       bottomNavigationBar: CurvedBottomNavigationBar(
         onBackToMenu: widget.onBackToMenu,
-        wifiStatusNotifier: wifiStatusNotifier,
+        wifiStatusNotifier: wifiStatusNotifier, isStarted: false,
       ),
     );
   }

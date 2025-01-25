@@ -489,7 +489,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
       ),
       bottomNavigationBar: CurvedBottomNavigationBar(
         onBackToMenu: widget.onBackToMenu,
-        wifiStatusNotifier: wifiStatusNotifier,
+        wifiStatusNotifier: wifiStatusNotifier, isStarted: false,
       ),
     );
   }

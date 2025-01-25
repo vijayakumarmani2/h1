@@ -323,17 +323,17 @@ class _TestPageState extends State<TestPage>
 
   void processData(String data) {
     logEvent('info', 'Data received: $data', page: 'test_page');
-    print("The string contains 'STARTED' is ${data.contains("STARTED")}");
+
     if (data.contains("STARTED")) {
       print("The string contains 'STARTED'");
       // Extract the sample number from the signal
       final sampleNumber = int.tryParse(data.split(" ")[1]);
       // Regular expression to extract numbers at the end of the string
-  //RegExp regex = RegExp(r'\d+$');
- //int sampleNumber = regex.firstMatch(data)?.group(0) as int;
+      //RegExp regex = RegExp(r'\d+$');
+      //int sampleNumber = regex.firstMatch(data)?.group(0) as int;
 
-  print("sampleNumber=$sampleNumber"); // Output: "1"
-      if (sampleNumber! >0) {
+      print("sampleNumber=$sampleNumber"); // Output: "1"
+      if (sampleNumber! > 0) {
         logEvent('info',
             'Sample $sampleNumber started processing. $sampleIds[$sampleNumber - 1]',
             page: 'test_page');
@@ -344,7 +344,7 @@ class _TestPageState extends State<TestPage>
       }
     } else if (data.contains("ENDED")) {
       final sampleNumber = int.tryParse(data.split(" ")[1]);
-      if (sampleNumber! >0) {
+      if (sampleNumber! > 0) {
         print("Hardware ended processing Sample $sampleNumber.");
         logEvent('info',
             'Sample $sampleNumber completed.$sampleIds[$sampleNumber - 1]',
@@ -372,7 +372,7 @@ class _TestPageState extends State<TestPage>
 
   void startSampleReading(int sampleNumber) {
     logEvent('info',
-        'Starting sample reading for Sample $sampleNumber. $sampleIds[$sampleNumber - 1]',
+        'Starting sample reading for Sample $sampleNumber. ${sampleIds[sampleNumber - 1]}',
         page: 'test_page');
     setState(() {
       running_status = "Running Sample $sampleNumber";
@@ -385,7 +385,7 @@ class _TestPageState extends State<TestPage>
     _animationController.repeat();
 
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
+      setState(() async {
         runningTime--;
         _absorbance_value =
             calculateAbsorbance(_adc_value2, _adc_value1).toStringAsFixed(4);
@@ -420,10 +420,12 @@ class _TestPageState extends State<TestPage>
             'json_data': jsonData, // Save the JSON data
           });
 
+          print( await DatabaseHelper.instance.fetchResults());
+
           setState(() {
             running_status = "Sample $sampleNumber Completed";
             logEvent('info',
-                'Sample $sampleNumber processing completed.$sampleIds[$sampleNumber - 1]',
+                'Sample $sampleNumber processing completed - ${sampleIds[sampleNumber - 1]}',
                 page: 'test_page');
             absorbanceJsonData = []; // Clear the absorbance data
           });
@@ -437,14 +439,14 @@ class _TestPageState extends State<TestPage>
 
   void completeSampleProcessing(int sampleNumber) {
     logEvent('info',
-        'Sample $sampleNumber processing completed. $sampleIds[$sampleNumber - 1]',
+        'Sample $sampleNumber processing completed - ${sampleIds[sampleNumber - 1]}',
         page: 'test_page');
 
     setState(() {
       running_status = "Sample $sampleNumber Completed";
     });
 
-    if (sampleNumber < sampleIds.length) {
+    if (sampleNumber > sampleIds.length) {
       logEvent('info', 'Waiting for next sample to process.',
           page: 'test_page');
       setState(() {

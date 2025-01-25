@@ -383,7 +383,7 @@ class _TestPageState extends State<TestPage>
     _animationController.repeat();
 
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() async {
+      setState(() {
         runningTime--;
         _absorbance_value =
             calculateAbsorbance(_adc_value2, _adc_value1).toStringAsFixed(4);
@@ -418,7 +418,7 @@ class _TestPageState extends State<TestPage>
             'json_data': jsonData, // Save the JSON data
           });
 
-          print(await DatabaseHelper.instance.fetchResults());
+          print( DatabaseHelper.instance.fetchResults());
 
           setState(() {
             running_status = "Sample $sampleNumber Completed";

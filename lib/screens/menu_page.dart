@@ -9,34 +9,14 @@ import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
 import 'package:intl/intl.dart'; // For formatting the date and time
 
 // Import custom screen files
-import 'screens/test_page.dart';
-import 'screens/calibration_page.dart';
-import 'screens/qc_page.dart';
-import 'screens/log_page.dart';
-import 'screens/system_page.dart';
-import 'screens/result.dart';
+import 'test_page.dart';
+import 'calibration_page.dart';
+import 'qc_page.dart';
+import 'log_page.dart';
+import 'system_page.dart';
+import 'result.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void main() {
-  // Initialize FFI for desktop platforms
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
-
-  runApp(MyApp()); // Start the Flutter application
-}
-
-// Main Application Widget
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false, // Disable debug banner
-      home: MainScreen(
-        onBackToMenu: () {},
-      ), // Set MainScreen as the home page
-    );
-  }
-}
 
 // MainScreen Stateful Widget
 class MainScreen extends StatefulWidget {
@@ -113,9 +93,9 @@ class _MainScreenState extends State<MainScreen> {
       },
     ];
 
-    Future.delayed(const Duration(seconds: 3), () {
-      initializeSerialReader(); // Prints after 1 second.
-    });
+    // Future.delayed(const Duration(seconds: 3), () {
+    //   initializeSerialReader(); // Prints after 1 second.
+    // });
   }
 
   void logEvent(String type, String message, {required String page}) async {

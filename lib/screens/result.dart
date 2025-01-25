@@ -259,7 +259,7 @@ class _ResultPageState extends State<ResultPage> {
                       onPressed: _deleteSelectedRows,
                       child: const Text("Delete Selected Rows"),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(162, 67, 154, 93),
+                        backgroundColor: const Color.fromARGB(162, 67, 154, 93),foregroundColor: Color( 0xFFFFFFFF),
                       ),
                     ),
                   if (data.isNotEmpty)
@@ -267,7 +267,7 @@ class _ResultPageState extends State<ResultPage> {
                       onPressed: _deleteAllRows,
                       child: const Text("Delete All Rows"),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(162, 29, 60, 139),
+                        backgroundColor: const Color.fromARGB(162, 29, 60, 139),foregroundColor: Color( 0xFFFFFFFF),
                       ),
                     ),
                 ],

@@ -323,17 +323,17 @@ class _TestPageState extends State<TestPage>
 
   void processData(String data) {
     logEvent('info', 'Data received: $data', page: 'test_page');
-    print("The string contains 'STARTED' is ${data.trim().contains("STARTED")}");
-    if (data.trim().contains("STARTED")) {
+    print("The string contains 'STARTED' is ${data.contains("STARTED")}");
+    if (data.contains("STARTED")) {
       print("The string contains 'STARTED'");
       // Extract the sample number from the signal
-     // final sampleNumber = int.tryParse(data.split(" ")[1]);
+      final sampleNumber = int.tryParse(data.split(" ")[1]);
       // Regular expression to extract numbers at the end of the string
-  RegExp regex = RegExp(r'\d+$');
- int sampleNumber = regex.firstMatch(data)?.group(0) as int;
+  //RegExp regex = RegExp(r'\d+$');
+ //int sampleNumber = regex.firstMatch(data)?.group(0) as int;
 
   print("sampleNumber=$sampleNumber"); // Output: "1"
-      if (sampleNumber >0) {
+      if (sampleNumber! >0) {
         logEvent('info',
             'Sample $sampleNumber started processing. $sampleIds[$sampleNumber - 1]',
             page: 'test_page');
@@ -343,9 +343,8 @@ class _TestPageState extends State<TestPage>
             page: 'test_page');
       }
     } else if (data.contains("ENDED")) {
-      RegExp regex = RegExp(r'\d+$');
- int sampleNumber = regex.firstMatch(data)?.group(0) as int;
-      if (sampleNumber >0) {
+      final sampleNumber = int.tryParse(data.split(" ")[1]);
+      if (sampleNumber! >0) {
         print("Hardware ended processing Sample $sampleNumber.");
         logEvent('info',
             'Sample $sampleNumber completed.$sampleIds[$sampleNumber - 1]',

@@ -95,7 +95,7 @@ class _WelcomePageState extends State<WelcomePage>
           page: 'welcome_page');
           _navigateToHome();
           buffer = '';
-          //serialReader.port?.close();
+          serialReader.port?.close();
         }
         // Extract data between `<` and `>` and add to the queue
         // while (buffer.contains('<') && buffer.contains('>')) {

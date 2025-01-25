@@ -185,6 +185,7 @@ class _TestPageState extends State<TestPage>
   int runningTime = 120;
   Timer? timer;
   String _temp_val = "0";
+  String pressure_val = "0";
   int secs = 0;
   late AnimationController _animationController;
   SerialReader? serialReader;
@@ -258,6 +259,7 @@ class _TestPageState extends State<TestPage>
 
   // Save samples and get their IDs
   List<int> sampleIds = [];
+
   void startProcess() async {
     _updateYValues();
     if (cards.isEmpty) {
@@ -365,8 +367,7 @@ class _TestPageState extends State<TestPage>
     }
   }
 
-  List<Map<String, dynamic>> absorbanceJsonData =
-      []; // List to hold absorbance data
+  List<Map<String, dynamic>> absorbanceJsonData = []; // List to hold absorbance data
 
   void startSampleReading(int sampleNumber) {
     logEvent('info',
@@ -400,7 +401,7 @@ class _TestPageState extends State<TestPage>
         //   'time': secs,
         //   'absorbance_value': _absorbance_value,
         // });
-
+       _updatePressureValues();
         if (runningTime == 0) {
           var sid = cards[sampleNumber - 1]['sampleName'];
           var typeofsample = cards[sampleNumber - 1]['type'];
@@ -422,6 +423,7 @@ class _TestPageState extends State<TestPage>
 
           setState(() {
             running_status = "Sample $sampleNumber Completed";
+            pressure_val = "0";
             logEvent('info',
                 'Sample $sampleNumber processing completed ',
                 page: 'test_page');
@@ -520,6 +522,16 @@ class _TestPageState extends State<TestPage>
     });
   }
 
+void _updatePressureValues() {
+    final random = Random();
+    setState(() {
+      
+        // Generate a new random Y value between 6 and 7.5
+        double newY = 6 + (random.nextDouble() * (7.5 - 6));
+        pressure_val = double.parse(newY.toStringAsFixed(2)).toString(); // Round to 2 decimal places
+      
+    });
+  }
   double calculateArea(List<FlSpot> spots, double startX, double endX) {
     final filteredSpots =
         dataPoints.where((spot) => spot.x >= startX && spot.x <= endX).toList();
@@ -1550,7 +1562,7 @@ class _TestPageState extends State<TestPage>
                                             color: Colors.orange, size: 24),
                                         SizedBox(width: 8),
                                         Text(
-                                          '0 MPa',
+                                          '$pressure_val MPa',
                                           style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.w600,

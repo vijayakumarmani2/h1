@@ -64,15 +64,7 @@ class _WelcomePageState extends State<WelcomePage>
           page: 'welcome_page');
 
       print('Failed to open serial port. Please check the connection.');
-      CommonPopup.show(
-              context,
-              title: 'Error',
-              content: 'Failed to open serial port /dev/ttyUSB-static. Please check the connection.',
-              onOk: () {
-                print('OK button clicked');
-                Navigator.of(context).pop(); // Close popup
-              },
-            );
+     
     } else {
       logEvent('info', 'Serial reader initialized successfully.',
           page: 'welcome_page');
@@ -124,15 +116,7 @@ class _WelcomePageState extends State<WelcomePage>
         print('Error reading serial port: $error');
         logEvent('error', 'Error reading serial port: $error',
             page: 'welcome_page');
-            CommonPopup.show(
-              context,
-              title: 'Error',
-              content: 'Error reading serial port: $error',
-              onOk: () {
-                print('OK button clicked');
-                Navigator.of(context).pop(); // Close popup
-              },
-            );
+        
       }, onDone: () {
         print('Serial port communication ended unexpectedly.');
         logEvent('warning', 'Serial port communication ended unexpectedly.',

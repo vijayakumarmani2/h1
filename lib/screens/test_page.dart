@@ -35,6 +35,8 @@ class _TestPageState extends State<TestPage>
   int _adc_value1 = 1; // To track if the action has started
   int _adc_value2 = 1;
   var _absorbance_value = "0.0";
+  
+  var _finishedAll=false;
 
   @override
   void initState() {
@@ -457,6 +459,7 @@ class _TestPageState extends State<TestPage>
           page: 'test_page');
       setState(() {
         running_status = "All samples processed.";
+        _finishedAll=true;
       });
     }
   }
@@ -1726,7 +1729,7 @@ void _updatePressureValues() {
                                                     fontSize: 16,
                                                   ),
                                                 ),
-                                                ElevatedButton(
+                                               _finishedAll ? ElevatedButton(
                                                   onPressed: stopTimer,
                                                   child: const Text(
                                                     'Stop',
@@ -1734,7 +1737,7 @@ void _updatePressureValues() {
                                                       fontSize: 16,
                                                     ),
                                                   ),
-                                                ),
+                                                ) : Container(),
                                               ],
                                             )
                                           : ElevatedButton(

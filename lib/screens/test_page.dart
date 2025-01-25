@@ -345,7 +345,7 @@ class _TestPageState extends State<TestPage>
       if (sampleNumber != null) {
         print("Hardware ended processing Sample $sampleNumber.");
         logEvent('info',
-            'Sample $sampleNumber completed.${sampleIds[sampleNumber - 1]}',
+            'Sample $sampleNumber completed.',
             page: 'test_page');
         completeSampleProcessing(sampleNumber);
       } else {
@@ -444,7 +444,7 @@ class _TestPageState extends State<TestPage>
       running_status = "Sample $sampleNumber Completed";
     });
 
-    if (sampleNumber > sampleIds.length) {
+    if (sampleNumber != cards.length) {
       logEvent('info', 'Waiting for next sample to process.',
           page: 'test_page');
       setState(() {

@@ -333,7 +333,7 @@ class _TestPageState extends State<TestPage>
       //int sampleNumber = regex.firstMatch(data)?.group(0) as int;
 
       print("sampleNumber=$sampleNumber"); // Output: "1"
-      if (sampleNumber! > 0) {
+      if (sampleNumber != null) {
         logEvent('info',
             'Sample $sampleNumber started processing. $sampleIds[$sampleNumber - 1]',
             page: 'test_page');
@@ -344,7 +344,7 @@ class _TestPageState extends State<TestPage>
       }
     } else if (data.contains("ENDED")) {
       final sampleNumber = int.tryParse(data.split(" ")[1]);
-      if (sampleNumber! > 0) {
+      if (sampleNumber != null) {
         print("Hardware ended processing Sample $sampleNumber.");
         logEvent('info',
             'Sample $sampleNumber completed.$sampleIds[$sampleNumber - 1]',

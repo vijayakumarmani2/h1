@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hba1c_analyzer_1/screens/menu_page.dart';
 import 'package:hba1c_analyzer_1/services/DataHandler.dart';
 import 'package:hba1c_analyzer_1/services/serial_port_service.dart';
+import 'package:hba1c_analyzer_1/widget/popup.dart';
 
 
 class WelcomePage extends StatefulWidget {
@@ -16,6 +17,8 @@ class _WelcomePageState extends State<WelcomePage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  
+  var init_content = "Initializing the device. Please wait...";
 
   @override
   void initState() {
@@ -61,6 +64,15 @@ class _WelcomePageState extends State<WelcomePage>
           page: 'welcome_page');
 
       print('Failed to open serial port. Please check the connection.');
+      CommonPopup.show(
+              context,
+              title: 'Error',
+              content: 'Failed to open serial port /dev/ttyUSB-static. Please check the connection.',
+              onOk: () {
+                print('OK button clicked');
+                Navigator.of(context).pop(); // Close popup
+              },
+            );
     } else {
       logEvent('info', 'Serial reader initialized successfully.',
           page: 'welcome_page');
@@ -73,12 +85,7 @@ class _WelcomePageState extends State<WelcomePage>
 });
       serialReader.port?.write(Uint8List.fromList(message.codeUnits));
       print("Sent to hardware: $message");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('sent to hardware: $message'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+     
     
      String buffer = '';
 
@@ -88,12 +95,15 @@ class _WelcomePageState extends State<WelcomePage>
         buffer += String.fromCharCodes(data);
         print("buffer: $buffer");
         if (buffer == "INI_CMPT") {
+          setState(() {
+            init_content = "Initialization completed.";
+          });
           print("Initialization completed - ${buffer}");
           logEvent('info', 'Initialization completed - ${buffer}',
           page: 'welcome_page');
           _navigateToHome();
           buffer = '';
-          serialReader.port?.close();
+          //serialReader.port?.close();
         }
         // Extract data between `<` and `>` and add to the queue
         // while (buffer.contains('<') && buffer.contains('>')) {
@@ -114,6 +124,15 @@ class _WelcomePageState extends State<WelcomePage>
         print('Error reading serial port: $error');
         logEvent('error', 'Error reading serial port: $error',
             page: 'welcome_page');
+            CommonPopup.show(
+              context,
+              title: 'Error',
+              content: 'Error reading serial port: $error',
+              onOk: () {
+                print('OK button clicked');
+                Navigator.of(context).pop(); // Close popup
+              },
+            );
       }, onDone: () {
         print('Serial port communication ended unexpectedly.');
         logEvent('warning', 'Serial port communication ended unexpectedly.',
@@ -192,7 +211,7 @@ class _WelcomePageState extends State<WelcomePage>
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "Initializing the system.. Please wait.",
+                  "$init_content",
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.white70,

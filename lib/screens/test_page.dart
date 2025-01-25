@@ -8,6 +8,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:hba1c_analyzer_1/services/DataHandler.dart';
 import 'package:hba1c_analyzer_1/services/serial_port_service.dart';
 import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
+import 'package:hba1c_analyzer_1/widget/popup.dart';
 import 'dart:async';
 import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:virtual_keyboard_multi_language/virtual_keyboard_multi_language.dart';
@@ -109,12 +110,23 @@ class _TestPageState extends State<TestPage>
       // Show a SnackBar if the maximum limit is reached
       logEvent('warning', 'Samples should be empty to add calibrators.',
           page: 'test_page');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Samples should be empty'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+
+          // Use the common popup
+            CommonPopup.show(
+              context,
+              title: 'Info',
+              content: 'Samples should be empty to add calibrators.',
+              onOk: () {
+                print('OK button clicked');
+                Navigator.of(context).pop(); // Close popup
+              },
+            );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text('Samples should be empty'),
+      //     duration: Duration(seconds: 2),
+      //   ),
+      // );
     }
   }
 
@@ -149,12 +161,15 @@ class _TestPageState extends State<TestPage>
       // Show a SnackBar if the maximum limit is reached
       logEvent('warning', 'Samples should be empty to add QC.',
           page: 'test_page');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Samples should be empty'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+       CommonPopup.show(
+              context,
+              title: 'Info',
+              content: 'Samples should be empty to add calibrators.',
+              onOk: () {
+                print('OK button clicked');
+                Navigator.of(context).pop(); // Close popup
+              },
+            );
     }
   }
 
@@ -213,6 +228,16 @@ class _TestPageState extends State<TestPage>
           page: 'test_page');
 
       print('Failed to open serial port. Please check the connection.');
+
+        CommonPopup.show(
+              context,
+              title: 'Error',
+              content: 'Failed to open serial port /dev/ttyUSB-static. Please check the connection.',
+              onOk: () {
+                print('OK button clicked');
+                Navigator.of(context).pop(); // Close popup
+              },
+            );
     } else {
       logEvent('info', 'Serial reader initialized successfully.',
           page: 'test_page');
@@ -455,6 +480,15 @@ class _TestPageState extends State<TestPage>
     } else {
       logEvent('info', 'All samples processed successfully.',
           page: 'test_page');
+           CommonPopup.show(
+              context,
+              title: 'Info',
+              content: 'All samples processed successfully.',
+              onOk: () {
+                print('OK button clicked');
+                Navigator.of(context).pop(); // Close popup
+              },
+            );
       setState(() {
         running_status = "All samples processed.";
       });
@@ -1875,3 +1909,5 @@ class _AnimatedLiquidLinearProgressIndicatorState
     );
   }
 }
+
+

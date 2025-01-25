@@ -415,7 +415,7 @@ class _TestPageState extends State<TestPage>
             'hbf': 10.5, // Example HbF value
             'hba1c': 5.8, // Example HbA1c value
             'remarks': 'Completed',
-            'json_data': jsonData, // Save the JSON data
+            'abs_data': jsonData, // Save the JSON data
           });
 
           print( DatabaseHelper.instance.fetchResults());
@@ -569,7 +569,7 @@ class _TestPageState extends State<TestPage>
         await DatabaseHelper.instance.fetchResults(); // Fetch all results
 
     for (var row in results) {
-      final jsonData = jsonDecode(row['json_data'] as String);
+      final jsonData = jsonDecode(row['abs_data'] as String);
       print("Sample No: ${row['sample_no']}");
       print("Absorbance Data: ${jsonData['data']}");
 

@@ -323,7 +323,7 @@ class _TestPageState extends State<TestPage>
 
   void processData(String data) {
     logEvent('info', 'Data received: $data', page: 'test_page');
-    if (data.startsWith("STARTED")) {
+    if (data.contains("STARTED")) {
       // Extract the sample number from the signal
      // final sampleNumber = int.tryParse(data.split(" ")[1]);
       // Regular expression to extract numbers at the end of the string
@@ -340,7 +340,7 @@ class _TestPageState extends State<TestPage>
         logEvent('error', 'Failed to parse sample number from: $data',
             page: 'test_page');
       }
-    } else if (data.startsWith("ENDED")) {
+    } else if (data.contains("ENDED")) {
       RegExp regex = RegExp(r'\d+$');
  int sampleNumber = regex.firstMatch(data)?.group(0) as int;
       if (sampleNumber >0) {

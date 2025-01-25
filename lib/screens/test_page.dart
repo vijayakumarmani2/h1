@@ -334,9 +334,7 @@ class _TestPageState extends State<TestPage>
 
       print("sampleNumber=$sampleNumber"); // Output: "1"
       if (sampleNumber != null) {
-        logEvent('info',
-            'Sample $sampleNumber started processing. $sampleIds[$sampleNumber - 1]',
-            page: 'test_page');
+        print("Hardware started processing Sample $sampleNumber.");
         startSampleReading(sampleNumber);
       } else {
         logEvent('error', 'Failed to parse sample number from: $data',
@@ -347,7 +345,7 @@ class _TestPageState extends State<TestPage>
       if (sampleNumber != null) {
         print("Hardware ended processing Sample $sampleNumber.");
         logEvent('info',
-            'Sample $sampleNumber completed.$sampleIds[$sampleNumber - 1]',
+            'Sample $sampleNumber completed.${sampleIds[sampleNumber - 1]}',
             page: 'test_page');
         completeSampleProcessing(sampleNumber);
       } else {
@@ -420,7 +418,7 @@ class _TestPageState extends State<TestPage>
             'json_data': jsonData, // Save the JSON data
           });
 
-          print( await DatabaseHelper.instance.fetchResults());
+          print(await DatabaseHelper.instance.fetchResults());
 
           setState(() {
             running_status = "Sample $sampleNumber Completed";

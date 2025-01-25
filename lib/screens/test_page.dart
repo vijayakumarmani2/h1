@@ -323,8 +323,8 @@ class _TestPageState extends State<TestPage>
 
   void processData(String data) {
     logEvent('info', 'Data received: $data', page: 'test_page');
-    print("The string contains 'STARTED' is ${data.contains("STARTED")}");
-    if (data.contains("STARTED")) {
+    print("The string contains 'STARTED' is ${data.trim().contains("STARTED")}");
+    if (data.trim().contains("STARTED")) {
       print("The string contains 'STARTED'");
       // Extract the sample number from the signal
      // final sampleNumber = int.tryParse(data.split(" ")[1]);

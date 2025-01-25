@@ -165,6 +165,7 @@ void initState() {
     onTap: () {
       // Define your action here
       print("Home icon tapped");
+      print("isStarted: ${widget.isStarted}");
       if(widget.isStarted == false){
         widget.onBackToMenu();
       }

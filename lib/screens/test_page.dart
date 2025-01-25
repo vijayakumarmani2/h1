@@ -370,7 +370,7 @@ class _TestPageState extends State<TestPage>
 
   void startSampleReading(int sampleNumber) {
     logEvent('info',
-        'Starting sample reading for Sample $sampleNumber. ${sampleIds[sampleNumber - 1]}',
+        'Starting sample reading for Sample $sampleNumber',
         page: 'test_page');
     setState(() {
       running_status = "Running Sample $sampleNumber";
@@ -423,7 +423,7 @@ class _TestPageState extends State<TestPage>
           setState(() {
             running_status = "Sample $sampleNumber Completed";
             logEvent('info',
-                'Sample $sampleNumber processing completed - ${sampleIds[sampleNumber - 1]}',
+                'Sample $sampleNumber processing completed ',
                 page: 'test_page');
             absorbanceJsonData = []; // Clear the absorbance data
           });
@@ -437,7 +437,7 @@ class _TestPageState extends State<TestPage>
 
   void completeSampleProcessing(int sampleNumber) {
     logEvent('info',
-        'Sample $sampleNumber processing completed - ${sampleIds[sampleNumber - 1]}',
+        'Sample $sampleNumber processing completed ',
         page: 'test_page');
 
     setState(() {

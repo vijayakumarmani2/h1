@@ -1768,7 +1768,7 @@ class _TestPageState extends State<TestPage>
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CurvedBottomNavigationBar(
         onBackToMenu: widget.onBackToMenu,
-        wifiStatusNotifier: wifiStatusNotifier, isStarted: _isStarted, 
+        wifiStatusNotifier: wifiStatusNotifier, isStarted: isRunning, 
       ),
     );
   }

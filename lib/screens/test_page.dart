@@ -238,6 +238,13 @@ class _TestPageState extends State<TestPage>
       //         Navigator.of(context).pop(); // Close popup
       //       },
       //     );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to open serial port. Please check the connection.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     } else {
       logEvent('info', 'Serial reader initialized successfully.',
           page: 'test_page');

@@ -4,26 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hba1c_analyzer_1/screens/menu_page.dart';
 import 'package:hba1c_analyzer_1/services/DataHandler.dart';
 import 'package:hba1c_analyzer_1/services/serial_port_service.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void main() {
-
-  // Initialize FFI for desktop platforms
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
-  
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: WelcomePage(),
-    );
-  }
-}
 
 class WelcomePage extends StatefulWidget {
   @override

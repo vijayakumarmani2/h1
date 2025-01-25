@@ -8,7 +8,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:hba1c_analyzer_1/services/DataHandler.dart';
 import 'package:hba1c_analyzer_1/services/serial_port_service.dart';
 import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
-import 'package:hba1c_analyzer_1/widget/popup.dart';
 import 'dart:async';
 import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:virtual_keyboard_multi_language/virtual_keyboard_multi_language.dart';
@@ -110,23 +109,12 @@ class _TestPageState extends State<TestPage>
       // Show a SnackBar if the maximum limit is reached
       logEvent('warning', 'Samples should be empty to add calibrators.',
           page: 'test_page');
-
-      // Use the common popup
-      CommonPopup.show(
-        context,
-        title: 'Info',
-        content: 'Samples should be empty to add calibrators.',
-        onOk: () {
-          print('OK button clicked');
-          Navigator.of(context).pop(); // Close popup
-        },
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Samples should be empty'),
+          duration: Duration(seconds: 2),
+        ),
       );
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //     content: Text('Samples should be empty'),
-      //     duration: Duration(seconds: 2),
-      //   ),
-      // );
     }
   }
 
@@ -161,14 +149,11 @@ class _TestPageState extends State<TestPage>
       // Show a SnackBar if the maximum limit is reached
       logEvent('warning', 'Samples should be empty to add QC.',
           page: 'test_page');
-      CommonPopup.show(
-        context,
-        title: 'Info',
-        content: 'Samples should be empty to add calibrators.',
-        onOk: () {
-          print('OK button clicked');
-          Navigator.of(context).pop(); // Close popup
-        },
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Samples should be empty'),
+          duration: Duration(seconds: 2),
+        ),
       );
     }
   }
@@ -228,23 +213,6 @@ class _TestPageState extends State<TestPage>
           page: 'test_page');
 
       print('Failed to open serial port. Please check the connection.');
-
-      // CommonPopup.show(
-      //       context,
-      //       title: 'Error',
-      //       content: 'Failed to open serial port /dev/ttyUSB-static. Please check the connection.',
-      //       onOk: () {
-      //         print('OK button clicked');
-      //         Navigator.of(context).pop(); // Close popup
-      //       },
-      //     );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to open serial port. Please check the connection.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
     } else {
       logEvent('info', 'Serial reader initialized successfully.',
           page: 'test_page');
@@ -378,7 +346,9 @@ class _TestPageState extends State<TestPage>
       final sampleNumber = int.tryParse(data.split(" ")[1]);
       if (sampleNumber != null) {
         print("Hardware ended processing Sample $sampleNumber.");
-        logEvent('info', 'Sample $sampleNumber completed.', page: 'test_page');
+        logEvent('info',
+            'Sample $sampleNumber completed.',
+            page: 'test_page');
         completeSampleProcessing(sampleNumber);
       } else {
         logEvent('error', 'Failed to parse sample number from: $data',
@@ -397,11 +367,11 @@ class _TestPageState extends State<TestPage>
     }
   }
 
-  List<Map<String, dynamic>> absorbanceJsonData =
-      []; // List to hold absorbance data
+  List<Map<String, dynamic>> absorbanceJsonData = []; // List to hold absorbance data
 
   void startSampleReading(int sampleNumber) {
-    logEvent('info', 'Starting sample reading for Sample $sampleNumber',
+    logEvent('info',
+        'Starting sample reading for Sample $sampleNumber',
         page: 'test_page');
     setState(() {
       running_status = "Running Sample $sampleNumber";
@@ -431,7 +401,7 @@ class _TestPageState extends State<TestPage>
         //   'time': secs,
         //   'absorbance_value': _absorbance_value,
         // });
-        _updatePressureValues();
+       _updatePressureValues();
         if (runningTime == 0) {
           var sid = cards[sampleNumber - 1]['sampleName'];
           var typeofsample = cards[sampleNumber - 1]['type'];
@@ -449,12 +419,13 @@ class _TestPageState extends State<TestPage>
             'abs_data': jsonData, // Save the JSON data
           });
 
-          print(DatabaseHelper.instance.fetchResults());
+          print( DatabaseHelper.instance.fetchResults());
 
           setState(() {
             running_status = "Sample $sampleNumber Completed";
             pressure_val = "0";
-            logEvent('info', 'Sample $sampleNumber processing completed ',
+            logEvent('info',
+                'Sample $sampleNumber processing completed ',
                 page: 'test_page');
             absorbanceJsonData = []; // Clear the absorbance data
           });
@@ -467,7 +438,8 @@ class _TestPageState extends State<TestPage>
   int currentSampleIndex = 0;
 
   void completeSampleProcessing(int sampleNumber) {
-    logEvent('info', 'Sample $sampleNumber processing completed ',
+    logEvent('info',
+        'Sample $sampleNumber processing completed ',
         page: 'test_page');
 
     setState(() {
@@ -483,15 +455,6 @@ class _TestPageState extends State<TestPage>
     } else {
       logEvent('info', 'All samples processed successfully.',
           page: 'test_page');
-      CommonPopup.show(
-        context,
-        title: 'Info',
-        content: 'All samples processed successfully.',
-        onOk: () {
-          print('OK button clicked');
-          Navigator.of(context).pop(); // Close popup
-        },
-      );
       setState(() {
         running_status = "All samples processed.";
       });
@@ -559,16 +522,16 @@ class _TestPageState extends State<TestPage>
     });
   }
 
-  void _updatePressureValues() {
+void _updatePressureValues() {
     final random = Random();
     setState(() {
-      // Generate a new random Y value between 6 and 7.5
-      double newY = 6 + (random.nextDouble() * (7.5 - 6));
-      pressure_val = double.parse(newY.toStringAsFixed(2))
-          .toString(); // Round to 2 decimal places
+      
+        // Generate a new random Y value between 6 and 7.5
+        double newY = 6 + (random.nextDouble() * (7.5 - 6));
+        pressure_val = double.parse(newY.toStringAsFixed(2)).toString(); // Round to 2 decimal places
+      
     });
   }
-
   double calculateArea(List<FlSpot> spots, double startX, double endX) {
     final filteredSpots =
         dataPoints.where((spot) => spot.x >= startX && spot.x <= endX).toList();
@@ -1817,8 +1780,7 @@ class _TestPageState extends State<TestPage>
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CurvedBottomNavigationBar(
         onBackToMenu: widget.onBackToMenu,
-        wifiStatusNotifier: wifiStatusNotifier,
-        isStarted: isRunning,
+        wifiStatusNotifier: wifiStatusNotifier, isStarted: isRunning, 
       ),
     );
   }
@@ -1913,3 +1875,5 @@ class _AnimatedLiquidLinearProgressIndicatorState
     );
   }
 }
+
+

@@ -136,7 +136,7 @@ class _PrimeCheckPageState extends State<PrimeCheckPage> {
                   });
                   showFirstPopup();
                 },
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.teal)),
+                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.teal), foregroundColor: MaterialStatePropertyAll(Colors.white)),
                 child: Text("Prime Check"),
               )
             : isProcessing

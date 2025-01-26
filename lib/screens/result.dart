@@ -433,13 +433,11 @@ class _ResultPageState extends State<ResultPage> {
       // Step 1: Format the view details
       List<String> lines = formatPrintData(resultData, spots);
 
-     
-
       // Step 3: Open the printer port
-      var port = SerialPort("/dev/ttyUSB-printer");
+      var port = SerialPort("/dev/ttyUSB0");
       if (!port.openReadWrite()) {
-        print('Failed to open port /dev/ttyUSB-printer');
-        logEvent("Error", "Failed to open port /dev/ttyUSB-printer",
+        print('Failed to open port /dev/ttyUSB0');
+        logEvent("Error", "Failed to open port /dev/ttyUSB0",
             page: "result_page");
         return;
       }
@@ -497,11 +495,11 @@ class _ResultPageState extends State<ResultPage> {
       port.close();
 
       print("View details and chart printed successfully.");
-       logEvent("Info", "View details and chart printed successfully.",
-            page: "result_page");
+      logEvent("Info", "View details and chart printed successfully.",
+          page: "result_page");
     } catch (e) {
-       logEvent("Error", "Error printing view details and chart: $e",
-            page: "result_page");
+      logEvent("Error", "Error printing view details and chart: $e",
+          page: "result_page");
       print("Error printing view details and chart: $e");
     }
   }
@@ -655,8 +653,6 @@ class _ResultPageState extends State<ResultPage> {
     return packedData;
   }
 
- 
- 
   List<String> formatPrintData(
       Map<String, dynamic> resultData, List<FlSpot> spots) {
     List<String> lines = [];

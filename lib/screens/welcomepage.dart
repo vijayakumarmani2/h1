@@ -134,9 +134,7 @@ class _WelcomePageState extends State<WelcomePage>
 
   @override
   Widget build(BuildContext context) {
-    final width = 1280;
-    final height = 800;
-    print("width = $width, height = $height");
+  
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -149,8 +147,6 @@ class _WelcomePageState extends State<WelcomePage>
             end: Alignment.bottomCenter,
           ),
         ),
-        height: height.toDouble(),
-        width: width.toDouble(),
         child: Center(
           child: FadeTransition(
             opacity: _fadeAnimation,

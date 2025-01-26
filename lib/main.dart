@@ -10,8 +10,10 @@ Future<void> main() async {
   databaseFactory = databaseFactoryFfi;
   
    WidgetsFlutterBinding.ensureInitialized();
+ // Ensure window_manager is initialized
   await windowManager.ensureInitialized();
 
+  // Set up window options (optional, adjust as needed)
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1280, 800),
     center: true,

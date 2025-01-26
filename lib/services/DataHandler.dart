@@ -19,8 +19,8 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'hba1c_database.db');
 
      // Delete the old database (for development purposes only)
-   await deleteDatabase(path);
-   print("Old database deleted");
+  // await deleteDatabase(path);
+   // print("Old database deleted");
 
     return await openDatabase(
       path,
@@ -122,6 +122,19 @@ class DatabaseHelper {
     abs_data TEXT -- Column to store JSON
   )
 ''');
+
+final result_data = {
+     'id': 1,
+    'sample_no': '1',
+    'type': 'HbA1c',
+    'date_time': DateTime.now().toIso8601String(),
+    'hbf': 0.0,
+    'hba1c': 0.0,
+    'remarks': 'No remarks',
+    'abs_data': '{"data": [{"secs": 5, "absorbance_value": 0.06}, {"secs": 10, "absorbance_value": 0.67}, {"secs": 15, "absorbance_value": 0.73}, {"secs": 20, "absorbance_value": 0.921}, {"secs": 25, "absorbance_value": 0.07}, {"secs": 30, "absorbance_value": 0.3}, {"secs": 35, "absorbance_value": 0.31}, {"secs": 40, "absorbance_value": 0.006}, {"secs": 45, "absorbance_value": 0.19}, {"secs": 50, "absorbance_value": 0.2}, {"secs": 55, "absorbance_value": 0.05}, {"secs": 60, "absorbance_value": 0.06}, {"secs": 65, "absorbance_value": 0.09}, {"secs": 70, "absorbance_value": 0.1}, {"secs": 75, "absorbance_value": 0.456}, {"secs": 80, "absorbance_value": 0.06}, {"secs": 85, "absorbance_value": 1.75}, {"secs": 90, "absorbance_value": 1.34}, {"secs": 95, "absorbance_value": 0.11}, {"secs": 100, "absorbance_value": 0.96}, {"secs": 105, "absorbance_value": 1.12}, {"secs": 110, "absorbance_value": 0.06}, {"secs": 115, "absorbance_value": 0.06}]}',
+  };
+
+await db.insert('result_table', result_data);
 
  // Create qc_target table
   await db.execute('''
@@ -436,6 +449,12 @@ Future<int> updateDBCalHighValue(int id, String newHighValue) async {
 Future<List<Map<String, dynamic>>> fetchResults() async {
   final db = await instance.database;
   return await db.query('result_table', orderBy: 'id ASC');
+}
+
+// Fetch results by id
+Future<List<Map<String, dynamic>>> fetchResultsByID(int id) async {
+  final db = await instance.database;
+  return await db.query('result_table', where: 'id = ?', whereArgs: [id],);
 }
 
 // Update result remarks

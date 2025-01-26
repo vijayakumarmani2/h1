@@ -30,7 +30,13 @@ class _SystemPageState extends State<SystemPage> {
 
     final List<Widget> _pages = [
    
-    Center(child: Text('About')), // About Section
+    Center(child: Center(child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+
+        Text('Hba1C Analyzer', style: TextStyle(fontSize: 24),),Text('V1.0.5', style: TextStyle(fontSize: 18),)
+      ],
+    ))), // About Section
      WiFiConfigurationWidget(wifiStatusNotifier: wifiStatusNotifier,), // WiFi Section
     IPDisplayScreen(), // IP Address Section
     Center(child: Text('State Check Status')),

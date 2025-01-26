@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
@@ -66,11 +67,11 @@ class _LineChartPrinterScreenState extends State<LineChartPrinterScreen> {
   }
 
   Future<void> printLineChart() async {
-    const String portName = 'COM9'; // Replace with your printer's port
+    const String portName = 'COM5'; // Replace with your printer's port
 
     Uint8List? chartImageForPrint = await generateLineChartImageForPrint();
     if (chartImageForPrint != null) {
-     await writeDataLineByLine(generateReceiptLines());
+      //await writeDataLineByLine(generateReceiptLines());
       await printChartToPrinter(chartImageForPrint, portName);
     } else {
       print('Failed to generate the chart image for printing.');
@@ -235,9 +236,9 @@ class _LineChartPrinterScreenState extends State<LineChartPrinterScreen> {
   late final SerialPort port;
 
   Future<void> writeDataLineByLine(List<String> lines) async {
-    port = SerialPort("COM9");
+    port = SerialPort("COM5");
     if (!port.openReadWrite()) {
-      print('Failed to open port com9');
+      print('Failed to open port com5');
       return;
     }
 
@@ -278,6 +279,19 @@ class _LineChartPrinterScreenState extends State<LineChartPrinterScreen> {
 
   Future<void> printChartToPrinter(
       Uint8List chartImageData, String portName) async {
+        port = SerialPort("COM5");
+    if (!port.openReadWrite()) {
+      print('Failed to open port com5');
+      return;
+    }
+
+    final SerialPortConfig config = SerialPortConfig();
+    config.baudRate = 9600;
+    config.parity = SerialPortParity.none;
+    config.stopBits = 1;
+    config.bits = 8;
+    config.setFlowControl(SerialPortFlowControl.none);
+    port.config = config;
     const int widthBytes = 48; // Printer width in bytes (384 pixels / 8)
     const int chartHeight = 1200;
 
@@ -294,6 +308,7 @@ class _LineChartPrinterScreenState extends State<LineChartPrinterScreen> {
           1,
         ]);
 
+        
         port.write(Uint8List.fromList(header + lineData));
         await Future.delayed(Duration(milliseconds: 5));
       }

@@ -9,23 +9,7 @@ Future<void> main() async {
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
   
-   WidgetsFlutterBinding.ensureInitialized();
- // Ensure window_manager is initialized
-  await windowManager.ensureInitialized();
-
-  // Set up window options (optional, adjust as needed)
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(1280, 800),
-    center: true,
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    fullScreen: true,
-  );
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.setFullScreen(true);
-    await windowManager.show();
-    await windowManager.focus();
-  });
+  
   runApp(MyApp());
 }
 

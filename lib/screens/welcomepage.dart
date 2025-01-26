@@ -1,12 +1,9 @@
-
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hba1c_analyzer_1/screens/menu_page.dart';
 import 'package:hba1c_analyzer_1/services/DataHandler.dart';
 import 'package:hba1c_analyzer_1/services/serial_port_service.dart';
 import 'package:hba1c_analyzer_1/widget/popup.dart';
-
 
 class WelcomePage extends StatefulWidget {
   @override
@@ -17,7 +14,7 @@ class _WelcomePageState extends State<WelcomePage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  
+
   var init_content = "Initializing the device. Please wait...";
 
   @override
@@ -33,10 +30,10 @@ class _WelcomePageState extends State<WelcomePage>
     );
 
     _animationController.forward();
-    
+
     Future.delayed(const Duration(seconds: 3), () {
       initializeSerialReader(); // Prints after 1 second.
-    //   _navigateToHome();
+      //   _navigateToHome();
     });
   }
 
@@ -65,26 +62,23 @@ class _WelcomePageState extends State<WelcomePage>
           page: 'welcome_page');
 
       print('Failed to open serial port. Please check the connection.');
-     
     } else {
       logEvent('info', 'Serial reader initialized successfully.',
           page: 'welcome_page');
-       
-  
+
       final message = "INITS"; // Example message format
       serialReader.port?.write(Uint8List.fromList(message.codeUnits));
       Future.delayed(Duration(seconds: 2), () {
-  print("This is executed after a 2-second delay");
-});
+        print("This is executed after a 2-second delay");
+      });
       serialReader.port?.write(Uint8List.fromList(message.codeUnits));
       print("Sent to hardware: $message");
-     
-    
-     String buffer = '';
+
+      String buffer = '';
 
       serialReader.getStream()!.listen((data) {
         // Append received data to the buffer
-        
+
         buffer += String.fromCharCodes(data);
         print("buffer: $buffer");
         if (buffer == "INI_CMPT") {
@@ -93,7 +87,7 @@ class _WelcomePageState extends State<WelcomePage>
           });
           print("Initialization completed - ${buffer}");
           logEvent('info', 'Initialization completed - ${buffer}',
-          page: 'welcome_page');
+              page: 'welcome_page');
           _navigateToHome();
           buffer = '';
           serialReader.port?.close();
@@ -117,7 +111,6 @@ class _WelcomePageState extends State<WelcomePage>
         print('Error reading serial port: $error');
         logEvent('error', 'Error reading serial port: $error',
             page: 'welcome_page');
-        
       }, onDone: () {
         print('Serial port communication ended unexpectedly.');
         logEvent('warning', 'Serial port communication ended unexpectedly.',
@@ -126,20 +119,24 @@ class _WelcomePageState extends State<WelcomePage>
     }
   }
 
-
   // Simulated initialization process
   void _navigateToHome() async {
     await Future.delayed(Duration(seconds: 2)); // Simulated delay
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => MainScreen(onBackToMenu: () {  },),
+        builder: (context) => MainScreen(
+          onBackToMenu: () {},
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final width = 1280;
+    final height = 800;
+    print("width = $width, height = $height");
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -152,6 +149,8 @@ class _WelcomePageState extends State<WelcomePage>
             end: Alignment.bottomCenter,
           ),
         ),
+        height: height.toDouble(),
+        width: width.toDouble(),
         child: Center(
           child: FadeTransition(
             opacity: _fadeAnimation,
@@ -185,12 +184,13 @@ class _WelcomePageState extends State<WelcomePage>
                     color: Colors.white,
                   ),
                 ),
-                 SizedBox(height: 30),
+                SizedBox(height: 30),
                 Text(
                   "HbA1c Analyzer",
                   style: TextStyle(
                     fontSize: 35,
-                    fontWeight: FontWeight.bold,fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
                     color: Color.fromARGB(148, 255, 255, 255),
                   ),
                 ),

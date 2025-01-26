@@ -4,10 +4,7 @@ import 'dart:ui' as ui; // Import 'dart:ui' for rendering
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_libserialport/flutter_libserialport.dart';
 import 'package:hba1c_analyzer_1/services/DataHandler.dart';
 import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
@@ -436,11 +433,7 @@ class _ResultPageState extends State<ResultPage> {
       // Step 1: Format the view details
       List<String> lines = formatPrintData(resultData, spots);
 
-      Uint8List? imageBytes = await captureWidgetToImage(
-        chartWidget(spots), // The chart widget to capture
-        width: 400,
-        height: 300,
-      );
+     
 
       // Step 3: Open the printer port
       var port = SerialPort("/dev/ttyUSB-printer");
@@ -662,133 +655,8 @@ class _ResultPageState extends State<ResultPage> {
     return packedData;
   }
 
-  Widget chartWidget(List<FlSpot> spots) {
-    return SizedBox(
-      height: 300,
-      width: 400,
-      child: LineChart(
-        LineChartData(
-          minX: 0,
-          maxX: 130,
-          minY: 0.0,
-          maxY: 1.8,
-          titlesData: FlTitlesData(
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 0.2,
-                getTitlesWidget: (value, meta) {
-                  return Text(
-                    value.toStringAsFixed(1),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  );
-                },
-              ),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 20,
-                getTitlesWidget: (value, meta) {
-                  return Text(
-                    value.toStringAsFixed(0),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          gridData: FlGridData(
-            show: true,
-            drawHorizontalLine: true,
-            horizontalInterval: 0.2,
-            getDrawingHorizontalLine: (value) {
-              return FlLine(
-                color: Colors.black.withOpacity(0.2),
-                strokeWidth: 1,
-              );
-            },
-          ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border.all(
-              color: Colors.black.withOpacity(0.3),
-              width: 1,
-            ),
-          ),
-          lineBarsData: [
-            LineChartBarData(
-              spots: spots,
-              isCurved: true,
-              barWidth: 2,
-              belowBarData: BarAreaData(show: false),
-              dotData: FlDotData(show: false),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Capture a widget to an image
-  Future<Uint8List?> captureWidgetToImage(
-    Widget widget, {
-    required double width,
-    required double height,
-  }) async {
-    try {
-      // Create a boundary for rendering
-      final RenderRepaintBoundary boundary = RenderRepaintBoundary();
-
-      // Create a pipeline owner for layout and painting
-      final PipelineOwner pipelineOwner = PipelineOwner();
-      final BuildOwner buildOwner = BuildOwner(focusManager: FocusManager());
-      final RenderView renderView = RenderView(
-        configuration: ViewConfiguration(size: Size(width, height)),
-        view: WidgetsBinding.instance.platformDispatcher.views.first,
-      );
-      pipelineOwner.rootNode = renderView;
-      renderView.child = boundary;
-
-      // Attach the widget to the rendering tree
-      final RenderObjectToWidgetAdapter adapter = RenderObjectToWidgetAdapter(
-        container: boundary,
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: widget,
-        ),
-      );
-      adapter.attachToRenderTree(buildOwner);
-
-      // Force synchronous layout and paint
-      pipelineOwner.flushLayout();
-      pipelineOwner.flushCompositingBits();
-      pipelineOwner.flushPaint();
-
-      // Ensure the boundary is fully painted
-      if (boundary.debugNeedsPaint) {
-        print("Widget needs painting. Delaying...");
-        await Future.delayed(const Duration(milliseconds: 100));
-        pipelineOwner.flushPaint();
-      }
-
-      // Capture the widget as an image
-      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      final ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
-    } catch (e) {
-      print("Error capturing widget to image: $e");
-      return null;
-    }
-  }
-
+ 
+ 
   List<String> formatPrintData(
       Map<String, dynamic> resultData, List<FlSpot> spots) {
     List<String> lines = [];

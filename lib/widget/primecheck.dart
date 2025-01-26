@@ -40,7 +40,7 @@ class _PrimeCheckPageState extends State<PrimeCheckPage> {
           page: 'PrimeCheck');
        
   
-      final message = "PCHECK"; // Example message format
+      final message = "PCHEC"; // Example message format
       Future.delayed(Duration(seconds: 2), () {
   print("This is executed after a 2-second delay");
 });

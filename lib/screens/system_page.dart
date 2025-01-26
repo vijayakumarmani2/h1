@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hba1c_analyzer_1/widget/primecheck.dart';
 import 'package:hba1c_analyzer_1/widget/show_ip.dart';
 import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
 import 'package:hba1c_analyzer_1/widget/wifi_configuration_widget.dart';
@@ -39,7 +40,7 @@ class _SystemPageState extends State<SystemPage> {
     ))), // About Section
      WiFiConfigurationWidget(wifiStatusNotifier: wifiStatusNotifier,), // WiFi Section
     IPDisplayScreen(), // IP Address Section
-    Center(child: Text('State Check Status')),
+    PrimeCheckPage(),
   ];
 
     return MaterialApp(
@@ -50,14 +51,14 @@ class _SystemPageState extends State<SystemPage> {
           children: [
             // Side tabs
             Container(
-              width: 130, // Adjust as needed
+              width: 150, // Adjust as needed
               color: Colors.white,
               child: ListView(
                 children: [
                   _buildTabItem(Icons.info, 'About', 0),
                   _buildTabItem(Icons.wifi, 'WiFi', 1),
                   _buildTabItem(Icons.build, 'IP Address', 2),
-                  _buildTabItem(Icons.check_circle, 'State', 3),
+                  _buildTabItem(Icons.check_circle, 'Prime Check', 3),
                 ],
               ),
             ),

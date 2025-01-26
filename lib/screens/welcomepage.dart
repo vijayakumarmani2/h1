@@ -36,7 +36,7 @@ class _WelcomePageState extends State<WelcomePage>
     
     Future.delayed(const Duration(seconds: 3), () {
       initializeSerialReader(); // Prints after 1 second.
-      // _navigateToHome();
+       _navigateToHome();
     });
   }
 

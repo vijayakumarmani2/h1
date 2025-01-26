@@ -416,7 +416,7 @@ class _ResultPageState extends State<ResultPage> {
     final data = await fetchAndDecodeJsonData(id);
     final absData = data["jsonData"];
     final resultData = data["result"];
-    print("abs_data = $resultData");
+   // print("abs_data = $resultData");
     final List<FlSpot> spots = (absData['data'] as List)
         .map((item) => FlSpot(
               (item['secs'] as num).toDouble(),

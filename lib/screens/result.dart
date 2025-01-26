@@ -420,7 +420,7 @@ class _ResultPageState extends State<ResultPage> {
     final List<FlSpot> spots = (absData['data'] as List)
         .map((item) => FlSpot(
               (item['secs'] as num).toDouble(),
-              (item['absorbance_value'] as num).toDouble(),
+              double.parse(item['absorbance_value']),
             ))
         .toList();
 
@@ -434,9 +434,9 @@ class _ResultPageState extends State<ResultPage> {
       List<String> lines = formatPrintData(resultData, spots);
 
       // Step 3: Open the printer port
-      var port = SerialPort("/dev/ttyUSB-printer");
+      var port = SerialPort("/dev/ttyUSB0");
       if (!port.openReadWrite()) {
-        print('Failed to open port /dev/ttyUSB-printer');
+        print('Failed to open port /dev/ttyUSB0');
         logEvent("Error", "Failed to open port /dev/ttyUSB-printer",
             page: "result_page");
         return;

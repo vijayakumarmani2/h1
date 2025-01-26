@@ -416,7 +416,7 @@ class _ResultPageState extends State<ResultPage> {
     final data = await fetchAndDecodeJsonData(id);
     final absData = data["jsonData"];
     final resultData = data["result"];
-
+    print("abs_data = $resultData");
     final List<FlSpot> spots = (absData['data'] as List)
         .map((item) => FlSpot(
               (item['secs'] as num).toDouble(),
@@ -434,10 +434,10 @@ class _ResultPageState extends State<ResultPage> {
       List<String> lines = formatPrintData(resultData, spots);
 
       // Step 3: Open the printer port
-      var port = SerialPort("/dev/ttyUSB0");
+      var port = SerialPort("/dev/ttyUSB-printer");
       if (!port.openReadWrite()) {
-        print('Failed to open port /dev/ttyUSB0');
-        logEvent("Error", "Failed to open port /dev/ttyUSB0",
+        print('Failed to open port /dev/ttyUSB-printer');
+        logEvent("Error", "Failed to open port /dev/ttyUSB-printer",
             page: "result_page");
         return;
       }
@@ -727,9 +727,9 @@ class _ResultPageState extends State<ResultPage> {
   }
 
   void _lineFeed() {
-    var port = SerialPort("COM5");
+    var port = SerialPort("/dev/ttyUSB-printer");
     if (!port.openReadWrite()) {
-      print('Failed to open port COM5');
+      print('Failed to open port /dev/ttyUSB-printer');
       return;
     }
 

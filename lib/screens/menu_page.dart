@@ -207,72 +207,79 @@ class _MainScreenState extends State<MainScreen> {
       body: Padding(
         padding: const EdgeInsets.all(30.0),
         child: Center(
-          child: Container(
-            child: Center(
-              child: GridView.builder(
-                shrinkWrap:
-                    true, // Ensures the grid takes only as much space as needed
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // Number of columns
-                  crossAxisSpacing: 35.0, // Spacing between columns
-                  mainAxisSpacing: 35.0, // Spacing between rows
-                ),
-                itemCount: _menuItems.length, // Number of menu items
-                itemBuilder: (context, index) {
-                  final menuItem = _menuItems[index];
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedIndex = index + 1; // Navigate to the page
-                      });
-                    },
-                    child: Column(
-                      children: [
-                        // Icon container
-                        Container(
-                          width: 200,
-                          height: 170,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0xFF276860),
-                                Color(0xFF276860)
-                              ], // Gradient colors
-                              begin: Alignment.topLeft, stops: [0.0, 0.4],
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius:
-                                BorderRadius.circular(12.0), // Rounded corners
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black26, // Shadow color
-                                blurRadius: 4,
-                                offset: Offset(2, 2),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            menuItem['icon'], // Display menu icon
-                            size: 70,
-                            color: Colors.white,
-                          ),
-                        ),
-                        // Label
-                        Text(
-                          menuItem['label'],
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF00706e),
-                          ),
-                        ),
-                      ],
+          child: Column(
+            children: [
+              Image.asset("assets/logo2.png", width:400,  ),
+              SizedBox(height: 30,),
+              Container(
+                height: 500, width: 720,
+                child: Center(
+                  child: GridView.builder(
+                    shrinkWrap:
+                        true, // Ensures the grid takes only as much space as needed
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3, // Number of columns
+                      crossAxisSpacing: 35.0, // Spacing between columns
+                      mainAxisSpacing: 35.0, // Spacing between rows
                     ),
-                  );
-                },
+                    itemCount: _menuItems.length, // Number of menu items
+                    itemBuilder: (context, index) {
+                      final menuItem = _menuItems[index];
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex = index + 1; // Navigate to the page
+                          });
+                        },
+                        child: Column(
+                          children: [
+                            // Icon container
+                            Container(
+                              width: 200,
+                              height: 170,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF276860),
+                                    Color(0xFF276860)
+                                  ], // Gradient colors
+                                  begin: Alignment.topLeft, stops: [0.0, 0.4],
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius:
+                                    BorderRadius.circular(12.0), // Rounded corners
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black26, // Shadow color
+                                    blurRadius: 4,
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                menuItem['icon'], // Display menu icon
+                                size: 70,
+                                color: Colors.white,
+                              ),
+                            ),
+                            // Label
+                            Text(
+                              menuItem['label'],
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF00706e),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),

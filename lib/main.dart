@@ -28,7 +28,25 @@ class MyApp extends StatelessWidget {
    
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainScreen(onBackToMenu: () {  },),
+      home: HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Home Page'),
+        backgroundColor: Color(0xFF224c84),
+      ),
+      body: Center(
+        child: Text(
+          "Home Page Content Here",
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
     );
   }
 }

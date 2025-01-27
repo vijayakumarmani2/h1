@@ -137,90 +137,99 @@ class _WelcomePageState extends State<WelcomePage>
   logEvent('warning', 'width : ${MediaQuery.of(context).size.width} , height: ${MediaQuery.of(context).size.height}',
             page: 'welcome_page');
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF224c84), // Your first palette color
-              Color.fromARGB(255, 51, 133, 77), // Your second palette color
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        width: 1280,
-      height: 800,
-      
-        child: Center(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Logo
-                Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 20,
-                        offset: Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.star,
-                    size: 100,
-                    color: Colors.white, // Replace with your logo if needed
-                  ),
-                ),
-                SizedBox(height: 20),
-                // Welcome Text
-                Text(
-                  "Welcome",
-                  style: TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 30),
-                Text(
-                  "HbA1c Analyzer",
-                  style: TextStyle(
-                    fontSize: 35,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic,
-                    color: Color.fromARGB(148, 255, 255, 255),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  "$init_content",
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white70,
-                  ),
-                ),
-                SizedBox(height: 40),
-                // Loading Animation
-                SizedBox(
-                  height: 50,
-                  width: 50,
-                  child: CircularProgressIndicator(
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(Color(0xFFffffff)),
-                    strokeWidth: 4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+      body: MainScreen(onBackToMenu: (){},)
+      );
   }
 }
+
+//  Widget build(BuildContext context) {
+//   logEvent('warning', 'width : ${MediaQuery.of(context).size.width} , height: ${MediaQuery.of(context).size.height}',
+//             page: 'welcome_page');
+//     return Scaffold(
+//       body: Container(
+//         decoration: BoxDecoration(
+//           gradient: LinearGradient(
+//             colors: [
+//               Color(0xFF224c84), // Your first palette color
+//               Color.fromARGB(255, 51, 133, 77), // Your second palette color
+//             ],
+//             begin: Alignment.topCenter,
+//             end: Alignment.bottomCenter,
+//           ),
+//         ),
+//         width: 1280,
+//       height: 800,
+      
+//         child: Center(
+//           child: FadeTransition(
+//             opacity: _fadeAnimation,
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 // Logo
+//                 Container(
+//                   decoration: BoxDecoration(
+//                     boxShadow: [
+//                       BoxShadow(
+//                         color: Colors.black26,
+//                         blurRadius: 20,
+//                         offset: Offset(0, 10),
+//                       ),
+//                     ],
+//                   ),
+//                   child: Icon(
+//                     Icons.star,
+//                     size: 100,
+//                     color: Colors.white, // Replace with your logo if needed
+//                   ),
+//                 ),
+//                 SizedBox(height: 20),
+//                 // Welcome Text
+//                 Text(
+//                   "Welcome",
+//                   style: TextStyle(
+//                     fontSize: 40,
+//                     fontWeight: FontWeight.bold,
+//                     color: Colors.white,
+//                   ),
+//                 ),
+//                 SizedBox(height: 30),
+//                 Text(
+//                   "HbA1c Analyzer",
+//                   style: TextStyle(
+//                     fontSize: 35,
+//                     fontWeight: FontWeight.bold,
+//                     fontStyle: FontStyle.italic,
+//                     color: Color.fromARGB(148, 255, 255, 255),
+//                   ),
+//                 ),
+//                 SizedBox(height: 10),
+//                 Text(
+//                   "$init_content",
+//                   style: TextStyle(
+//                     fontSize: 18,
+//                     color: Colors.white70,
+//                   ),
+//                 ),
+//                 SizedBox(height: 40),
+//                 // Loading Animation
+//                 SizedBox(
+//                   height: 50,
+//                   width: 50,
+//                   child: CircularProgressIndicator(
+//                     valueColor:
+//                         AlwaysStoppedAnimation<Color>(Color(0xFFffffff)),
+//                     strokeWidth: 4,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class HomePage extends StatelessWidget {
   @override

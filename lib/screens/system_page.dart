@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hba1c_analyzer_1/widget/primecheck.dart';
 import 'package:hba1c_analyzer_1/widget/show_ip.dart';
 import 'package:hba1c_analyzer_1/widget/BottomNavigationBar.dart';
+import 'package:hba1c_analyzer_1/widget/software_update.dart';
 import 'package:hba1c_analyzer_1/widget/wifi_configuration_widget.dart';
 
 
@@ -41,6 +42,7 @@ class _SystemPageState extends State<SystemPage> {
      WiFiConfigurationWidget(wifiStatusNotifier: wifiStatusNotifier,), // WiFi Section
     IPDisplayScreen(), // IP Address Section
     PrimeCheckPage(),
+    Sofwate_update()
   ];
 
     return MaterialApp(
@@ -59,6 +61,7 @@ class _SystemPageState extends State<SystemPage> {
                   _buildTabItem(Icons.wifi, 'WiFi', 1),
                   _buildTabItem(Icons.build, 'IP Address', 2),
                   _buildTabItem(Icons.check_circle, 'Prime Check', 3),
+                  _buildTabItem(Icons.check_circle, 'Update', 4),
                 ],
               ),
             ),

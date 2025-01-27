@@ -167,18 +167,18 @@ class _WelcomePageState extends State<WelcomePage>
                       ),
                     ],
                   ),
-                  child:Image.asset('assets/logo.jpeg',width: 120),
+                  child:Image.asset('assets/logo2.png', width:400,),
                 ),
                 SizedBox(height: 20),
                 // Welcome Text
-                Text(
-                  "Welcome",
-                  style: TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                // Text(
+                //   "Welcome",
+                //   style: TextStyle(
+                //     fontSize: 40,
+                //     fontWeight: FontWeight.bold,
+                //     color: Colors.white,
+                //   ),
+                // ),
                 SizedBox(height: 30),
                 Text(
                   "HbA1c Analyzer",

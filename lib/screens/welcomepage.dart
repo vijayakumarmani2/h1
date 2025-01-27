@@ -148,8 +148,8 @@ class _WelcomePageState extends State<WelcomePage>
             end: Alignment.bottomCenter,
           ),
         ),
-        width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
+        width: 1280,
+      height: 800,
       
         child: Center(
           child: FadeTransition(

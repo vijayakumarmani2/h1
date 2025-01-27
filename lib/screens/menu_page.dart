@@ -208,6 +208,7 @@ class _MainScreenState extends State<MainScreen> {
         padding: const EdgeInsets.all(30.0),
         child: Center(
           child: Container(
+            height: 400,
             child: Center(
               child: GridView.builder(
                 shrinkWrap:

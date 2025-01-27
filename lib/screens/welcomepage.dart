@@ -137,7 +137,7 @@ class _WelcomePageState extends State<WelcomePage>
   logEvent('warning', 'width : ${MediaQuery.of(context).size.width} , height: ${MediaQuery.of(context).size.height}',
             page: 'welcome_page');
     return Scaffold(
-      body: MainScreen(onBackToMenu: (){},)
+      body: HomePage()
       );
   }
 }

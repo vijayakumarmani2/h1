@@ -21,8 +21,14 @@ void configureWindow(Pointer<Void> windowPointer) {
 }
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
+ WidgetsFlutterBinding.ensureInitialized();
+SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+// to hide only bottom bar:
+SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  statusBarColor: Colors.transparent,
+  systemNavigationBarColor: Colors.transparent,
+  statusBarIconBrightness: Brightness.light,
+));
   
   // Initialize FFI for desktop platforms
   sqfliteFfiInit();

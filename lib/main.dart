@@ -3,7 +3,7 @@ import 'package:hba1c_analyzer_1/screens/welcomepage.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 
-Future<void> main() async {
+void main()  {
 
   // Initialize FFI for desktop platforms
   sqfliteFfiInit();

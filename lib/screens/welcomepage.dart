@@ -134,7 +134,8 @@ class _WelcomePageState extends State<WelcomePage>
 
   @override
   Widget build(BuildContext context) {
-  
+  logEvent('warning', 'width : ${MediaQuery.of(context).size.width} , height: ${MediaQuery.of(context).size.height}',
+            page: 'welcome_page');
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -147,6 +148,9 @@ class _WelcomePageState extends State<WelcomePage>
             end: Alignment.bottomCenter,
           ),
         ),
+        width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      
         child: Center(
           child: FadeTransition(
             opacity: _fadeAnimation,

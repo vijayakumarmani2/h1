@@ -33,7 +33,7 @@ class _WelcomePageState extends State<WelcomePage>
 
     Future.delayed(const Duration(seconds: 3), () {
       initializeSerialReader(); // Prints after 1 second.
-         _navigateToHome();
+      //   _navigateToHome();
     });
   }
 
@@ -167,11 +167,7 @@ class _WelcomePageState extends State<WelcomePage>
                       ),
                     ],
                   ),
-                  child: Icon(
-                    Icons.star,
-                    size: 100,
-                    color: Colors.white, // Replace with your logo if needed
-                  ),
+                  child:Image.asset('assets/logo.jpeg',width: 120),
                 ),
                 SizedBox(height: 20),
                 // Welcome Text

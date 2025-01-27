@@ -148,8 +148,7 @@ class _WelcomePageState extends State<WelcomePage>
             end: Alignment.bottomCenter,
           ),
         ),
-        width: 1280,
-      height: 800,
+        
       
         child: Center(
           child: FadeTransition(

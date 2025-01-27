@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
 
     // Create the GTK window and embed the Flutter view
     GtkWidget* window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
+    gtk_window_set_default_size(GTK_WINDOW(window), 1280, 800);
     gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));
 
     // Connect window close signal

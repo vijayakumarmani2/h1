@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hba1c_analyzer_1/screens/menu_page.dart';
 import 'package:hba1c_analyzer_1/screens/welcomepage.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
    
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: WelcomePage(),
+      home: MainScreen(onBackToMenu: () {  },),
     );
   }
 }

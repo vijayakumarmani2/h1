@@ -35,8 +35,8 @@ class _TestPageState extends State<TestPage>
   int _adc_value1 = 1; // To track if the action has started
   int _adc_value2 = 1;
   var _absorbance_value = "0.0";
-  
-  var _finishedAll=false;
+
+  var _finishedAll = false;
 
   @override
   void initState() {
@@ -196,7 +196,7 @@ class _TestPageState extends State<TestPage>
   List<String> log = [];
   String buffer = '';
 
- // List<FlSpot> spots = [];
+  // List<FlSpot> spots = [];
 
   List<FlSpot> spots = [
     FlSpot(0, 0.00),
@@ -293,7 +293,7 @@ class _TestPageState extends State<TestPage>
   List<int> sampleIds = [];
 
   void startProcess() async {
-   // _updateYValues();
+    // _updateYValues();
     if (cards.isEmpty) {
       // Show error if no cards are added
       logEvent('error', 'No samples added. Cannot start process.',
@@ -304,13 +304,13 @@ class _TestPageState extends State<TestPage>
           duration: Duration(seconds: 2),
         ),
       );
- final double area1 = calculatePercentageArea(spots, 0, 80);
+      final double area1 = calculatePercentageArea(spots, 0, 80);
       print("Area under the curve from 49 to 61 seconds: $area1");
-       final double area2 = calculatePercentageArea(spots, 80, 120);
+      final double area2 = calculatePercentageArea(spots, 80, 120);
       print("Area under the curve from 49 to 61 seconds: $area2");
       final double area3 = calculatePercentageArea(spots, 49, 61);
       print("Area under the curve from 49 to 61 seconds: $area3");
-       final double area4 = calculatePercentageArea(spots, 0, 120);
+      final double area4 = calculatePercentageArea(spots, 0, 120);
       print("Area under the curve from 0 to 120 seconds: $area4");
 
       return;
@@ -383,9 +383,7 @@ class _TestPageState extends State<TestPage>
       final sampleNumber = int.tryParse(data.split(" ")[1]);
       if (sampleNumber != null) {
         print("Hardware ended processing Sample $sampleNumber.");
-        logEvent('info',
-            'Sample $sampleNumber completed.',
-            page: 'test_page');
+        logEvent('info', 'Sample $sampleNumber completed.', page: 'test_page');
         completeSampleProcessing(sampleNumber);
       } else {
         logEvent('error', 'Failed to parse sample number from: $data',
@@ -404,11 +402,11 @@ class _TestPageState extends State<TestPage>
     }
   }
 
-  List<Map<String, dynamic>> absorbanceJsonData = []; // List to hold absorbance data
+  List<Map<String, dynamic>> absorbanceJsonData =
+      []; // List to hold absorbance data
 
   void startSampleReading(int sampleNumber) {
-    logEvent('info',
-        'Starting sample reading for Sample $sampleNumber',
+    logEvent('info', 'Starting sample reading for Sample $sampleNumber',
         page: 'test_page');
     setState(() {
       running_status = "Running Sample $sampleNumber";
@@ -438,31 +436,40 @@ class _TestPageState extends State<TestPage>
         //   'time': secs,
         //   'absorbance_value': _absorbance_value,
         // });
-       _updatePressureValues();
+        _updatePressureValues();
         if (runningTime == 0) {
           var sid = cards[sampleNumber - 1]['sampleName'];
           var typeofsample = cards[sampleNumber - 1]['type'];
 
           final jsonData = jsonEncode({"data": absorbanceJsonData});
 
+          if (cards[sampleNumber - 1]['sampleName'] != "Calibrator 1" || cards[sampleNumber - 1]['sampleName'] != "Calibrator 2") {
+            cards[sampleNumber - 1]['result'] =
+                calculatePercentageArea(spots, 49, 61).toString();
+          }
+
+          if (cards[sampleNumber - 1]['sampleName'] != "QC 1" || cards[sampleNumber - 1]['sampleName'] != "QC 2") {
+            cards[sampleNumber - 1]['result'] =
+                calculatePercentageArea(spots, 49, 61).toString();
+          }
           // Example of saving JSON data to the database
           DatabaseHelper.instance.insertResult({
             'sample_no': '$sid',
             'type': '$typeofsample',
             'date_time': DateTime.now().toIso8601String(),
             'hbf': 0.5, // Example HbF value
-            'hba1c': calculatePercentageArea(spots, 49, 61), // Example HbA1c value
+            'hba1c':
+                calculatePercentageArea(spots, 49, 61), // Example HbA1c value
             'remarks': 'Completed',
             'abs_data': jsonData, // Save the JSON data
           });
 
-          print( DatabaseHelper.instance.fetchResults());
+          print(DatabaseHelper.instance.fetchResults());
 
           setState(() {
             running_status = "Sample $sampleNumber Completed";
             pressure_val = "0";
-            logEvent('info',
-                'Sample $sampleNumber processing completed ',
+            logEvent('info', 'Sample $sampleNumber processing completed ',
                 page: 'test_page');
             absorbanceJsonData = []; // Clear the absorbance data
           });
@@ -475,8 +482,7 @@ class _TestPageState extends State<TestPage>
   int currentSampleIndex = 0;
 
   void completeSampleProcessing(int sampleNumber) {
-    logEvent('info',
-        'Sample $sampleNumber processing completed ',
+    logEvent('info', 'Sample $sampleNumber processing completed ',
         page: 'test_page');
 
     setState(() {
@@ -494,7 +500,7 @@ class _TestPageState extends State<TestPage>
           page: 'test_page');
       setState(() {
         running_status = "All samples processed.";
-        _finishedAll=true;
+        _finishedAll = true;
       });
     }
   }
@@ -521,8 +527,6 @@ class _TestPageState extends State<TestPage>
     return data.startsWith('B') || data.length >= 8;
   }
 
-  
-
   void _updateYValues() {
     final random = Random();
     setState(() {
@@ -534,82 +538,80 @@ class _TestPageState extends State<TestPage>
     });
   }
 
-void _updatePressureValues() {
+  void _updatePressureValues() {
     final random = Random();
     setState(() {
-      
-        // Generate a new random Y value between 6 and 7.5
-        double newY = 6 + (random.nextDouble() * (7.5 - 6));
-        pressure_val = double.parse(newY.toStringAsFixed(2)).toString(); // Round to 2 decimal places
-      
+      // Generate a new random Y value between 6 and 7.5
+      double newY = 6 + (random.nextDouble() * (7.5 - 6));
+      pressure_val = double.parse(newY.toStringAsFixed(2))
+          .toString(); // Round to 2 decimal places
     });
   }
 
+  double calculatePercentageArea(
+      List<FlSpot> dataPoints, double startRange, double endRange) {
+    // Helper function to calculate area using the trapezoidal rule
+    double calculateArea(List<FlSpot> points) {
+      double area = 0.0;
+      for (int i = 1; i < points.length; i++) {
+        final x1 = points[i - 1].x;
+        final y1 = points[i - 1].y;
+        final x2 = points[i].x;
+        final y2 = points[i].y;
 
+        final trapezoidArea = (x2 - x1) * ((y1 + y2) / 2);
+        area += trapezoidArea;
+      }
+      return area;
+    }
 
-  double calculatePercentageArea(List<FlSpot> dataPoints, double startRange, double endRange) {
-  // Helper function to calculate area using the trapezoidal rule
-  double calculateArea(List<FlSpot> points) {
-    double area = 0.0;
+    // Calculate total area for all points
+    double totalArea = calculateArea(dataPoints);
+
+    // Filter points in the given range
+    final filteredPoints = dataPoints
+        .where((point) => point.x >= startRange && point.x <= endRange)
+        .toList();
+
+    // Add boundary points if they are not part of the dataset
+    if (filteredPoints.isEmpty || filteredPoints.first.x != startRange) {
+      final FlSpot startPoint = _interpolatePoint(dataPoints, startRange);
+      filteredPoints.insert(0, startPoint);
+    }
+    if (filteredPoints.isEmpty || filteredPoints.last.x != endRange) {
+      final FlSpot endPoint = _interpolatePoint(dataPoints, endRange);
+      filteredPoints.add(endPoint);
+    }
+
+    // Calculate the area for the filtered range
+    double rangeArea = calculateArea(filteredPoints);
+
+    // Calculate the percentage area
+    return (rangeArea / totalArea) * 100.0;
+  }
+
+// Helper function to interpolate a point at a given x-value
+  FlSpot _interpolatePoint(List<FlSpot> points, double x) {
+    // Handle boundary cases directly
+    if (x <= points.first.x) return FlSpot(points.first.x, points.first.y);
+    if (x >= points.last.x) return FlSpot(points.last.x, points.last.y);
+
+    // Interpolate for values within the range
     for (int i = 1; i < points.length; i++) {
       final x1 = points[i - 1].x;
       final y1 = points[i - 1].y;
       final x2 = points[i].x;
       final y2 = points[i].y;
 
-      final trapezoidArea = (x2 - x1) * ((y1 + y2) / 2);
-      area += trapezoidArea;
+      if (x1 <= x && x <= x2) {
+        final slope = (y2 - y1) / (x2 - x1);
+        final y = y1 + slope * (x - x1);
+        return FlSpot(x, y);
+      }
     }
-    return area;
+
+    throw ArgumentError("Value $x is out of the range of data points");
   }
-
-  // Calculate total area for all points
-  double totalArea = calculateArea(dataPoints);
-
-  // Filter points in the given range
-  final filteredPoints = dataPoints.where((point) => point.x >= startRange && point.x <= endRange).toList();
-
-  // Add boundary points if they are not part of the dataset
-  if (filteredPoints.isEmpty || filteredPoints.first.x != startRange) {
-    final FlSpot startPoint = _interpolatePoint(dataPoints, startRange);
-    filteredPoints.insert(0, startPoint);
-  }
-  if (filteredPoints.isEmpty || filteredPoints.last.x != endRange) {
-    final FlSpot endPoint = _interpolatePoint(dataPoints, endRange);
-    filteredPoints.add(endPoint);
-  }
-
-  // Calculate the area for the filtered range
-  double rangeArea = calculateArea(filteredPoints);
-
-  // Calculate the percentage area
-  return (rangeArea / totalArea) * 100.0;
-}
-
-// Helper function to interpolate a point at a given x-value
-FlSpot _interpolatePoint(List<FlSpot> points, double x) {
-  // Handle boundary cases directly
-  if (x <= points.first.x) return FlSpot(points.first.x, points.first.y);
-  if (x >= points.last.x) return FlSpot(points.last.x, points.last.y);
-
-  // Interpolate for values within the range
-  for (int i = 1; i < points.length; i++) {
-    final x1 = points[i - 1].x;
-    final y1 = points[i - 1].y;
-    final x2 = points[i].x;
-    final y2 = points[i].y;
-
-    if (x1 <= x && x <= x2) {
-      final slope = (y2 - y1) / (x2 - x1);
-      final y = y1 + slope * (x - x1);
-      return FlSpot(x, y);
-    }
-  }
-
-  throw ArgumentError("Value $x is out of the range of data points");
-}
-
-
 
   void addFlSpot(double x, double y) {
     setState(() {
@@ -1785,15 +1787,18 @@ FlSpot _interpolatePoint(List<FlSpot> points, double x) {
                                                     fontSize: 16,
                                                   ),
                                                 ),
-                                               _finishedAll ? ElevatedButton(
-                                                  onPressed: stopTimer,
-                                                  child: const Text(
-                                                    'Stop',
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                ) : Container(),
+                                                _finishedAll
+                                                    ? ElevatedButton(
+                                                        onPressed: stopTimer,
+                                                        child: const Text(
+                                                          'Stop',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : Container(),
                                               ],
                                             )
                                           : ElevatedButton(
@@ -1839,7 +1844,8 @@ FlSpot _interpolatePoint(List<FlSpot> points, double x) {
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CurvedBottomNavigationBar(
         onBackToMenu: widget.onBackToMenu,
-        wifiStatusNotifier: wifiStatusNotifier, isStarted: isRunning, 
+        wifiStatusNotifier: wifiStatusNotifier,
+        isStarted: isRunning,
       ),
     );
   }
@@ -1934,5 +1940,3 @@ class _AnimatedLiquidLinearProgressIndicatorState
     );
   }
 }
-
-

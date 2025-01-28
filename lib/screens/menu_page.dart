@@ -37,7 +37,7 @@ class _MainScreenState extends State<MainScreen> {
 
   // Page titles for AppBar
   final List<String> _pageTitles = [
-    "Dashboard",
+    "",
     "Test",
     "Result",
     "Calibration",

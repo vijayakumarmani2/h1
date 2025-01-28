@@ -196,6 +196,36 @@ class _TestPageState extends State<TestPage>
   List<String> log = [];
   String buffer = '';
 
+ // List<FlSpot> spots = [];
+
+  List<FlSpot> spots = [
+    FlSpot(0, 0.00),
+    FlSpot(5, 0.06),
+    FlSpot(10, 0.67),
+    FlSpot(15, 0.73),
+    FlSpot(20, 0.921),
+    FlSpot(25, 0.07),
+    FlSpot(30, 0.3),
+    FlSpot(35, 0.31),
+    FlSpot(40, 0.006),
+    FlSpot(45, 0.19),
+    FlSpot(50, 0.2),
+    FlSpot(55, 0.05),
+    FlSpot(60, 0.06),
+    FlSpot(65, 0.09),
+    FlSpot(70, 0.1),
+    FlSpot(75, 0.456),
+    FlSpot(80, 0.06),
+    FlSpot(85, 1.75),
+    FlSpot(90, 1.34),
+    FlSpot(95, 0.11),
+    FlSpot(100, 0.96),
+    FlSpot(105, 1.12),
+    FlSpot(110, 0.06),
+    FlSpot(115, 0.06),
+    FlSpot(120, 0.06),
+  ];
+
   void logEvent(String type, String message, {required String page}) async {
     await DatabaseHelper.instance.logEvent(type, message, page: page);
     print("$type: $message");
@@ -263,7 +293,7 @@ class _TestPageState extends State<TestPage>
   List<int> sampleIds = [];
 
   void startProcess() async {
-    _updateYValues();
+   // _updateYValues();
     if (cards.isEmpty) {
       // Show error if no cards are added
       logEvent('error', 'No samples added. Cannot start process.',
@@ -274,9 +304,14 @@ class _TestPageState extends State<TestPage>
           duration: Duration(seconds: 2),
         ),
       );
-
-      final double area = calculateArea(spots, 80, 95);
-      print("Area under the curve from 55 to 60 seconds: $area");
+ final double area1 = calculatePercentageArea(spots, 0, 80);
+      print("Area under the curve from 49 to 61 seconds: $area1");
+       final double area2 = calculatePercentageArea(spots, 80, 120);
+      print("Area under the curve from 49 to 61 seconds: $area2");
+      final double area3 = calculatePercentageArea(spots, 49, 61);
+      print("Area under the curve from 49 to 61 seconds: $area3");
+       final double area4 = calculatePercentageArea(spots, 0, 120);
+      print("Area under the curve from 0 to 120 seconds: $area4");
 
       return;
     }
@@ -415,8 +450,8 @@ class _TestPageState extends State<TestPage>
             'sample_no': '$sid',
             'type': '$typeofsample',
             'date_time': DateTime.now().toIso8601String(),
-            'hbf': 10.5, // Example HbF value
-            'hba1c': 5.8, // Example HbA1c value
+            'hbf': 0.5, // Example HbF value
+            'hba1c': calculatePercentageArea(spots, 49, 61), // Example HbA1c value
             'remarks': 'Completed',
             'abs_data': jsonData, // Save the JSON data
           });
@@ -486,38 +521,12 @@ class _TestPageState extends State<TestPage>
     return data.startsWith('B') || data.length >= 8;
   }
 
-  List<FlSpot> spots = [];
-
-  List<FlSpot> dataPoints = [
-    FlSpot(5, 0.06),
-    FlSpot(10, 0.67),
-    FlSpot(15, 0.73),
-    FlSpot(20, 0.921),
-    FlSpot(25, 0.07),
-    FlSpot(30, 0.3),
-    FlSpot(35, 0.31),
-    FlSpot(40, 0.006),
-    FlSpot(45, 0.19),
-    FlSpot(50, 0.2),
-    FlSpot(55, 0.05),
-    FlSpot(60, 0.06),
-    FlSpot(65, 0.09),
-    FlSpot(70, 0.1),
-    FlSpot(75, 0.456),
-    FlSpot(80, 0.06),
-    FlSpot(85, 1.75),
-    FlSpot(90, 1.34),
-    FlSpot(95, 0.11),
-    FlSpot(100, 0.96),
-    FlSpot(105, 1.12),
-    FlSpot(110, 0.06),
-    FlSpot(115, 0.06),
-  ];
+  
 
   void _updateYValues() {
     final random = Random();
     setState(() {
-      dataPoints = dataPoints.map((point) {
+      spots = spots.map((point) {
         // Generate a new random Y value in a range (e.g., 0 to 2)
         double newY = random.nextDouble() * 2;
         return FlSpot(point.x, newY);
@@ -535,25 +544,72 @@ void _updatePressureValues() {
       
     });
   }
-  double calculateArea(List<FlSpot> spots, double startX, double endX) {
-    final filteredSpots =
-        dataPoints.where((spot) => spot.x >= startX && spot.x <= endX).toList();
-    if (filteredSpots.length < 2)
-      return 0.0; // Not enough points to calculate area
 
+
+
+  double calculatePercentageArea(List<FlSpot> dataPoints, double startRange, double endRange) {
+  // Helper function to calculate area using the trapezoidal rule
+  double calculateArea(List<FlSpot> points) {
     double area = 0.0;
-    for (int i = 1; i < filteredSpots.length; i++) {
-      final x1 = filteredSpots[i - 1].x;
-      final y1 = filteredSpots[i - 1].y;
-      final x2 = filteredSpots[i].x;
-      final y2 = filteredSpots[i].y;
+    for (int i = 1; i < points.length; i++) {
+      final x1 = points[i - 1].x;
+      final y1 = points[i - 1].y;
+      final x2 = points[i].x;
+      final y2 = points[i].y;
 
       final trapezoidArea = (x2 - x1) * ((y1 + y2) / 2);
       area += trapezoidArea;
     }
-
     return area;
   }
+
+  // Calculate total area for all points
+  double totalArea = calculateArea(dataPoints);
+
+  // Filter points in the given range
+  final filteredPoints = dataPoints.where((point) => point.x >= startRange && point.x <= endRange).toList();
+
+  // Add boundary points if they are not part of the dataset
+  if (filteredPoints.isEmpty || filteredPoints.first.x != startRange) {
+    final FlSpot startPoint = _interpolatePoint(dataPoints, startRange);
+    filteredPoints.insert(0, startPoint);
+  }
+  if (filteredPoints.isEmpty || filteredPoints.last.x != endRange) {
+    final FlSpot endPoint = _interpolatePoint(dataPoints, endRange);
+    filteredPoints.add(endPoint);
+  }
+
+  // Calculate the area for the filtered range
+  double rangeArea = calculateArea(filteredPoints);
+
+  // Calculate the percentage area
+  return (rangeArea / totalArea) * 100.0;
+}
+
+// Helper function to interpolate a point at a given x-value
+FlSpot _interpolatePoint(List<FlSpot> points, double x) {
+  // Handle boundary cases directly
+  if (x <= points.first.x) return FlSpot(points.first.x, points.first.y);
+  if (x >= points.last.x) return FlSpot(points.last.x, points.last.y);
+
+  // Interpolate for values within the range
+  for (int i = 1; i < points.length; i++) {
+    final x1 = points[i - 1].x;
+    final y1 = points[i - 1].y;
+    final x2 = points[i].x;
+    final y2 = points[i].y;
+
+    if (x1 <= x && x <= x2) {
+      final slope = (y2 - y1) / (x2 - x1);
+      final y = y1 + slope * (x - x1);
+      return FlSpot(x, y);
+    }
+  }
+
+  throw ArgumentError("Value $x is out of the range of data points");
+}
+
+
 
   void addFlSpot(double x, double y) {
     setState(() {

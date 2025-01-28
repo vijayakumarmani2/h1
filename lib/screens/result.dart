@@ -677,12 +677,12 @@ class _ResultPageState extends State<ResultPage> {
     lines.add(formatLine("----------------------", alignment: 'center'));
 
     // Chart Data
-    lines.add(formatLine("Absorbance Data:", alignment: 'left'));
-    for (var spot in spots) {
-      String line =
-          "T:${spot.x.toStringAsFixed(1)}s A:${spot.y.toStringAsFixed(3)}";
-      lines.add(formatLine(line, alignment: 'left'));
-    }
+    // lines.add(formatLine("Absorbance Data:", alignment: 'left'));
+    // for (var spot in spots) {
+    //   String line =
+    //       "T:${spot.x.toStringAsFixed(1)}s A:${spot.y.toStringAsFixed(3)}";
+    //   lines.add(formatLine(line, alignment: 'left'));
+    // }
 
     // Footer
     // lines.add(formatLine("----------------------", alignment: 'center'));

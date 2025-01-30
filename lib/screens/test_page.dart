@@ -196,7 +196,7 @@ class _TestPageState extends State<TestPage>
   List<String> log = [];
   String buffer = '';
 
-   List<FlSpot> spots = [];
+  List<FlSpot> spots = [];
 
   // List<FlSpot> spots = [
   //   FlSpot(0, 0.00),
@@ -421,6 +421,7 @@ class _TestPageState extends State<TestPage>
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
         runningTime--;
+        print("runningTime = $runningTime");
         _absorbance_value =
             calculateAbsorbance(_adc_value2, _adc_value1).toStringAsFixed(4);
         secs++;
@@ -436,20 +437,22 @@ class _TestPageState extends State<TestPage>
         //   'time': secs,
         //   'absorbance_value': _absorbance_value,
         // });
-       // _updatePressureValues();   // for random values
-       
+        // _updatePressureValues();   // for random values
+
         if (runningTime == 0) {
           var sid = cards[sampleNumber - 1]['sampleName'];
           var typeofsample = cards[sampleNumber - 1]['type'];
 
           final jsonData = jsonEncode({"data": absorbanceJsonData});
 
-          if (cards[sampleNumber - 1]['sampleName'] != "Calibrator 1" || cards[sampleNumber - 1]['sampleName'] != "Calibrator 2") {
+          if (cards[sampleNumber - 1]['sampleName'] != "Calibrator 1" ||
+              cards[sampleNumber - 1]['sampleName'] != "Calibrator 2") {
             cards[sampleNumber - 1]['result'] =
                 calculatePercentageArea(spots, 49, 61).toString();
           }
 
-          if (cards[sampleNumber - 1]['sampleName'] != "QC 1" || cards[sampleNumber - 1]['sampleName'] != "QC 2") {
+          if (cards[sampleNumber - 1]['sampleName'] != "QC 1" ||
+              cards[sampleNumber - 1]['sampleName'] != "QC 2") {
             cards[sampleNumber - 1]['result'] =
                 calculatePercentageArea(spots, 49, 61).toString();
           }

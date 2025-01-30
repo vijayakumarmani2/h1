@@ -196,35 +196,35 @@ class _TestPageState extends State<TestPage>
   List<String> log = [];
   String buffer = '';
 
-  // List<FlSpot> spots = [];
+   List<FlSpot> spots = [];
 
-  List<FlSpot> spots = [
-    FlSpot(0, 0.00),
-    FlSpot(5, 0.06),
-    FlSpot(10, 0.67),
-    FlSpot(15, 0.73),
-    FlSpot(20, 0.921),
-    FlSpot(25, 0.07),
-    FlSpot(30, 0.3),
-    FlSpot(35, 0.31),
-    FlSpot(40, 0.006),
-    FlSpot(45, 0.19),
-    FlSpot(50, 0.2),
-    FlSpot(55, 0.05),
-    FlSpot(60, 0.06),
-    FlSpot(65, 0.09),
-    FlSpot(70, 0.1),
-    FlSpot(75, 0.456),
-    FlSpot(80, 0.06),
-    FlSpot(85, 1.75),
-    FlSpot(90, 1.34),
-    FlSpot(95, 0.11),
-    FlSpot(100, 0.96),
-    FlSpot(105, 1.12),
-    FlSpot(110, 0.06),
-    FlSpot(115, 0.06),
-    FlSpot(120, 0.06),
-  ];
+  // List<FlSpot> spots = [
+  //   FlSpot(0, 0.00),
+  //   FlSpot(5, 0.06),
+  //   FlSpot(10, 0.67),
+  //   FlSpot(15, 0.73),
+  //   FlSpot(20, 0.921),
+  //   FlSpot(25, 0.07),
+  //   FlSpot(30, 0.3),
+  //   FlSpot(35, 0.31),
+  //   FlSpot(40, 0.006),
+  //   FlSpot(45, 0.19),
+  //   FlSpot(50, 0.2),
+  //   FlSpot(55, 0.05),
+  //   FlSpot(60, 0.06),
+  //   FlSpot(65, 0.09),
+  //   FlSpot(70, 0.1),
+  //   FlSpot(75, 0.456),
+  //   FlSpot(80, 0.06),
+  //   FlSpot(85, 1.75),
+  //   FlSpot(90, 1.34),
+  //   FlSpot(95, 0.11),
+  //   FlSpot(100, 0.96),
+  //   FlSpot(105, 1.12),
+  //   FlSpot(110, 0.06),
+  //   FlSpot(115, 0.06),
+  //   FlSpot(120, 0.06),
+  // ];
 
   void logEvent(String type, String message, {required String page}) async {
     await DatabaseHelper.instance.logEvent(type, message, page: page);
@@ -436,7 +436,8 @@ class _TestPageState extends State<TestPage>
         //   'time': secs,
         //   'absorbance_value': _absorbance_value,
         // });
-        _updatePressureValues();
+       // _updatePressureValues();   // for random values
+       
         if (runningTime == 0) {
           var sid = cards[sampleNumber - 1]['sampleName'];
           var typeofsample = cards[sampleNumber - 1]['type'];

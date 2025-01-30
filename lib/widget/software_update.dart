@@ -67,10 +67,28 @@ class _GitBuildWidgetState extends State<GitBuildWidget> {
     }
   }
 
+  
+
   void _appendOutput(String text) {
     if (text.isNotEmpty) {
       setState(() {
         _output += text + '\n';
+      });
+    }
+  }
+
+  void _runRaspiConfig() async {
+    setState(() {
+      _output = "Running raspi-config...";
+    });
+
+    try {
+      ProcessResult result = await Process.run('sudo', ['raspi-config']);
+      _appendOutput(result.stdout);
+      _appendOutput(result.stderr);
+    } catch (e) {
+      setState(() {
+        _output += "\nError: $e";
       });
     }
   }
@@ -98,6 +116,12 @@ class _GitBuildWidgetState extends State<GitBuildWidget> {
                     ),
             ),
             SizedBox(height: 20),
+            SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _runRaspiConfig,
+            child: Text('Get Config'),
+          ),
+          
             Flexible(
               child: Container(
                 constraints: BoxConstraints(

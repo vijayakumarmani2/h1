@@ -415,6 +415,7 @@ class _TestPageState extends State<TestPage>
       runningTime = 120;
       secs = 0;
       spots = [];
+      highlightedIndex = sampleNumber - 1;
     });
 
     _animationController.repeat();

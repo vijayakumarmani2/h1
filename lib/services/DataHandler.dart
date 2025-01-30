@@ -16,14 +16,15 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'hba1c_database.db');
-
+   // String path = join(await getDatabasesPath(), 'hba1c_database.db');
+var dbPath = '/home/pi/.config/hba1c_analyzer/hba1c_database.db';
+  print("Testing database path: $dbPath");
      // Delete the old database (for development purposes only)
   // await deleteDatabase(path);
    // print("Old database deleted");
 
     return await openDatabase(
-      path,
+      dbPath,
       version: 1,
       onCreate: _onCreate,
     );

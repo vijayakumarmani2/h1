@@ -914,9 +914,8 @@ class _TestPageState extends State<TestPage>
                                                           ),
                                                         ),
                                                         color: isHighlighted
-                                                            ? Color.fromARGB(
-                                                                30, 0, 112, 110)
-                                                            : Color.fromARGB(73, 129, 58, 58),
+                                                            ? Color.fromARGB(142, 112, 0, 41): Color.fromARGB(
+                                                                30, 0, 112, 110),
                                                         // Rounded corners for inner boxes
                                                       ),
                                                       child: Text(
@@ -1460,8 +1459,8 @@ class _TestPageState extends State<TestPage>
                         LineChartData(
                           minX: 0,
                           maxX: 130,
-                          minY: 0.0,
-                          maxY: 1.8,
+                          minY: 0.000,
+                          maxY: 0.020,
                           titlesData: FlTitlesData(
                             leftTitles: AxisTitles(
                               axisNameWidget: Padding(

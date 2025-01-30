@@ -37,6 +37,7 @@ class _TestPageState extends State<TestPage>
   var _absorbance_value = "0.0";
 
   var _finishedAll = false;
+  int highlightedIndex = -1; // Track the currently highlighted card
 
   @override
   void initState() {
@@ -304,13 +305,13 @@ class _TestPageState extends State<TestPage>
           duration: Duration(seconds: 2),
         ),
       );
-      final double area1 = calculatePercentageArea(spots, 0, 80);
-      print("Area under the curve from 49 to 61 seconds: $area1");
-      final double area2 = calculatePercentageArea(spots, 80, 120);
-      print("Area under the curve from 49 to 61 seconds: $area2");
-      final double area3 = calculatePercentageArea(spots, 49, 61);
+      // final String area1 = calculatePercentageArea(spots, 0, 80);
+      // print("Area under the curve from 49 to 61 seconds: $area1");
+      // final String area2 = calculatePercentageArea(spots, 80, 120);
+      // print("Area under the curve from 49 to 61 seconds: $area2");
+      final String area3 = calculatePercentageArea(spots, 49, 61);
       print("Area under the curve from 49 to 61 seconds: $area3");
-      final double area4 = calculatePercentageArea(spots, 0, 120);
+      final String area4 = calculatePercentageArea(spots, 0, 120);
       print("Area under the curve from 0 to 120 seconds: $area4");
 
       return;
@@ -511,6 +512,8 @@ class _TestPageState extends State<TestPage>
 
   double calculateAbsorbance(int intensity, int referenceIntensity) {
     if (intensity <= 0 || referenceIntensity <= 0) {
+      logEvent('error', 'Intensity values must be greater than 0',
+          page: 'test_page');
       throw ArgumentError('Intensity values must be greater than 0');
     }
     return math.log(referenceIntensity / intensity) / math.log(10);
@@ -552,7 +555,7 @@ class _TestPageState extends State<TestPage>
     });
   }
 
-  double calculatePercentageArea(
+  String calculatePercentageArea(
       List<FlSpot> dataPoints, double startRange, double endRange) {
     // Helper function to calculate area using the trapezoidal rule
     double calculateArea(List<FlSpot> points) {
@@ -589,9 +592,11 @@ class _TestPageState extends State<TestPage>
 
     // Calculate the area for the filtered range
     double rangeArea = calculateArea(filteredPoints);
+    double finalresult = (rangeArea / totalArea) * 100.0;
 
     // Calculate the percentage area
-    return (rangeArea / totalArea) * 100.0;
+    // return (rangeArea / totalArea) * 100.0;
+    return double.parse(finalresult.toStringAsFixed(2)).toString();
   }
 
 // Helper function to interpolate a point at a given x-value
@@ -861,6 +866,8 @@ class _TestPageState extends State<TestPage>
                                       itemCount: cards.length,
                                       itemBuilder: (context, index) {
                                         final card = cards[index];
+                                        bool isHighlighted =
+                                            index == highlightedIndex;
                                         return Card(
                                           elevation:
                                               0, // Increased elevation for a subtle shadow effect
@@ -891,8 +898,7 @@ class _TestPageState extends State<TestPage>
                                                     child: Container(
                                                       padding: EdgeInsets.all(
                                                           12), // Increased padding for better spacing
-                                                      decoration:
-                                                          const BoxDecoration(
+                                                      decoration: BoxDecoration(
                                                         border: Border(
                                                           bottom: BorderSide(
                                                             color:
@@ -906,8 +912,11 @@ class _TestPageState extends State<TestPage>
                                                                 .solid,
                                                           ),
                                                         ),
-                                                        color: Color.fromARGB(
-                                                            30, 0, 112, 110),
+                                                        color: isHighlighted
+                                                            ? Color.fromARGB(
+                                                                30, 0, 112, 110)
+                                                            : Color.fromARGB(
+                                                                0, 101, 96, 96),
                                                         // Rounded corners for inner boxes
                                                       ),
                                                       child: Text(

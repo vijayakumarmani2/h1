@@ -916,8 +916,7 @@ class _TestPageState extends State<TestPage>
                                                         color: isHighlighted
                                                             ? Color.fromARGB(
                                                                 30, 0, 112, 110)
-                                                            : Color.fromARGB(
-                                                                0, 101, 96, 96),
+                                                            : Color.fromARGB(73, 129, 58, 58),
                                                         // Rounded corners for inner boxes
                                                       ),
                                                       child: Text(

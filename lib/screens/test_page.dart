@@ -633,6 +633,7 @@ class _TestPageState extends State<TestPage>
   void dispose() {
     _animationController.dispose();
     timer?.cancel();
+    serialReader!.port!.close();
     super.dispose();
   }
 
@@ -914,8 +915,10 @@ class _TestPageState extends State<TestPage>
                                                           ),
                                                         ),
                                                         color: isHighlighted
-                                                            ? Color.fromARGB(142, 112, 0, 41): Color.fromARGB(
-                                                                30, 0, 112, 110),
+                                                            ? Color.fromARGB(
+                                                                142, 112, 0, 41)
+                                                            : Color.fromARGB(30,
+                                                                0, 112, 110),
                                                         // Rounded corners for inner boxes
                                                       ),
                                                       child: Text(

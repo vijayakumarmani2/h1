@@ -35,11 +35,11 @@ class _TestPageState extends State<TestPage>
 
   int _adc_value1 = 1; // To track if the action has started
   int _adc_value2 = 1;
-  int _adc_value1_blank = 1;
-  int _adc_value2_blank = 1;
+  int _adc_value1_blank = 26000;
+  int _adc_value2_blank = 22000;
   var _absorbance_value = "0.0";
-  double _absorbance_value1 = 22450;
-  double _absorbance_value2 = 19550;
+  double _absorbance_value1 = 0;
+  double _absorbance_value2 = 0;
 
   var _finishedAll = false;
   int highlightedIndex = -1; // Track the currently highlighted card
@@ -459,6 +459,7 @@ class _TestPageState extends State<TestPage>
             (_absorbance_value1 - _absorbance_value2).toStringAsFixed(4);
         secs++;
         addFlSpot(secs.toDouble(), double.parse(_absorbance_value));
+        print("absorbance value: $_absorbance_value, ($_absorbance_value1 - $_absorbance_value2)");
 // Add the current absorbance data to the list
         absorbanceJsonData.add({
           "secs": secs,
@@ -501,7 +502,7 @@ class _TestPageState extends State<TestPage>
             'abs_data': jsonData, // Save the JSON data
           });
 
-          print(DatabaseHelper.instance.fetchResults());
+         // print(DatabaseHelper.instance.fetchResults());
 
           setState(() {
             running_status = "Sample $sampleNumber Completed";

@@ -443,6 +443,7 @@ class _TestPageState extends State<TestPage>
       spots = [];
       highlightedIndex = sampleNumber - 1;
     });
+    
 
     _animationController.repeat();
 

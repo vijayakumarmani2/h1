@@ -465,7 +465,7 @@ class _TestPageState extends State<TestPage>
 // Add the current absorbance data to the list
         absorbanceJsonData.add({
           "secs": secs,
-          "absorbance_value": _absorbance_value,
+          "absorbance_value": _absorbance_value2,
         });
         // Save absorbance value to the database
         // DatabaseHelper.instance.insertAbsorbance({

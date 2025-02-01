@@ -371,6 +371,7 @@ class _TestPageState extends State<TestPage>
         page: 'test_page');
     setState(() {
       running_status = "Waiting";
+      runningTime = 0;
       isRunning = true;
     });
   }
@@ -454,12 +455,13 @@ class _TestPageState extends State<TestPage>
             calculateAbsorbance(_adc_value1, _adc_value1_blank);
         _absorbance_value2 =
             calculateAbsorbance(_adc_value2, _adc_value2_blank);
-        
-        _absorbance_value =
-            ((_absorbance_value1 - _absorbance_value2).abs()).toStringAsFixed(4);
+
+        _absorbance_value = ((_absorbance_value1 - _absorbance_value2).abs())
+            .toStringAsFixed(4);
         secs++;
         addFlSpot(secs.toDouble(), double.parse(_absorbance_value));
-        print("absorbance value: $_absorbance_value, ($_absorbance_value1 - $_absorbance_value2)");
+        print(
+            "absorbance value: $_absorbance_value, ($_absorbance_value1 - $_absorbance_value2)");
 // Add the current absorbance data to the list
         absorbanceJsonData.add({
           "secs": secs,
@@ -502,7 +504,7 @@ class _TestPageState extends State<TestPage>
             'abs_data': jsonData, // Save the JSON data
           });
 
-         // print(DatabaseHelper.instance.fetchResults());
+          // print(DatabaseHelper.instance.fetchResults());
 
           setState(() {
             running_status = "Sample $sampleNumber Completed";

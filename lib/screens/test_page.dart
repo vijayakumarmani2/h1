@@ -459,7 +459,7 @@ class _TestPageState extends State<TestPage>
         _absorbance_value = ((_absorbance_value1 - _absorbance_value2).abs())
             .toStringAsFixed(4);
         secs++;
-        addFlSpot(secs.toDouble(), double.parse(_absorbance_value));
+        addFlSpot(secs.toDouble(), double.parse(_absorbance_value2.toStringAsFixed(6)) );
         print(
             "absorbance value: $_absorbance_value, ($_absorbance_value1 - $_absorbance_value2)");
 // Add the current absorbance data to the list
@@ -1508,7 +1508,7 @@ class _TestPageState extends State<TestPage>
                           minX: 0,
                           maxX: 130,
                           minY: 0.00,
-                          maxY: 0.05,
+                          maxY: 0.5,
                           titlesData: FlTitlesData(
                             leftTitles: AxisTitles(
                               axisNameWidget: Padding(

@@ -465,7 +465,7 @@ class _TestPageState extends State<TestPage>
 // Add the current absorbance data to the list
         absorbanceJsonData.add({
           "secs": secs,
-          "absorbance_value": _absorbance_value2,
+          "absorbance_value": _absorbance_value2.toString(),
         });
         // Save absorbance value to the database
         // DatabaseHelper.instance.insertAbsorbance({
@@ -1765,7 +1765,7 @@ class _TestPageState extends State<TestPage>
                                             color: Colors.purple, size: 32),
                                         SizedBox(height: 8),
                                         Text(
-                                          '${_absorbance_value}',
+                                          '${_absorbance_value2}',
                                           style: TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w600,

@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -34,7 +35,11 @@ class _TestPageState extends State<TestPage>
 
   int _adc_value1 = 1; // To track if the action has started
   int _adc_value2 = 1;
+  int _adc_value1_blank = 1;
+  int _adc_value2_blank = 1;
   var _absorbance_value = "0.0";
+  double _absorbance_value1 = 22450;
+  double _absorbance_value2 = 19550;
 
   var _finishedAll = false;
   int highlightedIndex = -1; // Track the currently highlighted card
@@ -290,6 +295,14 @@ class _TestPageState extends State<TestPage>
     }
   }
 
+  void fetchBlankFromHardware() {
+    if (serialReader != null) {
+      final message = "BLANK"; // send blank command
+      serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
+      print("Sent to hardware: $message");
+    }
+  }
+
   // Save samples and get their IDs
   List<int> sampleIds = [];
 
@@ -348,9 +361,10 @@ class _TestPageState extends State<TestPage>
     //   });
     //   sampleIds.add(sampleId);
     // }
+// Send sample blank command to hardware
+ //   fetchBlankFromHardware();
 
-    // Send sample count to hardware
-    sendSampleCountToHardware(cards.length);
+ sendSampleCountToHardware(cards.length);
 
     // Wait for "Started 1" signal from hardware
     logEvent('info', 'Process started with ${cards.length} samples.',
@@ -390,7 +404,15 @@ class _TestPageState extends State<TestPage>
         logEvent('error', 'Failed to parse sample number from: $data',
             page: 'test_page');
       }
-    } else if (isTemperatureData(data)) {
+    } 
+    // else if (data.contains("BENDED")) {
+    //   print("The string contains 'BENDED'");
+    //   sleep(1 as Duration);
+    //   // Send sample count to hardware
+    //   sendSampleCountToHardware(cards.length);
+    // } 
+    
+    else if (isTemperatureData(data)) {
       logEvent('info', 'Temperature data: $data', page: 'test_page');
       log.add('Temperature data: $data');
       _temp_val = data;
@@ -398,6 +420,10 @@ class _TestPageState extends State<TestPage>
       _adc_value1 = int.parse(data.substring(1, data.length));
     } else if (isAbsorbanceData2(data)) {
       _adc_value2 = int.parse(data.substring(1, data.length));
+    } else if (isBlank1(data)) {
+      _adc_value1_blank = int.parse(data.substring(1, data.length));
+    } else if (isBlank2(data)) {
+      _adc_value2_blank = int.parse(data.substring(1, data.length));
     } else {
       logEvent('warning', 'Unknown data format: $data', page: 'test_page');
     }
@@ -424,8 +450,13 @@ class _TestPageState extends State<TestPage>
       setState(() {
         runningTime--;
         print("runningTime = $runningTime");
+        _absorbance_value1 =
+            calculateAbsorbance(_adc_value1, _adc_value1_blank);
+        _absorbance_value2 =
+            calculateAbsorbance(_adc_value2, _adc_value2_blank);
+        secs++;
         _absorbance_value =
-            calculateAbsorbance(_adc_value2, _adc_value1).toStringAsFixed(4);
+            (_absorbance_value1 - _absorbance_value2).toStringAsFixed(4);
         secs++;
         addFlSpot(secs.toDouble(), double.parse(_absorbance_value));
 // Add the current absorbance data to the list
@@ -533,6 +564,16 @@ class _TestPageState extends State<TestPage>
   bool isAbsorbanceData2(String data) {
     // Example logic for absorbance data
     return data.startsWith('B') || data.length >= 8;
+  }
+
+  bool isBlank1(String data) {
+    // Example logic for absorbance data
+    return data.startsWith('C') || data.length >= 8;
+  }
+
+  bool isBlank2(String data) {
+    // Example logic for absorbance data
+    return data.startsWith('D') || data.length >= 8;
   }
 
   void _updateYValues() {

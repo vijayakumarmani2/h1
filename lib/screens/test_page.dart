@@ -1506,7 +1506,7 @@ class _TestPageState extends State<TestPage>
                           minX: 0,
                           maxX: 130,
                           minY: 0.0,
-                          maxY: 1.8,
+                          maxY: 0.5,
                           titlesData: FlTitlesData(
                             leftTitles: AxisTitles(
                               axisNameWidget: Padding(

@@ -87,9 +87,11 @@ class _GitBuildWidgetState extends State<GitBuildWidget> {
     });
 
     try {
-      ProcessResult result = await Process.run('sudo',
-    ['raspi-config'],
-    runInShell: true,);
+      ProcessResult result = await Process.run(
+    'script',
+    ['-q', '-c', 'sudo raspi-config'],
+    runInShell: true,
+  );
       _appendOutput(result.stdout);
       _appendOutput(result.stderr);
     } catch (e) {

@@ -1765,7 +1765,7 @@ class _TestPageState extends State<TestPage>
                                             color: Colors.purple, size: 32),
                                         SizedBox(height: 8),
                                         Text(
-                                          '${_absorbance_value2}',
+                                          '${_absorbance_value2.toStringAsFixed(6)}',
                                           style: TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w600,

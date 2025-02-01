@@ -48,7 +48,7 @@ class _GitBuildWidgetState extends State<GitBuildWidget> {
 
       // Run flutter build linux
       ProcessResult buildResult = await Process.run(
-          '/home/pi/flutter/bin/flutter', ['build', 'linux'],
+          'flutter', ['build', 'linux'],
           workingDirectory: '/home/pi/h1/');
       _appendOutput(buildResult.stdout);
       _appendOutput(buildResult.stderr);

@@ -362,9 +362,9 @@ class _TestPageState extends State<TestPage>
     //   sampleIds.add(sampleId);
     // }
 // Send sample blank command to hardware
- //   fetchBlankFromHardware();
+    //   fetchBlankFromHardware();
 
- sendSampleCountToHardware(cards.length);
+    sendSampleCountToHardware(cards.length);
 
     // Wait for "Started 1" signal from hardware
     logEvent('info', 'Process started with ${cards.length} samples.',
@@ -404,14 +404,14 @@ class _TestPageState extends State<TestPage>
         logEvent('error', 'Failed to parse sample number from: $data',
             page: 'test_page');
       }
-    } 
+    }
     // else if (data.contains("BENDED")) {
     //   print("The string contains 'BENDED'");
     //   sleep(1 as Duration);
     //   // Send sample count to hardware
     //   sendSampleCountToHardware(cards.length);
-    // } 
-    
+    // }
+
     else if (isTemperatureData(data)) {
       logEvent('info', 'Temperature data: $data', page: 'test_page');
       log.add('Temperature data: $data');
@@ -443,7 +443,6 @@ class _TestPageState extends State<TestPage>
       spots = [];
       highlightedIndex = sampleNumber - 1;
     });
-    
 
     _animationController.repeat();
 
@@ -569,6 +568,7 @@ class _TestPageState extends State<TestPage>
 
   bool isBlank1(String data) {
     // Example logic for absorbance data
+    print("f");
     return data.startsWith('C') || data.length >= 8;
   }
 

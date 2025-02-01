@@ -223,7 +223,7 @@ class _ResultPageState extends State<ResultPage> {
                       minX: 0,
                       maxX: 130,
                       minY: 0.0,
-                      maxY: 1.8,
+                      maxY: 0.05,
                       titlesData: FlTitlesData(
                         leftTitles: AxisTitles(
                           axisNameWidget: Padding(

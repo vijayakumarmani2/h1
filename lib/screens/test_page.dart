@@ -454,7 +454,7 @@ class _TestPageState extends State<TestPage>
             calculateAbsorbance(_adc_value1, _adc_value1_blank);
         _absorbance_value2 =
             calculateAbsorbance(_adc_value2, _adc_value2_blank);
-        secs++;
+        
         _absorbance_value =
             ((_absorbance_value1 - _absorbance_value2).abs()).toStringAsFixed(4);
         secs++;

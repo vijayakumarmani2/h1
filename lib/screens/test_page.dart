@@ -960,8 +960,7 @@ class _TestPageState extends State<TestPage>
                                                           ),
                                                         ),
                                                         color: isHighlighted
-                                                            ? Color.fromARGB(
-                                                                142, 112, 0, 41)
+                                                            ? Color.fromARGB(251, 0, 69, 68)
                                                             : Color.fromARGB(30,
                                                                 0, 112, 110),
                                                         // Rounded corners for inner boxes
@@ -974,7 +973,9 @@ class _TestPageState extends State<TestPage>
                                                           fontWeight:
                                                               FontWeight.w700,
                                                           fontSize: 18,
-                                                          color: Color.fromARGB(
+                                                          color: isHighlighted
+                                                            ? Color.fromARGB(251, 253, 253, 253)
+                                                            : Color.fromARGB(
                                                               255,
                                                               0,
                                                               112,

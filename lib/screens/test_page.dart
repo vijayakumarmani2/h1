@@ -595,7 +595,7 @@ class _TestPageState extends State<TestPage>
     final random = Random();
     setState(() {
       // Generate a new random Y value between 6 and 7.5
-      double newY = 6.3 + (random.nextDouble() * (7.5 - 6.3));
+      double newY = 6 + (random.nextDouble() * (6.3 - 6));
       pressure_val = double.parse(newY.toStringAsFixed(2))
           .toString(); // Round to 2 decimal places
     });
@@ -1702,7 +1702,7 @@ class _TestPageState extends State<TestPage>
                                             color: Colors.red, size: 24),
                                         SizedBox(width: 8),
                                         Text(
-                                          'Dil. Blood',
+                                          'W. Blood',
                                           style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.w600,

@@ -192,7 +192,7 @@ class _TestPageState extends State<TestPage>
   bool isRunning = false;
   int runningTime = 120;
   Timer? timer;
-  String _temp_val = "0";
+  String _temp_val = "27";
   String pressure_val = "0";
   int secs = 0;
   late AnimationController _animationController;

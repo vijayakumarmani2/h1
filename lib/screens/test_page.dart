@@ -473,7 +473,7 @@ class _TestPageState extends State<TestPage>
         //   'time': secs,
         //   'absorbance_value': _absorbance_value,
         // });
-        // _updatePressureValues();   // for random values
+         _updatePressureValues();   // for random values
 
         if (runningTime == 0) {
           var sid = cards[sampleNumber - 1]['sampleName'];

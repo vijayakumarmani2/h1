@@ -595,7 +595,7 @@ class _TestPageState extends State<TestPage>
     final random = Random();
     setState(() {
       // Generate a new random Y value between 6 and 7.5
-      double newY = 6 + (random.nextDouble() * (7.5 - 6));
+      double newY = 6.3 + (random.nextDouble() * (7.5 - 6.3));
       pressure_val = double.parse(newY.toStringAsFixed(2))
           .toString(); // Round to 2 decimal places
     });

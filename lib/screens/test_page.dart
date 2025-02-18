@@ -35,8 +35,8 @@ class _TestPageState extends State<TestPage>
 
   int _adc_value1 = 1; // To track if the action has started
   int _adc_value2 = 1;
-  int _adc_value1_blank = 26000;
-  int _adc_value2_blank = 23500;
+  int _adc_value1_blank = 31200;
+  int _adc_value2_blank = 25000;
   var _absorbance_value = "0.0";
   double _absorbance_value1 = 0;
   double _absorbance_value2 = 0;
@@ -1512,17 +1512,17 @@ class _TestPageState extends State<TestPage>
                           maxY: 0.06,
                           titlesData: FlTitlesData(
                             leftTitles: AxisTitles(
-                              axisNameWidget: Padding(
-                                padding: const EdgeInsets.only(bottom: 1.0),
-                                child: Text(
-                                  "Abs. Value",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color.fromARGB(255, 1, 90, 77),
-                                  ),
-                                ),
-                              ),
+                              // axisNameWidget: Padding(
+                              //   padding: const EdgeInsets.only(bottom: 1.0),
+                              //   child: Text(
+                              //     "Abs. Value",
+                              //     style: TextStyle(
+                              //       fontSize: 14,
+                              //       fontWeight: FontWeight.bold,
+                              //       color: Color.fromARGB(255, 1, 90, 77),
+                              //     ),
+                              //   ),
+                              // ),
                               sideTitles: SideTitles(
                                 showTitles: true,
                                 reservedSize: 40,
@@ -1532,7 +1532,7 @@ class _TestPageState extends State<TestPage>
                                     "10mOD", // Custom text instead of Y-axis values
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 10,
                                       color: Color.fromARGB(255, 0, 112, 110),
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -1544,7 +1544,7 @@ class _TestPageState extends State<TestPage>
                               axisNameWidget: Padding(
                                 padding: const EdgeInsets.only(top: 0.0),
                                 child: Text(
-                                  "Time",
+                                  "RT",
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,

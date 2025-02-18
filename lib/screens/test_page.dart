@@ -1529,7 +1529,7 @@ class _TestPageState extends State<TestPage>
                                 interval: 0.2,
                                 getTitlesWidget: (value, meta) {
                                   return Text(
-                                    value.toStringAsFixed(1),
+                                    "10mOD", // Custom text instead of Y-axis values
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 12,

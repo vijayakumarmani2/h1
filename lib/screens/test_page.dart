@@ -35,8 +35,8 @@ class _TestPageState extends State<TestPage>
 
   int _adc_value1 = 1; // To track if the action has started
   int _adc_value2 = 1;
-  int _adc_value1_blank = 31200;
-  int _adc_value2_blank = 26000;
+  int _adc_value1_blank = 31200;  // 500nm
+  int _adc_value2_blank = 26000;  // 415nm
   var _absorbance_value = "0.0";
   double _absorbance_value1 = 0;
   double _absorbance_value2 = 0;
@@ -457,10 +457,10 @@ class _TestPageState extends State<TestPage>
             calculateAbsorbance(_adc_value2, _adc_value2_blank);
 
         if (_absorbance_value1 < 0) {
-          _absorbance_value1 = 0.000;
+          _absorbance_value1 = 0.007;
         }
         if (_absorbance_value2 < 0) {
-          _absorbance_value2 = 0.000;
+          _absorbance_value2 = 0.007;
         }
 
 

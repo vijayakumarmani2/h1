@@ -36,7 +36,7 @@ class _TestPageState extends State<TestPage>
   int _adc_value1 = 1; // To track if the action has started
   int _adc_value2 = 1;
   int _adc_value1_blank = 31200;
-  int _adc_value2_blank = 25000;
+  int _adc_value2_blank = 26000;
   var _absorbance_value = "0.0";
   double _absorbance_value1 = 0;
   double _absorbance_value2 = 0;

@@ -456,10 +456,19 @@ class _TestPageState extends State<TestPage>
         _absorbance_value2 =
             calculateAbsorbance(_adc_value2, _adc_value2_blank);
 
+        if (_absorbance_value1 < 0) {
+          _absorbance_value1 = 0.000;
+        }
+        if (_absorbance_value2 < 0) {
+          _absorbance_value2 = 0.000;
+        }
+
+
         _absorbance_value = ((_absorbance_value1 - _absorbance_value2).abs())
             .toStringAsFixed(4);
         secs++;
-        addFlSpot(secs.toDouble(), double.parse(_absorbance_value2.toStringAsFixed(6)) );
+        addFlSpot(secs.toDouble(),
+            double.parse(_absorbance_value2.toStringAsFixed(6)));
         print(
             "absorbance value: $_absorbance_value, ($_absorbance_value1 - $_absorbance_value2)");
 // Add the current absorbance data to the list
@@ -473,7 +482,7 @@ class _TestPageState extends State<TestPage>
         //   'time': secs,
         //   'absorbance_value': _absorbance_value,
         // });
-         _updatePressureValues();   // for random values
+        _updatePressureValues(); // for random values
 
         if (runningTime == 0) {
           var sid = cards[sampleNumber - 1]['sampleName'];
@@ -974,12 +983,16 @@ class _TestPageState extends State<TestPage>
                                                               FontWeight.w700,
                                                           fontSize: 18,
                                                           color: isHighlighted
-                                                            ? Color.fromARGB(251, 253, 253, 253)
-                                                            : Color.fromARGB(
-                                                              255,
-                                                              0,
-                                                              112,
-                                                              110), // Darker text color
+                                                              ? Color.fromARGB(
+                                                                  251,
+                                                                  253,
+                                                                  253,
+                                                                  253)
+                                                              : Color.fromARGB(
+                                                                  255,
+                                                                  0,
+                                                                  112,
+                                                                  110), // Darker text color
                                                         ),
                                                       ),
                                                     ),
@@ -1509,7 +1522,7 @@ class _TestPageState extends State<TestPage>
                           minX: 0,
                           maxX: 130,
                           minY: 0.00,
-                          maxY: 0.06,
+                          maxY: 0.2,
                           titlesData: FlTitlesData(
                             leftTitles: AxisTitles(
                               // axisNameWidget: Padding(
@@ -1555,7 +1568,7 @@ class _TestPageState extends State<TestPage>
                               sideTitles: SideTitles(
                                 showTitles: true,
                                 reservedSize: 30,
-                                interval: 20,
+                                interval: 10,
                                 getTitlesWidget: (value, meta) {
                                   return Text(
                                     value.toStringAsFixed(0),

@@ -1521,8 +1521,8 @@ class _TestPageState extends State<TestPage>
                         LineChartData(
                           minX: 0,
                           maxX: 130,
-                          minY: 0.00,
-                          maxY: 0.2,
+                          minY: 0.007,
+                          maxY: 0.10,
                           titlesData: FlTitlesData(
                             leftTitles: AxisTitles(
                               // axisNameWidget: Padding(

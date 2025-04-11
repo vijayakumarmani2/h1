@@ -35,8 +35,8 @@ class _TestPageState extends State<TestPage>
 
   int _adc_value1 = 1; // To track if the action has started
   int _adc_value2 = 1;
-  int _adc_value1_blank = 26300;  // 500nm
-  int _adc_value2_blank = 21300;  // 415nm
+  int _adc_value1_blank = 26300; // 500nm
+  int _adc_value2_blank = 21300; // 415nm
 
   // int _adc_value1_blank = 31200;  // 500nm
   // int _adc_value2_blank = 26000;  // 415nm
@@ -299,6 +299,8 @@ class _TestPageState extends State<TestPage>
   }
 
   void fetchBlankFromHardware() {
+     logEvent('info', "Sending blank command processing.",
+          page: 'test_page');
     if (serialReader != null) {
       final message = "BLANK"; // send blank command
       serialReader!.port?.write(Uint8List.fromList(message.codeUnits));
@@ -364,10 +366,12 @@ class _TestPageState extends State<TestPage>
     //   });
     //   sampleIds.add(sampleId);
     // }
-// Send sample blank command to hardware
-    //   fetchBlankFromHardware();
 
-    sendSampleCountToHardware(cards.length);
+// Send sample blank command to hardware
+
+    fetchBlankFromHardware();
+
+    // sendSampleCountToHardware(cards.length);
 
     // Wait for "Started 1" signal from hardware
     logEvent('info', 'Process started with ${cards.length} samples.',
@@ -408,19 +412,16 @@ class _TestPageState extends State<TestPage>
         logEvent('error', 'Failed to parse sample number from: $data',
             page: 'test_page');
       }
-    }
-    // else if (data.contains("BENDED")) {
-    //   print("The string contains 'BENDED'");
-    //   sleep(1 as Duration);
-    //   // Send sample count to hardware
-    //   sendSampleCountToHardware(cards.length);
-    // }
-
-    else if (isTemperatureData(data)) {
-      logEvent('info', 'Temperature data: $data', page: 'test_page');
-      log.add('Temperature data: $data');
-      _temp_val = data;
-    } else if (isAbsorbanceData1(data)) {
+    } else if (data.contains("BENDED")) {
+      print("The string contains 'BENDED'");
+      logEvent('info', "Blank ended processing.",
+          page: 'test_page');
+      sleep(1 as Duration);
+      // Send sample count to hardware
+       logEvent('info', "Sending sample processing.",
+          page: 'test_page');
+      sendSampleCountToHardware(cards.length);
+    }else if (isAbsorbanceData1(data)) {
       _adc_value1 = int.parse(data.substring(1, data.length));
     } else if (isAbsorbanceData2(data)) {
       _adc_value2 = int.parse(data.substring(1, data.length));
@@ -428,8 +429,25 @@ class _TestPageState extends State<TestPage>
       _adc_value1_blank = int.parse(data.substring(1, data.length));
     } else if (isBlank2(data)) {
       _adc_value2_blank = int.parse(data.substring(1, data.length));
-    } else {
+    } else if (isTemperatureData(data)) {
+      logEvent('info', 'Temperature data: $data', page: 'test_page');
+      log.add('Temperature data: $data');
+      _temp_val = data;
+    } else if (isPressureData(data)) {
+      logEvent('info', 'Pressure data: $data', page: 'test_page');
+      log.add('Pressure data: $data');
+      setState(() {
+        // Generate a new random Y value between 6 and 7.5
+        pressure_val = data; // Round to 2 decimal places
+      });
+    }  else {
       logEvent('warning', 'Unknown data format: $data', page: 'test_page');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Unknown data format: $data'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -466,7 +484,6 @@ class _TestPageState extends State<TestPage>
           _absorbance_value2 = 0.007;
         }
 
-
         _absorbance_value = ((_absorbance_value1 - _absorbance_value2).abs())
             .toStringAsFixed(4);
         secs++;
@@ -485,7 +502,7 @@ class _TestPageState extends State<TestPage>
         //   'time': secs,
         //   'absorbance_value': _absorbance_value,
         // });
-        _updatePressureValues(); // for random values
+        //_updatePressureValues(); // for random values
 
         if (runningTime == 0) {
           var sid = cards[sampleNumber - 1]['sampleName'];
@@ -571,6 +588,11 @@ class _TestPageState extends State<TestPage>
     return data.startsWith('T') || data.length < 5;
   }
 
+  bool isPressureData(String data) {
+    // Example logic for temperature data
+    return data.startsWith('P') || data.length <= 5;
+  }
+
   bool isAbsorbanceData1(String data) {
     // Example logic for absorbance data
     return data.startsWith('A') || data.length >= 8;
@@ -583,12 +605,18 @@ class _TestPageState extends State<TestPage>
 
   bool isBlank1(String data) {
     // Example logic for absorbance data
-    print("f");
+   // print("Blank1 data: $data");
+    logEvent('info', "Blank1 data: $data",
+        page: 'test_page');
+
     return data.startsWith('C') || data.length >= 8;
   }
 
   bool isBlank2(String data) {
     // Example logic for absorbance data
+     // print("Blank1 data: $data");
+      logEvent('info', "Blank2 data: $data",
+        page: 'test_page');
     return data.startsWith('D') || data.length >= 8;
   }
 
@@ -603,15 +631,15 @@ class _TestPageState extends State<TestPage>
     });
   }
 
-  void _updatePressureValues() {
-    final random = Random();
-    setState(() {
-      // Generate a new random Y value between 6 and 7.5
-      double newY = 6 + (random.nextDouble() * (6.3 - 6));
-      pressure_val = double.parse(newY.toStringAsFixed(2))
-          .toString(); // Round to 2 decimal places
-    });
-  }
+  // void _updatePressureValues() {
+  //   final random = Random();
+  //   setState(() {
+  //     // Generate a new random Y value between 6 and 7.5
+  //     double newY = 6 + (random.nextDouble() * (6.3 - 6));
+  //     pressure_val = double.parse(newY.toStringAsFixed(2))
+  //         .toString(); // Round to 2 decimal places
+  //   });
+  // }
 
   String calculatePercentageArea(
       List<FlSpot> dataPoints, double startRange, double endRange) {
@@ -1525,7 +1553,7 @@ class _TestPageState extends State<TestPage>
                           minX: 0,
                           maxX: 130,
                           minY: 0.007,
-                          maxY: 0.10,
+                          maxY: 0.20,
                           titlesData: FlTitlesData(
                             leftTitles: AxisTitles(
                               // axisNameWidget: Padding(

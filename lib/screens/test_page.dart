@@ -402,7 +402,7 @@ class _TestPageState extends State<TestPage>
         logEvent('error', 'Failed to parse sample number from: $data',
             page: 'test_page');
       }
-    } else if (data == "ENDED") {
+    } else if (data.contains("ENDED")) {
       final sampleNumber = int.tryParse(data.split(" ")[1]);
       if (sampleNumber != null) {
         print("Hardware ended processing Sample $sampleNumber.");
@@ -412,8 +412,8 @@ class _TestPageState extends State<TestPage>
         logEvent('error', 'Failed to parse sample number from: $data',
             page: 'test_page');
       }
-    } else if (data == "BENDED") {
-      print("The string contains 'BENDED'");
+    } else if (data.contains("BLDONE")) {
+      print("The string contains 'BLDONE'");
       logEvent('info', "Blank ended processing.",
           page: 'test_page');
       //sleep(1 as Duration);

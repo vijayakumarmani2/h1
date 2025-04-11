@@ -416,7 +416,7 @@ class _TestPageState extends State<TestPage>
       print("The string contains 'BENDED'");
       logEvent('info', "Blank ended processing.",
           page: 'test_page');
-      sleep(1 as Duration);
+      //sleep(1 as Duration);
       // Send sample count to hardware
        logEvent('info', "Sending sample processing.",
           page: 'test_page');

@@ -477,10 +477,10 @@ class _TestPageState extends State<TestPage>
         _absorbance_value2 =
             calculateAbsorbance(_adc_value2, _adc_value2_blank);
 
-        if (_absorbance_value1 < 0) {
+        if (_absorbance_value1 < 0.007) {
           _absorbance_value1 = 0.007;
         }
-        if (_absorbance_value2 < 0) {
+        if (_absorbance_value2 < 0.007) {
           _absorbance_value2 = 0.007;
         }
 
@@ -507,6 +507,10 @@ class _TestPageState extends State<TestPage>
         if (runningTime == 0) {
           var sid = cards[sampleNumber - 1]['sampleName'];
           var typeofsample = cards[sampleNumber - 1]['type'];
+      final String area_1 = calculatePercentageArea(spots, 49, 61);
+      print("Area under the curve from 49 to 61 seconds: $area_1");
+      final String area_2 = calculatePercentageArea(spots, 0, 120);
+      print("Area under the curve from 0 to 120 seconds: $area_2");
 
           final jsonData = jsonEncode({"data": absorbanceJsonData});
 
@@ -655,6 +659,7 @@ class _TestPageState extends State<TestPage>
         final trapezoidArea = (x2 - x1) * ((y1 + y2) / 2);
         area += trapezoidArea;
       }
+     // print("Area under the curve from 49 to 61 seconds: $area");
       return area;
     }
 

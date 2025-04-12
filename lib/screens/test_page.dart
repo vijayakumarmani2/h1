@@ -41,6 +41,7 @@ class _TestPageState extends State<TestPage>
   // int _adc_value1_blank = 31200;  // 500nm
   // int _adc_value2_blank = 26000;  // 415nm
   var _absorbance_value = "0.0";
+  double _absorbance_value_final = 0;
   double _absorbance_value1 = 0;
   double _absorbance_value2 = 0;
 
@@ -484,25 +485,23 @@ class _TestPageState extends State<TestPage>
         //  _absorbance_value2 = 0.007;
         //}
 
-        double _absorbance_value_final = (_absorbance_value1 - _absorbance_value2).abs();
+         _absorbance_value_final = (_absorbance_value1 - _absorbance_value2).abs();
 
 if (_absorbance_value_final < 0.007) {
   _absorbance_value_final = 0.007;
 }
 
-_absorbance_value = _absorbance_value_final.toStringAsFixed(6);
+// _absorbance_value = _absorbance_value_final.toStringAsFixed(6);
 
         secs++;
-        //addFlSpot(secs.toDouble(),
-        //    double.parse(_absorbance_value2.toStringAsFixed(6)));
-        addFlSpot(secs.toDouble(),
-            double.parse(_absorbance_value);
+        //addFlSpot(secs.toDouble(),double.parse(_absorbance_value2.toStringAsFixed(6)));
+        addFlSpot(secs.toDouble(), double.parse(_absorbance_value_final.toStringAsFixed(6)));
         print(
-            "absorbance value: $_absorbance_value, ($_absorbance_value1 - $_absorbance_value2)");
+            "absorbance value: $_absorbance_value_final.toStringAsFixed(6), ($_absorbance_value1 - $_absorbance_value2)");
 // Add the current absorbance data to the list
         absorbanceJsonData.add({
           "secs": secs,
-          "absorbance_value": _absorbance_value.toString(),
+          "absorbance_value": _absorbance_value_final.toString(),
         });
         // Save absorbance value to the database
         // DatabaseHelper.instance.insertAbsorbance({
@@ -1823,7 +1822,7 @@ print("Total area of 120 datapoints: $totalArea");
                                             color: Colors.purple, size: 32),
                                         SizedBox(height: 8),
                                         Text(
-                                          '${_absorbance_value.toStringAsFixed(6)}',
+                                          '${_absorbance_value_final.toStringAsFixed(6)}',
                                           style: TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w600,

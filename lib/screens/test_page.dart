@@ -490,7 +490,7 @@ if (_absorbance_value_final < 0.007) {
   _absorbance_value_final = 0.007;
 }
 
-_absorbance_value = _absorbance_value_final.toStringAsFixed(4);
+_absorbance_value = _absorbance_value_final.toStringAsFixed(6);
 
         secs++;
         //addFlSpot(secs.toDouble(),
@@ -502,7 +502,7 @@ _absorbance_value = _absorbance_value_final.toStringAsFixed(4);
 // Add the current absorbance data to the list
         absorbanceJsonData.add({
           "secs": secs,
-          "absorbance_value": _absorbance_value2.toString(),
+          "absorbance_value": _absorbance_value.toString(),
         });
         // Save absorbance value to the database
         // DatabaseHelper.instance.insertAbsorbance({
@@ -1823,7 +1823,7 @@ print("Total area of 120 datapoints: $totalArea");
                                             color: Colors.purple, size: 32),
                                         SizedBox(height: 8),
                                         Text(
-                                          '${_absorbance_value2.toStringAsFixed(6)}',
+                                          '${_absorbance_value.toStringAsFixed(6)}',
                                           style: TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w600,

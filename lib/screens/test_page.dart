@@ -477,18 +477,26 @@ class _TestPageState extends State<TestPage>
         _absorbance_value2 =
             calculateAbsorbance(_adc_value2, _adc_value2_blank);
 
-        if (_absorbance_value1 < 0.007) {
-          _absorbance_value1 = 0.007;
-        }
-        if (_absorbance_value2 < 0.007) {
-          _absorbance_value2 = 0.007;
-        }
+       // if (_absorbance_value1 < 0.007) {
+       //   _absorbance_value1 = 0.007;
+       // }
+        // if (_absorbance_value2 < 0.007) {
+        //  _absorbance_value2 = 0.007;
+        //}
 
-        _absorbance_value = ((_absorbance_value1 - _absorbance_value2).abs())
-            .toStringAsFixed(4);
+        double _absorbance_value_final = (_absorbance_value1 - _absorbance_value2).abs();
+
+if (_absorbance_value_final < 0.007) {
+  _absorbance_value_final = 0.007;
+}
+
+_absorbance_value = _absorbance_value_final.toStringAsFixed(4);
+
         secs++;
+        //addFlSpot(secs.toDouble(),
+        //    double.parse(_absorbance_value2.toStringAsFixed(6)));
         addFlSpot(secs.toDouble(),
-            double.parse(_absorbance_value2.toStringAsFixed(6)));
+            double.parse(_absorbance_value);
         print(
             "absorbance value: $_absorbance_value, ($_absorbance_value1 - $_absorbance_value2)");
 // Add the current absorbance data to the list
@@ -665,7 +673,7 @@ class _TestPageState extends State<TestPage>
 
     // Calculate total area for all points
     double totalArea = calculateArea(dataPoints);
-
+print("Total area of 120 datapoints: $totalArea");
     // Filter points in the given range
     final filteredPoints = dataPoints
         .where((point) => point.x >= startRange && point.x <= endRange)
